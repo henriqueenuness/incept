@@ -28,7 +28,7 @@ SECRET_KEY = 'batata_frita'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', '74.220.49.0/24', '74.220.57.0/24']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000']
 
 
 # Application definition
@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'incept.urls'
@@ -129,6 +130,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 """STATICFILES_DIRS = [BASE_DIR / "static"]"""
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 LOGOUT_REDIRECT_URL = "login_pg"
 
