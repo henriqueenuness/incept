@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incept Edit Core</title>
+</head>
+<body>
+    <form method="POST" action="{% url 'change_core' %}">
+        {% csrf_token %}
+        <input name="real_name" placeholder="Nome Real(opcional)" value="{{user.real_name}}">
+        <input name="bio" placeholder="Breve biografia sobre você" value="{{user.bio}}">
+        <select name="art_style" value="{{user.art_style}}">
+            <option value="{{user.art_style}}" selected disabled>{{user.art_style|default_if_none:"selecionar"}}</option>
+            <optgroup label="música">
+                <option value="música clássica">música clássica</option>
+                <option value="jazz">jazz</option>
+                <option value="blues">blues</option>
+                <option value="gospel">gospel</option>
+                <option value="soul">soul</option>
+                <option value="pop">pop</option>
+                <option value="rock">rock</option>
+                <option value="country">country</option>
+            </optgroup>
+            <optgroup label="pintura/desenho">
+                <option value="desenhista 2D">desenhista 2D</option>
+                <option value="realismo">realismo</option>
+                <option value="cartoon">cartoon</option>
+                <option value="manga">mangá</option>
+                <option value="chibi">chibi</option>
+                <option value="caricatura">caricatura</option>
+                <option value="doodleArt">doodleArt</option>
+                <option value="surrealismo">surrealismo</option>
+                <option value="modelador 3D">modelador 3D</option>
+            </optgroup>
+            <optgroup label="audiovisual">
+                <option value="videomaker">videomaker</option>
+                <option value="editor de vídeos">editor de vídeos</option>
+                <option value="filmmaker">filmmaker</option>
+                <option value="roteirista">roteirista</option>
+                <option value="designergrafico">designer gráfico</option>
+                <option value="editor de fotos">editor de fotos</option>
+                <option value="colorista">colorista</option>
+                <option value="motion designer">motion designer</option>
+            </optgroup>
+        </select>
+        <button type="submit">pronto</button>
+    </form>
+    {% if user.is_authenticated%}
+    <p>{{user.real_name|default_if_none:""}}</p>
+    <p>{{user.bio|default_if_none:""}}</p>
+    <a href="{% url 'core_pg' %}">voltar</a>
+    <a href="{% url 'logout' %}">logout</a>
+    {%else%}
+        <a href="{% url 'login_pg' %}">fazer login</a>
+    {%endif%}
+</body>
+</html>

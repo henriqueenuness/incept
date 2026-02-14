@@ -1,0 +1,41 @@
+"""
+URL configuration for incept project.
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/6.0/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.contrib import admin
+from django.urls import path
+from signin import views as signin_views
+from feed import views as feed_views
+
+urlpatterns = [
+    path('', signin_views.home, name='home'),
+    path('signup/',signin_views.signup_pg, name='signup_pg'),
+    path('signup/auth/', signin_views.signup, name='signup'),
+    path('login/',signin_views.login_pg, name='login_pg'),
+    path('login/auth/', signin_views.login_auth, name='login'), #essa pagina nao existe, mas a funcao dela faz login do user
+    path('logout/',signin_views.make_logout, name='logout'),
+    path('users_list/',signin_views.users_list_pg, name='users_list'),
+
+    path('explore/', signin_views.explore_pg, name='explore_pg'),
+    path('explore/search/', feed_views.search_user, name='search_user'),
+    path('core/user/<str:nick>/', feed_views.enter_core, name="enter_core"),
+    path('core/', signin_views.core_pg, name='core_pg'),
+    path('core/edit-core/', signin_views.edit_core, name='edit_core'),
+    path('core/edit-core/post', signin_views.change_core, name='change_core'),
+    path('admin/', admin.site.urls),
+    #rota, view, nome da rota
+    #caminho pra pagina, view = arquivo com a função pra renderizar a pagina.nome da função, nome que vai ser procurado pra executar o url
+    
+]

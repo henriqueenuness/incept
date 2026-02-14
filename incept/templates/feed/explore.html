@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incept Explore</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+        body{
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #151515;
+            max-width: 100vw;
+            margin: 0;
+            padding-top: 20px;
+        }
+        .profileandnick{
+            display: flex;
+            align-items: center;
+            gap:5px;
+        }
+        .user{
+            display: flex;
+            background: black;
+            border-radius:15px;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap:5px;
+            padding:0 5px;
+            margin: 5px auto;
+            border: 1px solid #878383;
+            width: 620px;
+        }
+
+        .profile-circle{
+            background: gray;
+            height: 40px;
+            border-radius: 100%;
+            width: 40px;
+        }
+        .feed{
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        form{
+            min-height: 50px;
+            max-width: 630px;
+            min-width: 630px;
+            display: flex;
+            background-color: #39003F4F;
+            backdrop-filter: blur(4px);
+            border:1px solid lightgray;
+            margin: 0 auto;
+            justify-content: space-between;
+            padding: 0;
+            border:1px solid #d9d9d9;
+
+            border-radius: 15px;
+            position: sticky;
+            top: 20px;
+        }
+        .profiles{
+            position: fixed;
+            top:0;
+            display: flex;
+            flex-direction: column;
+            width: 123px;
+            justify-content: center;
+            justify-self: center;
+            align-self: flex-end;
+        }
+        .profile{
+            height: 123px;
+            width: 123px;
+            min-width: 123px;
+            min-height: 123px;
+            border-radius: 123px;
+            background: gray;
+            margin:15px 0;
+        }
+        .profile:hover{
+            cursor:pointer;
+        }
+        .div{
+            min-height: 400px;
+            max-width: 400px;
+            min-width: 400px;
+            justify-self: center;
+            align-self: center;
+            background:gray;
+            margin: 10px;
+        }
+        button{
+            background: none;
+            color:white;
+            font-family: 'montserrat';
+            border-radius: 30px;
+            width: 30px;
+            border: none;
+        }
+        input, p, h6, h5, h4, h3, h2, h1{
+            color: white;
+            font-family: 'montserrat';
+        }
+        input{
+            background: none;
+            border:none;
+            font-size: 24px;
+            margin:5px;
+            width: 100%;
+            font-size: 13px;
+        }
+        .side-menu{
+            position: fixed;
+            left:0;
+            top: 0;
+            background: #39003F4F;
+            width: 530px;
+            height: 100vh;
+        }
+        input:focus{
+            outline:none;
+        }
+        .answer{
+            display: flex;
+            margin: 0 auto;
+            padding:0;
+            align-items: left;
+            width: 630px;
+            flex-direction: column;
+        }
+        h2{
+            font-size: 64px;
+            margin: 0 auto;
+            margin-top: 41px;
+            text-align: center;
+        }
+        .follow{
+            font-weight: bold;
+            color:#d9d9d9;
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="side-menu">
+        <h2>-Incept.</h2>
+    </div>
+    <form action ='{% url "search_user" %}' method="GET">
+        {% csrf_token %}
+        <input name="search" placeholder="Looking for something new?" value="{{ search }}">
+        <button type="submit"></button>
+    </form>
+    <div class="answer">
+        {% for user in users %}
+        <div class="user">
+            <div class="profileandnick">
+                <div class="profile-circle"></div>
+                <a href="{% url 'enter_core' nick=user.nick %}">@{{ user.nick }}</a>
+            </div><button class="follow">+Seguir</button>
+        </div>
+        {% empty %}
+        {% endfor %}
+    </div>
+    <div class="profiles" id="essa parte deveria scrollar">
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+        <div class="profile"></div>
+
+    </div>
+    <div class="feed">
+            <div class="div">0</div>
+    <div class="div">1</div>
+    <div class="div">2</div>
+    <div class="div">3</div>
+    <div class="div">4</div>
+    <div class="div">5</div>
+    </div>
+
+</body>
+</html>

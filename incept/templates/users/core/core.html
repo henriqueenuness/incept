@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incept Core</title>
+</head>
+<body>
+    <div class="core">
+        <div class="top-core">
+            <p class="nick">@{{user.nick}}</p>
+            {% if request.user.nick == user.nick %}
+            <a href="{% url 'edit_core' %}">editar core</a>
+            {% endif %}
+        </div>
+        <p class="real_name">{{user.real_name|default_if_none:""}}</p>
+        <p class="bio">{{user.bio|default_if_none:""}}</p>
+        <p>{{user.art_style|default_if_none:""}}</p>
+    </div>
+
+
+</body>
+<style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    body{
+        background: #151515;
+        color:white;
+        font-family: 'montserrat';
+    }
+    .core{
+        display: flex;
+        flex-direction: column;
+        margin:0;
+        width: 500px;
+    }
+    .nick{
+        font-weight: bold;
+        font-size: 48px;
+    }
+    .top-core{
+        display: flex;
+        margin:0;
+        padding:0;
+        gap:15px;
+        margin: 0;
+        align-items: center;
+    }
+    .real_name{
+        font-size: 25px;
+        color:#878383;
+    }
+    p{
+        margin: 0;
+        padding: 0;
+    }
+    .bio{
+        font-size: 20px;
+        width: 500px;
+    }
+    a{
+        color:#3838FF;
+        text-decoration: none;
+    }
+</style>
+</html>
