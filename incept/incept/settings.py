@@ -28,7 +28,7 @@ SECRET_KEY = 'batata_frita'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000','https://incept-7o6d.onrender.com']
 
 
 # Application definition
@@ -80,7 +80,16 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config( 
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}' )
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}' ),
+        
+    'render': {
+        'ENGINE': 'django.db.backends.postgresql', 
+        'NAME': 'postergres',
+        'USER': 'incept_user',
+        'PASSWORD': 'o4xOMd7LRdahXVB7F17YBOkhNrQalTkz',
+        'HOST': 'dpg-d67sfijnv86c73e1u8mg-a',
+        'PORT':'5432',
+    }
 }
 
 """    'supabase': { 
