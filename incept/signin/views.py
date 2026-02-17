@@ -1,6 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from .models import User
+import base64
+from .models import base64image
+from django.http import HttpResponse
 
 
 # Create your views here.
@@ -82,6 +85,21 @@ def users_list_pg(request):
 
 def new_post_pg(request):
     return render(request, 'users/core/new_post.html')
+
+
+
+
+
+def publish_post(request):
+    if request.method == 'POST':
+        description = request.POST.get('post_description')
+        img = request.FILES.get('post_image')
+        if img:
+            img_b64 = base64.b64encode(img.read()).decode('utf-8')
+            base64image.objects.create(description=description, image=img_b64)
+            return redirect('core_pg')
+        else:
+            return HttpResponse('erro: algo deu errado')
 
 
 """def users_list(request):

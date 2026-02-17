@@ -6,8 +6,9 @@
     <title>Document</title>
 </head>
 <body>
-    <form action="{% url 'new_post_post' %}" method="POST">
-        <input name="post_image" type="image">
+    <form action="{% url 'publish_post' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="post_image">
         <input type="text" name="post_description"></input>
         <button type="submit">Enviar</button>
     </form>

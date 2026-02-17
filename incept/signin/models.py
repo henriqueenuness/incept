@@ -74,3 +74,10 @@ class User(AbstractBaseUser):
     objects = UserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['nick']
+
+
+class base64image(models.Model):
+    description = models.CharField(max_length=255)
+    image = models.TextField(null=True)
+    def __str__(self):
+        return self.description
