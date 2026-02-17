@@ -11,6 +11,7 @@
             <p class="nick">@{{user.nick}}</p>
             {% if request.user.nick == user.nick %}
             <a href="{% url 'edit_core' %}">editar core</a>
+            <a href="{% url 'new_post_pg' %}">new post</a>
             {% endif %}
         </div>
         <p class="real_name">{{user.real_name|default_if_none:""}}</p>

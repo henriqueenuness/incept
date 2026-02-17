@@ -79,17 +79,20 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config( 
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}' ),
 
-    'supabase': { 
+    'default': { 
         'ENGINE': 'django.db.backends.postgresql', 
         'NAME': 'postgres', 
         'USER': 'postgres', 
         'PASSWORD': 'incept2026*', 
         'HOST': 'db.sloqpnvutcreuxstuldh.supabase.co', 
         'PORT': '5432', 
-        }
+        },
+
+    'local': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

@@ -34,6 +34,8 @@ urlpatterns = [
     path('core/', signin_views.core_pg, name='core_pg'),
     path('core/edit-core/', signin_views.edit_core, name='edit_core'),
     path('core/edit-core/post', signin_views.change_core, name='change_core'),
+
+    path('core/new-post/', signin_views.new_post_pg, name='new_post_pg'),
     path('admin/', admin.site.urls),
     #rota, view, nome da rota
     #caminho pra pagina, view = arquivo com a função pra renderizar a pagina.nome da função, nome que vai ser procurado pra executar o url

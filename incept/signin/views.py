@@ -80,7 +80,8 @@ def users_list_pg(request):
     return render(request, 'users/users_list.html')
 
 
-
+def new_post_pg(request):
+    return render(request, 'users/core/new_post.html')
 
 
 """def users_list(request):

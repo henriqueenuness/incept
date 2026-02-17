@@ -13,13 +13,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
     art_type = models.TextField(max_length=30, null=True)"""
 
 
-class UserManager(BaseUserManager):
-    def create_user(self,email, password=None, **extra_fields):
+class UserManager(BaseUserManager): #fazer cadastro
+    def create_user(self,email, password=None, **extra_fields): #**extra_fields é pra guardar tudo que vier além da senha e email
         if not email:
             raise ValueError('ta faltando o email')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
-        user.save(using=self.db)
+        user.save(using='default')
         return user
     
 class User(AbstractBaseUser):
