@@ -26,7 +26,7 @@ SECRET_KEY = 'batata_frita'
 #SECRET_KEY = 'django-insecure-s)a@ly@c2x#7i$6z%pxq*#4bzaa8n93ccuqg332luwjod1eh)1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000','https://incept-7o6d.onrender.com']
 
