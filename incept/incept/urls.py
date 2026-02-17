@@ -16,27 +16,28 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from signin import views as signin_views
+from accounts import views as accounts_views
 from feed import views as feed_views
 
 urlpatterns = [
-    path('', signin_views.home, name='home'),
-    path('signup/',signin_views.signup_pg, name='signup_pg'),
-    path('signup/auth/', signin_views.signup, name='signup'),
-    path('login/',signin_views.login_pg, name='login_pg'),
-    path('login/auth/', signin_views.login_auth, name='login'), #essa pagina nao existe, mas a funcao dela faz login do user
-    path('logout/',signin_views.make_logout, name='logout'),
-    path('users_list/',signin_views.users_list_pg, name='users_list'),
+    path('', accounts_views.home, name='home'),
+    path('signup/',accounts_views.signup_pg, name='signup_pg'),
+    path('signup/auth/', accounts_views.signup, name='signup'),
+    path('login/',accounts_views.login_pg, name='login_pg'),
+    path('login/auth/', accounts_views.login_auth, name='login'), #essa pagina nao existe, mas a funcao dela faz login do user
+    path('logout/',accounts_views.make_logout, name='logout'),
+    path('users_list/',accounts_views.users_list_pg, name='users_list'),
 
-    path('explore/', signin_views.explore_pg, name='explore_pg'),
+    path('explore/', accounts_views.explore_pg, name='explore_pg'),
     path('explore/search/', feed_views.search_user, name='search_user'),
     path('core/user/<str:nick>/', feed_views.enter_core, name="enter_core"),
-    path('core/', signin_views.core_pg, name='core_pg'),
-    path('core/edit-core/', signin_views.edit_core, name='edit_core'),
-    path('core/edit-core/post', signin_views.change_core, name='change_core'),
+    path('core/', accounts_views.core_pg, name='core_pg'),
+    path('core/edit-core/', accounts_views.edit_core, name='edit_core'),
+    path('core/edit-core/post', accounts_views.change_core, name='change_core'),
 
-    path('core/new-post/', signin_views.new_post_pg, name='new_post_pg'),
-    path('core/new-post/post', signin_views.publish_post, name='publish_post'),
+    path('core/new-post/', accounts_views.new_post_pg, name='new_post_pg'),
+    path('core/new-post/post', accounts_views.publish_post, name='publish_post'),
+    
     path('admin/', admin.site.urls),
     #rota, view, nome da rota
     #caminho pra pagina, view = arquivo com a função pra renderizar a pagina.nome da função, nome que vai ser procurado pra executar o url
