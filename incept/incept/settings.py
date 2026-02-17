@@ -81,26 +81,27 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config( 
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}' ),
-        
-    'render': {
-        'ENGINE': 'django.db.backends.postgresql', 
-        'NAME': 'postergres',
-        'USER': 'incept_user',
-        'PASSWORD': 'o4xOMd7LRdahXVB7F17YBOkhNrQalTkz',
-        'HOST': 'dpg-d67sfijnv86c73e1u8mg-a',
-        'PORT':'5432',
-    }
-}
 
-"""    'supabase': { 
+    'supabase': { 
         'ENGINE': 'django.db.backends.postgresql', 
         'NAME': 'postgres', 
         'USER': 'postgres', 
         'PASSWORD': 'incept2026*', 
         'HOST': 'db.sloqpnvutcreuxstuldh.supabase.co', 
         'PORT': '5432', 
-        }"""
+        }
+}
 
+
+
+"""    'render': {
+        'ENGINE': 'django.db.backends.postgresql', 
+        'NAME': 'postergres',
+        'USER': 'incept_user',
+        'PASSWORD': 'o4xOMd7LRdahXVB7F17YBOkhNrQalTkz',
+        'HOST': 'dpg-d67sfijnv86c73e1u8mg-a',
+        'PORT':'5432',
+    }"""
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
