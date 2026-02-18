@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 import base64
-from .models import base64image
+from .models import post
 from django.http import HttpResponse
 
 
@@ -63,15 +63,15 @@ def explore_pg(request):
 
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
-    imagens = base64image.objects.filter(user=user)
+    imagens = post.objects.filter(user=user)
     return render(request, "users/core/core.html", {
+        "perfil_user" : user,
          "imagens": imagens })
-
 
 
 '''def core_posts(request, nick):
     nick = request.user.user_id #pega o id do usuario com tal nick
-    imagens = base64image.objects.filter(user = user)
+    imagens = post.objects.filter(user = user)
     return render(request, "users/core/core.html", {"imagens" : imagens})'''
 
 def edit_core_pg(request):
@@ -105,14 +105,14 @@ def publish_post(request): #postar post
         if img:
             img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
 
-            if base64image.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
+            if post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
                 return HttpResponse("erro: essa postagem já foi feita")
             else:
-                base64image.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
+                post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
                 #decoded_img = base64.b64decode(img_b64, validate=True)
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
-                user.arts = base64image.objects.filter(user=user).count()
+                user.arts = post.objects.filter(user=user).count()
                 user.save() #salva a quantidade de artes do user
                 nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
                 return core_pg(request, nick)
@@ -120,7 +120,12 @@ def publish_post(request): #postar post
         else:
             return HttpResponse('erro: algo deu errado')
         
-
+def delete_post(request, id):
+    user_post = post.objects.get(id=id)
+    user_post.delete()
+    user = request.user
+    nick = user.nick
+    return core_pg(request, nick)
 
 
 '''def users_list_pg(request):

@@ -77,7 +77,7 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['nick']
 
 
-class base64image(models.Model):
+class post(models.Model):
     description = models.CharField(max_length=255)
     image = models.TextField(null=True)
     def __str__(self):

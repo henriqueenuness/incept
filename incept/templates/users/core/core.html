@@ -8,42 +8,37 @@
 <body>
     <div class="core">
         <div class="top-core">
-            <p class="nick">@{{user.nick}}</p>
-            {% if request.user.nick == user.nick %}
+            <p class="nick">@{{perfil_user.nick}}</p>
+            <p class="real_name">{{user.real_name|default_if_none:""}}</p>
+            <p class="bio">{{user.bio|default_if_none:""}}</p>
+            <p>{{user.art_style|default_if_none:""}}</p>
+            <div class="div">
+                <p>seguidores {{user.followers|default_if_none:"0"}}</p>
+                <p>seguindo {{user.following|default_if_none:"0"}}</p>
+            </div>
+        </div>
+            {% if perfil_user.nick == user.nick %}
                 {% if request.user.cargo == "cliente" %}
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                     <p>voce é cliente</p>
-                    <p class="real_name">{{user.real_name|default_if_none:""}}</p>
-                    <p class="bio">{{user.bio|default_if_none:""}}</p>
-                    <p>{{user.art_style|default_if_none:""}}</p>
-                    <div class="div">
-                        <p>seguidores {{user.followers|default_if_none:"0"}}</p>
-                        <p>seguindo {{user.following|default_if_none:"0"}}</p>
-                    </div>
                 {% else %}
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                     <a href="{% url 'new_post_pg' user.nick %}">new post</a>
-                    <p class="real_name">{{user.real_name|default_if_none:""}}</p>
-                    <p class="bio">{{user.bio|default_if_none:""}}</p>
-                    <p>{{user.art_style|default_if_none:""}}</p>
-                    <div class="div">
-                        <p>seguidores {{user.followers|default_if_none:"0"}}</p>
-                        <p>seguindo {{user.following|default_if_none:"0"}}</p>
-                        <p>artes {{user.arts|default_if_none:"0"}}</p>
-                    </div>
                 {% endif %}
             {% endif %}
         </div>
     </div>
     <div class="main-core">
         {% for img in imagens %}
-        <div class="post">
-        <img src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
-        <p>{{img.description}}</p>
-        </div>
-
+            <div class="post">
+                <img class="img-post" src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
+                <p>{{img.description}}</p>
+                {% if perfil_user.nick == user.nick %}
+                    <a href="{% url 'delete_post' img.id %}">delete post</a>
+                {% endif %}
+            </div>
         {% empty %}
-        <p>nada ainda</p>
+            <p>nada ainda</p>
         {% endfor %}
     </div>
 
@@ -51,6 +46,24 @@
 <style>
 
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    .post{
+        max-width: 500px;
+        max-height: 500px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction:column;
+        margin: 10px;
+    }
+    .main-core{
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .img-post{
+        display: flex;
+        max-width: 400px;
+        max-height: 400px;
+        border-radius: 15px;
+    }
     body{
         background: #151515;
         color:white;
