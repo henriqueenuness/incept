@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 import base64
@@ -48,7 +48,7 @@ def login_auth(request): #login usuario
             # se der algum erro, volta pro cadastro
 
 
-        
+
 
 
 
@@ -61,13 +61,23 @@ def explore_pg(request):
     return render(request, 'feed/explore.html')
 
 
-def core_pg(request):
-    return render(request, 'users/core/core.html')
+def core_pg(request, nick):
+    user = get_object_or_404(User, nick=nick)
+    imagens = base64image.objects.filter(user=user)
+    return render(request, "users/core/core.html", {
+         "imagens": imagens })
 
-def edit_core(request):
+
+
+'''def core_posts(request, nick):
+    nick = request.user.user_id #pega o id do usuario com tal nick
+    imagens = base64image.objects.filter(user = user)
+    return render(request, "users/core/core.html", {"imagens" : imagens})'''
+
+def edit_core_pg(request):
     return render(request, 'users/core/edit-core.html')
 
-def change_core(request):
+def edit_core(request): #edit core
     if request.method == "POST":
         real_name = request.POST.get('real_name')
         bio = request.POST.get('bio')
@@ -79,27 +89,42 @@ def change_core(request):
         user.save()
         return render(request, 'users/core/edit-core.html', {'user': request.user})
 
-def users_list_pg(request):
-    return render(request, 'users/users_list.html')
-
-
-def new_post_pg(request):
-    return render(request, 'users/core/new_post.html')
 
 
 
+def new_post_pg(request, nick):
+    nick = request.user.user_id
+    return render(request, 'users/core/new_post.html', {"nick" : nick})
 
 
-def publish_post(request):
+def publish_post(request): #postar post
     if request.method == 'POST':
         description = request.POST.get('post_description')
         img = request.FILES.get('post_image')
+        u_id = request.user.user_id
         if img:
-            img_b64 = base64.b64encode(img.read()).decode('utf-8')
-            base64image.objects.create(description=description, image=img_b64)
-            return redirect('core_pg')
+            img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
+
+            if base64image.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
+                return HttpResponse("erro: essa postagem já foi feita")
+            else:
+                base64image.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
+                #decoded_img = base64.b64decode(img_b64, validate=True)
+                #parte que adiciona 1 ao numero de postagens do usuario
+                user = request.user
+                user.arts = base64image.objects.filter(user=user).count()
+                user.save() #salva a quantidade de artes do user
+                nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
+                return core_pg(request, nick)
+            
         else:
             return HttpResponse('erro: algo deu errado')
+        
+
+
+
+'''def users_list_pg(request):
+    return render(request, 'users/users_list.html')'''
 
 
 """def users_list(request):
