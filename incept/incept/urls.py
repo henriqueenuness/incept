@@ -26,18 +26,24 @@ urlpatterns = [
     path('login/',accounts_views.login_pg, name='login_pg'),
     path('login/auth/', accounts_views.login_auth, name='login'), #essa pagina nao existe, mas a funcao dela faz login do user
     path('logout/',accounts_views.make_logout, name='logout'),
-    path('users_list/',accounts_views.users_list_pg, name='users_list'),
+
+    path('core/new-post/<str:nick>/', accounts_views.new_post_pg, name='new_post_pg'),
+
+    path('core/new-post/post', accounts_views.publish_post, name='publish_post'),
+
 
     path('explore/', accounts_views.explore_pg, name='explore_pg'),
     path('explore/search/', feed_views.search_user, name='search_user'),
-    path('core/user/<str:nick>/', feed_views.enter_core, name="enter_core"),
-    path('core/', accounts_views.core_pg, name='core_pg'),
-    path('core/edit-core/', accounts_views.edit_core, name='edit_core'),
-    path('core/edit-core/post', accounts_views.change_core, name='change_core'),
+    path('core/edit-core/', accounts_views.edit_core_pg, name='edit_core_pg'),
 
-    path('core/new-post/', accounts_views.new_post_pg, name='new_post_pg'),
-    path('core/new-post/post', accounts_views.publish_post, name='publish_post'),
-    
+    path('core/edit-core/post', accounts_views.edit_core, name='edit_core'),
+    path('core/user/<str:nick>/', feed_views.enter_core, name="enter_core"),
+
+    path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
+
+
+
+
     path('admin/', admin.site.urls),
     #rota, view, nome da rota
     #caminho pra pagina, view = arquivo com a função pra renderizar a pagina.nome da função, nome que vai ser procurado pra executar o url
