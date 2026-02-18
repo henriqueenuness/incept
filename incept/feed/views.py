@@ -14,7 +14,7 @@ def search_user(request):
                       {'users' : users,
                        'search' : search})
     
-def enter_core(request, nick): 
+'''def enter_core(request, nick): 
     user = User.objects.get(nick=nick) # pega direto do path
-    return render(request, 'users/core/core.html', {'user': user})
+    return render(request, 'users/core/core.html', {'user': user})'''
 

@@ -30,6 +30,7 @@ urlpatterns = [
     path('core/new-post/<str:nick>/', accounts_views.new_post_pg, name='new_post_pg'),
 
     path('core/new-post/post', accounts_views.publish_post, name='publish_post'),
+    path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
 
 
     path('explore/', accounts_views.explore_pg, name='explore_pg'),
@@ -37,7 +38,6 @@ urlpatterns = [
     path('core/edit-core/', accounts_views.edit_core_pg, name='edit_core_pg'),
 
     path('core/edit-core/post', accounts_views.edit_core, name='edit_core'),
-    path('core/user/<str:nick>/', feed_views.enter_core, name="enter_core"),
 
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
 

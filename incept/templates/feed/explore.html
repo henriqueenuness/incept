@@ -160,7 +160,7 @@
         <div class="user">
             <div class="profileandnick">
                 <div class="profile-circle"></div>
-                <a href="{% url 'enter_core' nick=user.nick %}">@{{ user.nick }}</a>
+                <a href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
             </div><button class="follow">+Seguir</button>
         </div>
         {% empty %}
