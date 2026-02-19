@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 import base64
-from .models import post
+from feed.models import post
 from django.http import HttpResponse
 
 
@@ -82,7 +82,11 @@ def edit_core(request): #edit core
         real_name = request.POST.get('real_name')
         bio = request.POST.get('bio')
         art_style = request.POST.get('art_style')
+        core_picture = request.FILES.get('core_picture')
         user = request.user
+        if core_picture:
+            core_p = base64.b64encode(core_picture.read()).decode('utf-8')
+            user.core_picture = core_p
         user.real_name = real_name
         user.bio = bio
         user.art_style = art_style
@@ -90,7 +94,10 @@ def edit_core(request): #edit core
         return render(request, 'users/core/edit-core.html', {'user': request.user})
 
 
-
+def delete_account(request):
+    user = request.user
+    user.delete()
+    return signup_pg(request)
 
 def new_post_pg(request, nick):
     nick = request.user.user_id
@@ -109,7 +116,6 @@ def publish_post(request): #postar post
                 return HttpResponse("erro: essa postagem já foi feita")
             else:
                 post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
-                #decoded_img = base64.b64decode(img_b64, validate=True)
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
                 user.arts = post.objects.filter(user=user).count()
@@ -125,6 +131,8 @@ def delete_post(request, id):
     user_post.delete()
     user = request.user
     nick = user.nick
+    user.arts = post.objects.filter(user=user).count()
+    user.save()
     return core_pg(request, nick)
 
 

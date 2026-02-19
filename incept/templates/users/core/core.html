@@ -8,6 +8,8 @@
 <body>
     <div class="core">
         <div class="top-core">
+            <div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div>
+            
             <p class="nick">@{{perfil_user.nick}}</p>
             <p class="real_name">{{user.real_name|default_if_none:""}}</p>
             <p class="bio">{{user.bio|default_if_none:""}}</p>
@@ -15,13 +17,14 @@
             <div class="div">
                 <p>seguidores {{user.followers|default_if_none:"0"}}</p>
                 <p>seguindo {{user.following|default_if_none:"0"}}</p>
+                
             </div>
         </div>
             {% if perfil_user.nick == user.nick %}
                 {% if request.user.cargo == "cliente" %}
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
-                    <p>voce é cliente</p>
                 {% else %}
+                    <p>artes {{user.arts|default_if_none:"0"}}</p>
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                     <a href="{% url 'new_post_pg' user.nick %}">new post</a>
                 {% endif %}
@@ -46,6 +49,18 @@
 <style>
 
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+    .core-picture{
+        display: flex;
+        width: 100px;
+        height: 100px;
+        margin: 0;
+        padding: 0;
+        border: 5px solid white;
+        border-radius: 100%;
+    }
+    .core-picture img{
+        border-radius: 100%;
+    }
     .post{
         max-width: 500px;
         max-height: 500px;
