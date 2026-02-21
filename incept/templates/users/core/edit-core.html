@@ -8,7 +8,7 @@
 <body>
     <form method="POST" action="{% url 'edit_core' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        <input name="core_picture" type="file" value="{{user.core_picture|default_if_none:''}}">
+        <input name="core_picture" accept="image/*" type="file" value="{{user.core_picture|default_if_none:''}}">
         <input name="real_name" placeholder="Nome Real(opcional)" value="{{user.real_name}}">
         <input name="bio" placeholder="Breve biografia sobre você" value="{{user.bio}}">
         <select name="art_style" value="{{user.art_style}}">
@@ -53,6 +53,7 @@
     <a href="{% url 'core_pg' user.nick %}">voltar</a>
     <a href="{% url 'logout' %}">logout</a>
     <a href="{% url 'delete_account' %}">me apagar da existência</a>
+    <a href="{% url 'delete_core_picture' %}">remover foto de core</a>
     {%else%}
         <a href="{% url 'login_pg' %}">fazer login</a>
     {%endif%}

@@ -8,15 +8,18 @@
 <body>
     <div class="core">
         <div class="top-core">
-            <div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div>
+            <div class="core-picture"><img src="data:image/png;base64, {{ perfil_user.core_picture }}"></div>
             
             <p class="nick">@{{perfil_user.nick}}</p>
-            <p class="real_name">{{user.real_name|default_if_none:""}}</p>
-            <p class="bio">{{user.bio|default_if_none:""}}</p>
-            <p>{{user.art_style|default_if_none:""}}</p>
+            <p class="real_name">{{perfil_user.real_name|default_if_none:""}}</p>
+            <p class="bio">{{perfil_user.bio|default_if_none:""}}</p>
+            <p>{{perfil_user.art_style|default_if_none:""}}</p>
             <div class="div">
-                <p>seguidores {{user.followers|default_if_none:"0"}}</p>
-                <p>seguindo {{user.following|default_if_none:"0"}}</p>
+                <p>seguidores {{perfil_user.followers|default_if_none:"0"}}</p>
+                <p>seguindo {{perfil_user.following|default_if_none:"0"}}</p>
+                {% if perfil_user.cargo == "artista" %}
+                    <p>artes {{perfil_user.arts|default_if_none:"0"}}</p>
+                {% endif %}
                 
             </div>
         </div>
@@ -24,7 +27,6 @@
                 {% if request.user.cargo == "cliente" %}
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                 {% else %}
-                    <p>artes {{user.arts|default_if_none:"0"}}</p>
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                     <a href="{% url 'new_post_pg' user.nick %}">new post</a>
                 {% endif %}
@@ -35,13 +37,17 @@
         {% for img in imagens %}
             <div class="post">
                 <img class="img-post" src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
+                <a href="{% url 'like' img.id %}">{{img.likes_set.count}}</a>
+                <p>{{img.date}}</p>
                 <p>{{img.description}}</p>
                 {% if perfil_user.nick == user.nick %}
                     <a href="{% url 'delete_post' img.id %}">delete post</a>
                 {% endif %}
             </div>
         {% empty %}
-            <p>nada ainda</p>
+            {%if request.user.cargo == "artista" %}
+                <p>nada ainda</p>
+            {%endif%}
         {% endfor %}
     </div>
 
@@ -51,15 +57,31 @@
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
     .core-picture{
         display: flex;
-        width: 100px;
-        height: 100px;
+        width: 300px;
+        height: calc(width);
+        background: linear-gradient(90deg, #3838FF, #151515);
         margin: 0;
-        padding: 0;
-        border: 5px solid white;
         border-radius: 100%;
+        padding: 0;
+        justify-content: center;
+        align-items: center;
+        animation: rotation 5s linear infinite;
+    }
+    @keyframes rotation{
+        0%{
+            transform: rotate(0deg);
+        }
+        100%{
+            transform: rotate(359deg);
+        }
     }
     .core-picture img{
         border-radius: 100%;
+        width: 100px;
+        height: 100px;
+        scale: .9;
+        object-fit: cover;     
+        animation: rotation 5s linear reverse infinite;   
     }
     .post{
         max-width: 500px;

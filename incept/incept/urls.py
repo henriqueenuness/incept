@@ -31,12 +31,16 @@ urlpatterns = [
 
     path('core/new-post/post', accounts_views.publish_post, name='publish_post'),
     path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
+    
 
 
     path('explore/', accounts_views.explore_pg, name='explore_pg'),
+    path('explore/like-post/<id>/', feed_views.like, name='like'),
+    path('explore/comment/<id>', feed_views.comment, name = 'comment'),
     path('explore/search/', feed_views.search_user, name='search_user'),
     path('core/edit-core/', accounts_views.edit_core_pg, name='edit_core_pg'),
     path('delete-account/', accounts_views.delete_account, name='delete_account'),
+    path('delete/core-picture/', accounts_views.delete_core_picture, name='delete_core_picture'),
     path('core/edit-core/post', accounts_views.edit_core, name='edit_core'),
 
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
