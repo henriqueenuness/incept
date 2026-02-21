@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .models import User
 import base64
-from feed.models import post
+from feed.models import Post
 from django.http import HttpResponse
 
 
@@ -58,14 +58,16 @@ def make_logout(request):
 
 
 def explore_pg(request):
-    return render(request, 'feed/explore.html')
+    post = Post.objects.all()
+    return render(request, 'feed/explore.html', {
+         "posts": post })
 
 
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
-    imagens = post.objects.filter(user=user)
+    imagens = Post.objects.filter(user=user)
     return render(request, "users/core/core.html", {
-        "perfil_user" : user,
+        "perfil_user" : user, #perfil do cabra que foi pesquisado. Isso garante que na hora de colocar dados na pagina, possa ser diferenciado user.nick de perfil_user.nick
          "imagens": imagens })
 
 
@@ -99,6 +101,13 @@ def delete_account(request):
     user.delete()
     return signup_pg(request)
 
+def delete_core_picture(request):
+    user = request.user
+    default_core_picture = User._meta.get_field("core_picture").get_default()
+    user.core_picture = default_core_picture
+    user.save()
+    return render(request, 'users/core/edit-core.html', {'user': request.user})
+
 def new_post_pg(request, nick):
     nick = request.user.user_id
     return render(request, 'users/core/new_post.html', {"nick" : nick})
@@ -112,13 +121,13 @@ def publish_post(request): #postar post
         if img:
             img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
 
-            if post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
+            if Post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
                 return HttpResponse("erro: essa postagem já foi feita")
             else:
-                post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
+                Post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
-                user.arts = post.objects.filter(user=user).count()
+                user.arts = Post.objects.filter(user=user).count()
                 user.save() #salva a quantidade de artes do user
                 nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
                 return core_pg(request, nick)
@@ -127,11 +136,11 @@ def publish_post(request): #postar post
             return HttpResponse('erro: algo deu errado')
         
 def delete_post(request, id):
-    user_post = post.objects.get(id=id)
+    user_post = Post.objects.get(id=id)
     user_post.delete()
     user = request.user
     nick = user.nick
-    user.arts = post.objects.filter(user=user).count()
+    user.arts = Post.objects.filter(user=user).count()
     user.save()
     return core_pg(request, nick)
 
