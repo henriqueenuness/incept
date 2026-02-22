@@ -44,6 +44,7 @@ urlpatterns = [
     path('core/edit-core/post', accounts_views.edit_core, name='edit_core'),
 
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
+    path('core/follow/<id>/', accounts_views.follow, name='follow'),
 
 
 

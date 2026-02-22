@@ -15,6 +15,8 @@ class Post(models.Model):
         null = True
     )
     date = models.DateTimeField(auto_now_add=True, null=True)
+    class Meta:
+        ordering = ["-date"]
 
 class Likes(models.Model):
     #id do post
