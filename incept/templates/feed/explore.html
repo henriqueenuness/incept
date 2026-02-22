@@ -5,14 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incept Explore</title>
     <style>
-        .post{
-            display: flex;
-            flex-direction: column;
-        }
-        .post img{
-            width: 500px;
-            border-radius: 15px;
-        }
     </style>
 </head>
 <body>
@@ -30,7 +22,8 @@
             <div class="profileandnick">
                 <div class="profile-circle"><div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div></div>
                 <a href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
-            </div><button class="follow">+Seguir</button>
+            </div>
+            <a href="{% url 'follow' user.user_id %}">+seguir</a>
         </div>
         {% empty %}
         {% endfor %}
@@ -49,7 +42,7 @@
     <div class="feed">
         {% for post in posts %}
             <div class="post">
-                <a href="{% url 'core_pg' user.nick %}">{{post.user_id}}</a>
+                <a href="{% url 'core_pg' user.nick %}">{{post.user.nick}}</a>
                 <img class="img-post" src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
                 <a href="{% url 'like' post.id %}">{{post.likes_set.count}}</a>
                 <p>{{post.date}}</p>
@@ -61,8 +54,12 @@
                 </form>
                 {% for comment in comments %}
                     {% if comment.post_id == post.id %}
-                        <a href="{% url 'core_pg' user.nick %}">{{comment.user.nick}}</a>
-                        <p>{{comment.content}}</p>
+                    <div class="comment">
+                       <a href="{% url 'core_pg' user.nick %}">{{comment.user.nick}}</a>
+                        <p class="c-content">{{comment.content}}</p>
+                        <p class="date">{{comment.date}}</p>
+                    </div>
+
                     {% endif %}
                 {% endfor %}
 

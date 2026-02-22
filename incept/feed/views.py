@@ -38,7 +38,6 @@ def comment(request, id):
     if request.method == 'POST':
         Comments.objects.create(user=user, content=content, post=postid)
 
-
     comments = Comments.objects.all()
     post = Post.objects.all()
     return render(request, 'feed/explore.html', {

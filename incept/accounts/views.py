@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .models import User
+from .models import User, Followers
 import base64
 from feed.models import Post
 from django.http import HttpResponse
+from django.db.models import F
 
 
 # Create your views here.
@@ -144,6 +145,22 @@ def delete_post(request, id):
     user.save()
     return core_pg(request, nick)
 
+def follow(request, id):
+    follower_id = request.user.user_id
+    user = id
+    relation = Followers.objects.filter(follower_id=follower_id, user_id=user)
+
+    if relation.exists():
+        relation.delete()
+        User.objects.filter(user_id=follower_id).update(following=F('following')-1) #nao entendi muito bem como funciona essa linha, mas ela funciona ent DEIXA AI
+        User.objects.filter(user_id=user).update(followers=F('followers')-1)
+    else:
+        Followers.objects.create(follower_id=follower_id, user_id=user)
+        User.objects.filter(user_id=follower_id).update(following=F('following')+1)
+        User.objects.filter(user_id=user).update(followers=F('followers')+1)
+
+
+    return HttpResponse("")
 
 '''def users_list_pg(request):
     return render(request, 'users/users_list.html')'''

@@ -77,3 +77,16 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['nick']
 
 
+class Followers(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="seguido"
+    )
+    follower = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="seguidor"
+    )
+    #eles pegam fk da mesma tabela, mas oq define como cada campo será preenchido é o models
+    #related name garante que django consiga guardar os dois e diferenciar eles
