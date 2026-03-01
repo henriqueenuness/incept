@@ -1,0 +1,62 @@
+<div class="container">
+    <a href="{% url 'home' %}">home</a>
+    <table>
+        <tr>
+            <th>id</th>
+            <th>email</th>
+            <th>senha</th>
+            <th>nick</th>
+            <th>cargo</th>
+        </tr>
+        {% for user in users%}
+        <tr>
+            <td>{{user.id_user}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.password}}</td>
+            <td>{{user.nick}}</td>
+            <td>{{user.cargo}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<style>
+    body{
+        margin:0;
+        height: 100vh;
+    }
+    thead tr {
+        background-color: purple;
+        color:#fff;
+        text-align: left;
+    }
+    th,td{
+        padding:12px 15px;
+    }
+    tbody tr{
+        border-bottom: 1px solid #dddddd;
+    }
+    tbody tr:nth-last-of-type(even){
+        background-color: lightgray;
+    }
+    .container{
+        margin: 0;
+        padding: 0;
+        display: flex;
+        height: auto;
+        width: 100%;
+        align-items: space-around;
+        justify-content: space-around;
+    }
+    table{
+        justify-content: space-around;
+        width: 100%;
+        height: auto;
+    }
+</style> 
+
+
+
+
+
+
+

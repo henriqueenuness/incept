@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="{% url 'explore_pg' %}">explore</a>
+    <form action ='{% url "search_user" %}' method="GET">
+        {% csrf_token %}
+        <input name="search" placeholder="Looking for something new?" value="{{ search }}">
+        <button type="submit"></button>
+    </form>
+    <div class="answer">
+        {% for user in users %}
+        <div class="user">
+            <div class="profileandnick">
+                <div class="profile-circle"><div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div></div>
+                <a href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
+            </div>
+            <a href="{% url 'follow' user.user_id %}">
+                {% if request.user.user_id == user.user_id %}
+                    <p></p>
+                {% else %}
+                    {% if user.user_id in following %}
+                        <p>Seguindo</p>
+                    {% else %}
+                        <p>Seguir</p>
+                    {% endif %}
+                {% endif %}
+
+            </a>
+        </div>
+        {% empty %}
+        {% endfor %}
+    </div>
+</body>
+</html>

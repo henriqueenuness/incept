@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Incept Login</title>
+
+  <style>
+    body{
+      height:100vh;
+      display: flex;
+      margin: 0;
+
+    }
+    .signin{
+      background-image: linear-gradient(120deg, purple, black);
+      justify-content: center;
+      align-items: center;
+    }
+    .form{
+      display: flex;
+      background-color: #3C2F3D;
+      width: 400px;
+      height:482px;
+      border-radius: 15px;
+      justify-content: space-between;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #878383;
+    }
+  </style>
+</head>
+<body class="signin">
+  <form action="{% url 'login' %}" class="form" method="POST">
+    {% csrf_token %}
+    <div class="form-header">
+      <h2>-Incept.</h2>
+      <h3>Just Start. Just Incept</h3>
+      <p>Vamos voltar ao trabalho?</p>
+    </div>
+
+    <input type="email" placeholder="email" name="email">
+    <input type="password" placeholder='senha' name="password">
+    <div class="form-btn">
+      <button type="submit">Entrar</button>
+    </div>
+    <p>Não tem uma conta? <a href="{% url 'signup_pg' %}">Fazer cadastro</a></p>
+  </form>
+</body>
+  <style>
+
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+    body{
+      height:100vh;
+      display: flex;
+      margin: 0;
+
+    }
+    h2{
+      font-weight: bold;
+      margin: 0;
+      padding:0;
+      font-size: 64px;
+    }
+    h3{
+      font-weight: bold;
+      font-size: 24px;
+      padding: 0;
+      margin: 0;
+    }
+    p{
+      color:#878383;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      font-family: 'montserrat';
+      font-size: 17px;
+    }
+    input{
+      height: 35px;
+      color: white;
+      width: 300px;
+      border-radius: 5px;
+      font-size: 15px;
+      border: 1px solid #878383;
+      background: none;
+    }
+    h1,h2,h3,button{
+      color:white;
+      font-family: 'montserrat';
+    }
+    button{
+      height:60px;
+      width: 155px;
+      background: linear-gradient(90deg, #6C0CC6, #CF17E3);
+      border:none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .signin{
+      background-image: linear-gradient(120deg, #7E0E8B, black);
+      justify-content: center;
+      align-items: center;
+    }
+    .form{
+      display: flex;
+      background-color: #3C2F3D;
+      width: 400px;
+      height:561px;
+      border-radius: 15px;
+      justify-content: space-around;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #878383;
+    }
+    .form-btn{
+      display: flex;
+      justify-content: space-evenly;
+      width: 100%;
+    }
+    .alt-btn{
+      background: #151515;
+      border: 1px solid #838383;
+    }
+    .jatemumaconta{
+      font-size: 17px;
+      color:white;
+    }
+    button:hover{
+      cursor:pointer;
+    }
+    a{
+      text-decoration: none;
+      font-weight: bold;
+      color:#E81EFE;
+    }
+  </style>
+</html>
