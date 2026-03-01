@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Django==6.0.1
 gunicorn==25.1.0
 psycopg2-binary==2.9.11
@@ -7,13 +6,3 @@ whitenoise==6.12.0
 Pillow==12.1.1
 django-allauth==65.14.3
 djangorestframework==3.16.1
-=======
-Django>=4.2,<5.0
-gunicorn
-psycopg2-binary
-dj-database-url
-whitenoise
-Pillow
-django-allauth
-djangorestframework
->>>>>>> 5aeb13799323ecd45b25d2c6b12bacd419e5cc58
