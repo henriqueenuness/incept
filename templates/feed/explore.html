@@ -13,24 +13,14 @@
     </div>
     <a href="{% url 'search_pg' %}">search</a>
     <a href="{% url 'cycle_pg' %}">cycle</a>
-    <div class="profiles" id="essa parte deveria scrollar">
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-        <div class="profile"></div>
-
-    </div>
     <div class="feed">
         {% for post in posts %}
             <div class="post">
                 <a href="{% url 'core_pg' post.user.nick %}">{{post.user.nick}}</a>
                 <img class="img-post" src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
-                <a href="{% url 'like' post.id %}">{{post.likes_set.count}}</a>
-                <button id="like">{{post.likes_set.count}}</button>
+
+                <button class="like-btn" data-url="{% url 'like' post.id %}">{{post.likes_set.count}}</button>
+                
                 <p>{{post.date}}</p>
                 <p>{{post.description}}</p>
                 <form action="{%url 'comment' post.id %}" method="POST">
@@ -58,5 +48,22 @@
 
 </body>
 <script>
+    const csrftoken = "{{ csrf_token }}"; //pega a 'senha' pra garantir que o form é do site
+    document.querySelectorAll('.like-btn').forEach(btn => { //não entendi
+        btn.addEventListener('click', () => { //quando clicar, ele ativa o resto
+            const url = btn.getAttribute('data-url'); //pega o dado q ta no btn, nesse caso, o id do post
+            fetch(url, { //envia tipo um form
+                method: 'POST', 
+                headers: { //os dados desse 'form'
+                    'X-CSRFToken': csrftoken, //equivalente a {% csrf_token %}
+                    'Content-Type': 'application/json' //avisando que ele quer uma resposta em json
+                }
+            })
+            .then(response => response.json()) //n entendi mt bem, mas aparentemente é como se ele 'abrisse uma carta pra ver oq tem de mensagem'
+            .then(data => { //essa é a mensagem
+                btn.textContent = data.likes; //troca o conteudo do botao pelo numero de likes atual
+            });
+        });
+    })
 </script>
 </html>

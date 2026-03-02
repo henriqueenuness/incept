@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+</script>
 </head>
 <body>
     <a href="{% url 'explore_pg' %}">explore</a>
@@ -19,21 +21,35 @@
                 <div class="profile-circle"><div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div></div>
                 <a href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
             </div>
-            <a href="{% url 'follow' user.user_id %}">
-                {% if request.user.user_id == user.user_id %}
-                    <p></p>
-                {% else %}
-                    {% if user.user_id in following %}
-                        <p>Seguindo</p>
-                    {% else %}
-                        <p>Seguir</p>
-                    {% endif %}
-                {% endif %}
-
-            </a>
         </div>
         {% empty %}
         {% endfor %}
     </div>
 </body>
+<script>
+    const csrftoken = "{{ csrf_token}}";
+    document.querySelectorAll('.follow-btn').forEach(btn => {
+
+        btn.addEventListener('click',() => {
+        const url = btn.getAttribute('data-url');
+            fetch(url,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                }
+            })
+.then(response => response.json())
+.then(data=>{
+    if(data.is_following){
+        btn.textContent = 'Seguindo';
+    } else {
+        btn.textContent = 'Seguir';
+    }
+})
+
+
+
+        });
+    });
+</script>
 </html>

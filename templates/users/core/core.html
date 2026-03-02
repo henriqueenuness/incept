@@ -11,6 +11,7 @@
             <div class="core-picture"><img src="data:image/png;base64, {{ perfil_user.core_picture }}"></div>
             
             <p class="nick">@{{perfil_user.nick}}</p>
+            <p class="nick">{{perfil_user.user_id}}</p>
             <p class="real_name">{{perfil_user.real_name|default_if_none:""}}</p>
             <p class="bio">{{perfil_user.bio|default_if_none:""}}</p>
             <p>{{perfil_user.art_style|default_if_none:""}}</p>
@@ -30,7 +31,15 @@
                     <a href="{% url 'edit_core_pg' %}">editar core</a>
                     <a href="{% url 'new_post_pg' user.nick %}">new post</a>
                 {% endif %}
-            {% endif %}
+                {% else %}
+                    <button class="follow-btn" data-url="{% url 'follow' user.user_id %}">
+                            {% if is_following %}
+                                Seguindo
+                            {% else %}
+                                Seguir
+                            {% endif %}
+                    </button>
+        {% endif %}
         </div>
     </div>
     <div class="main-core">
@@ -52,6 +61,32 @@
     </div>
 
 </body>
+<script>
+    const csrftoken = "{{ csrf_token}}";
+    document.querySelectorAll('.follow-btn').forEach(btn => {
+
+        btn.addEventListener('click',() => {
+        const url = btn.getAttribute('data-url');
+            fetch(url,{
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                }
+            })
+.then(response => response.json())
+.then(data=>{
+    if(data.is_following){
+        btn.textContent = 'Seguindo';
+    } else {
+        btn.textContent = 'Seguir';
+    }
+})
+
+
+
+        });
+    });
+</script>
 <style>
 
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');

@@ -23,6 +23,8 @@ def cycle_pg(request):
 def search_user(request):
     if request.method=="GET":
         search = request.GET.get('search')
+        users = []
+        followings_ids = []
         if search:
             users = User.objects.filter(nick__icontains=search)
             users_ids = list(users.values_list("user_id", flat=True))
@@ -31,14 +33,21 @@ def search_user(request):
 
             #1. filtrar o following do usuário logado
             #2. filtrar se o id do usuário buscado está na lista de seguindo do user logado
-            followings_ids = Followers.objects.filter(follower_id = request.user.user_id, user_id__in = users_ids).values_list('user_id', flat=True)
+            followings_ids = list(
+                Followers.objects.filter(
+                    follower_id = request.user.user_id, 
+                    user_id__in = users_ids)
+                    .values_list('user_id', flat=True)
+                    )
+
         else:
             users = ""
-        #return HttpResponse(", ".join(str(x) for x in followings_ids))
         return render(request, 'feed/search.html',
-                      {'users' : users,
-                       'search' : search,
-                       'following': list(followings_ids)})
+                    {'users' : users,
+                    'search' : search,
+                    'following': followings_ids})
+        #return HttpResponse(", ".join(str(x) for x in followings_ids))
+
     
 '''def enter_core(request, nick): 
     user = User.objects.get(nick=nick) # pega direto do path
@@ -50,9 +59,12 @@ def like(request, id):
     post = get_object_or_404(Post, id=id)
     if Likes.objects.filter(user=user, post=post).exists():
         Likes.objects.filter(user=user, post=post).delete()
+        liked = False
     else:
         Likes.objects.create(post=post, user_id = user) #primeiro o db, dps a variavel python
-    return JsonResponse({"likes": post.likes_set.count()})
+        liked = True
+    return JsonResponse({"likes": post.likes_set.count(),
+                         "liked" : liked }) #
 
 def comment(request, id):
     user=request.user

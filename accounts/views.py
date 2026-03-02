@@ -66,10 +66,13 @@ def explore_pg(request):
 
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
+    logged_user = request.user
     imagens = Post.objects.filter(user=user)
+    is_following = Followers.objects.filter( follower_id=logged_user.user_id, user_id=user.user_id ).exists()
     return render(request, "users/core/core.html", {
         "perfil_user" : user, #perfil do cabra que foi pesquisado. Isso garante que na hora de colocar dados na pagina, possa ser diferenciado user.nick de perfil_user.nick
-         "imagens": imagens })
+         "imagens": imagens,
+          "is_following": is_following })
 
 
 '''def core_posts(request, nick):
@@ -147,20 +150,23 @@ def delete_post(request, id):
 
 def follow(request, id):
     follower_id = request.user.user_id
-    user = id
-    relation = Followers.objects.filter(follower_id=follower_id, user_id=user)
+    followed_id = id
+    relation = Followers.objects.filter(follower_id=follower_id, user_id=followed_id)
 
     if relation.exists():
         relation.delete()
         User.objects.filter(user_id=follower_id).update(following=F('following')-1) #nao entendi muito bem como funciona essa linha, mas ela funciona ent DEIXA AI
-        User.objects.filter(user_id=user).update(followers=F('followers')-1)
+        User.objects.filter(user_id=followed_id).update(followers=F('followers')-1)
+        is_following = False
     else:
-        Followers.objects.create(follower_id=follower_id, user_id=user)
+        Followers.objects.create(follower_id=follower_id, user_id=followed_id)
         User.objects.filter(user_id=follower_id).update(following=F('following')+1)
-        User.objects.filter(user_id=user).update(followers=F('followers')+1)
+        User.objects.filter(user_id=followed_id).update(followers=F('followers')+1)
+        is_following = True
 
-
-    return HttpResponse("")
+    return JsonResponse({
+        'is_following' : is_following,
+    })
 
 '''def users_list_pg(request):
     return render(request, 'users/users_list.html')'''
