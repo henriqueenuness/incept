@@ -1,55 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+{% extends "base.html" %}
 
-</script>
-</head>
-<body>
-    <a href="{% url 'explore_pg' %}">explore</a>
-    <form action ='{% url "search_user" %}' method="GET">
-        {% csrf_token %}
-        <input name="search" placeholder="Looking for something new?" value="{{ search }}">
-        <button type="submit"></button>
-    </form>
-    <div class="answer">
-        {% for user in users %}
-        <div class="user">
-            <div class="profileandnick">
-                <div class="profile-circle"><div class="core-picture"><img src="data:image/png;base64, {{ user.core_picture }}"></div></div>
-                <a href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
-            </div>
+{% block title %}Incept | Busca{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shell {
+        width: calc(100% - 24px);
+        max-width: none;
+        margin: 0 12px;
+        padding-top: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Página Inicial</span>
+        </a>
+        <a class="social-nav-link is-active" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="#">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificações</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <a href="#">Configurações</a>
+            <a href="#">Sua atividade</a>
+            <a href="#">Salvos</a>
+            <a href="#">Alternar exibição</a>
+            <a href="#">Relatar um problema</a>
+            <a href="#">Trocar de conta</a>
+            <a href="{% url 'logout' %}">Sair</a>
         </div>
-        {% empty %}
-        {% endfor %}
-    </div>
-</body>
-<script>
-    const csrftoken = "{{ csrf_token}}";
-    document.querySelectorAll('.follow-btn').forEach(btn => {
+    </details>
 
-        btn.addEventListener('click',() => {
-        const url = btn.getAttribute('data-url');
-            fetch(url,{
+    <a class="messages-fab" href="#">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+
+    <div class="app-main">
+        <section class="social-layout">
+            <div class="feed-stack">
+                <article class="social-card feed-hero">
+                    <div class="feed-hero-copy">
+                        <span class="social-kicker">Busca</span>
+                        <h2>Descubra perfis sem sair da linguagem do feed.</h2>
+                        <p class="lead">Menos pagina de formulario. Mais painel de descoberta dentro do proprio app.</p>
+                    </div>
+                    <form class="feed-comment-form" action="{% url 'search_user' %}" method="GET">
+                        {% csrf_token %}
+                        <input class="field" name="search" placeholder="Quem você quer descobrir hoje?" value="{{ search }}">
+                        <button class="button" type="submit">Buscar</button>
+                    </form>
+                </article>
+
+                {% if users %}
+                    {% for user in users %}
+                    <article class="feed-card">
+                        <div class="feed-card-header">
+                            <a class="feed-card-author" href="{% url 'core_pg' user.nick %}">
+                                <span class="avatar-lg" style="width:64px; height:64px;"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+                                <span class="feed-card-author-copy">
+                                    <strong>@{{ user.nick }}</strong>
+                                    <small>{{ user.real_name|default_if_none:"Sem nome publico" }}</small>
+                                </span>
+                            </a>
+                            <span class="tag">{{ user.cargo }}</span>
+                        </div>
+                        <p class="feed-card-copy">{{ user.bio|default_if_none:"Este perfil ainda nao escreveu uma bio." }}</p>
+                        <div class="feed-toolbar">
+                            <div class="feed-toolbar-meta">
+                                {% if user.art_style %}
+                                <span>{{ user.art_style }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="feed-toolbar-actions">
+                                <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Ver perfil</a>
+                                {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
+                                <button class="button follow-btn" data-url="{% url 'follow' user.user_id %}">
+                                    {% if user.user_id in following %}Seguindo{% else %}Seguir{% endif %}
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                {% elif search %}
+                <article class="social-card profile-empty">
+                    <h3>Nada apareceu para "{{ search }}".</h3>
+                    <p>Tente um apelido diferente, um estilo ou parte do nome.</p>
+                </article>
+                {% else %}
+                <article class="social-card profile-empty">
+                    <h3>A busca comeca aqui.</h3>
+                    <p>Digite um nome, nicho ou pista visual para descobrir novos perfis.</p>
+                </article>
+                {% endif %}
+            </div>
+
+            <aside class="social-rail">
+                <article class="social-card">
+                    <span class="social-kicker">Filtro</span>
+                    <div class="chip-row" style="margin-top:14px;">
+                        <span class="tag">artista</span>
+                        <span class="tag">processo</span>
+                        <span class="tag">ilustracao</span>
+                        <span class="tag">video</span>
+                    </div>
+                </article>
+            </aside>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrftoken = "{{ csrf_token }}";
+    document.querySelectorAll('.follow-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            fetch(btn.dataset.url, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': csrftoken,
+                    'X-CSRFToken': csrftoken
                 }
             })
-.then(response => response.json())
-.then(data=>{
-    if(data.is_following){
-        btn.textContent = 'Seguindo';
-    } else {
-        btn.textContent = 'Seguir';
-    }
-})
-
-
-
+            .then((response) => response.json())
+            .then((data) => {
+                btn.textContent = data.is_following ? 'Seguindo' : 'Seguir';
+            });
         });
     });
 </script>
-</html>
+{% endblock %}

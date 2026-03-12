@@ -1,42 +1,202 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incept Cycle</title>
-</head>
-<body>
-    {% if not posts%}
-        <p>Siga alguém para que os posts apareçam</p>
-    {% endif %}
-        {% for post in posts %}
-            <div class="post">
-                <a href="{% url 'core_pg' post.user.nick %}">{{post.user.nick}}</a>
-                <img class="img-post" src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
-                <a href="{% url 'like' post.id %}">{{post.likes_set.count}}</a>
-                <button id="like">{{post.likes_set.count}}</button>
-                <p>{{post.date}}</p>
-                <p>{{post.description}}</p>
-                <form action="{%url 'comment' post.id %}" method="POST">
-                    {% csrf_token %}
-                    <input type="text" name="comment-content" placeholder="digite seu comentário">
-                    <button type="submit"></button>
-                </form>
-                {% for comment in comments %}
-                    {% if comment.post_id == post.id %}
-                    <div class="comment">
-                       <a href="{% url 'core_pg' user.nick %}">{{comment.user.nick}}</a>
-                        <p class="c-content">{{comment.content}}</p>
-                        <p class="date">{{comment.date}}</p>
+{% extends "base.html" %}
+
+{% block title %}Incept | Cycle{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shell {
+        width: calc(100% - 24px);
+        max-width: none;
+        margin: 0 12px;
+        padding-top: 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Página Inicial</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link is-active" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="#">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificações</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <a href="#">Configurações</a>
+            <a href="#">Sua atividade</a>
+            <a href="#">Salvos</a>
+            <a href="#">Alternar exibição</a>
+            <a href="#">Relatar um problema</a>
+            <a href="#">Trocar de conta</a>
+            <a href="{% url 'logout' %}">Sair</a>
+        </div>
+    </details>
+
+    <a class="messages-fab" href="#">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+
+    <div class="app-main">
+        <section class="social-layout">
+            <div class="feed-stack">
+                <article class="social-card feed-hero">
+                    <div class="feed-hero-copy">
+                        <span class="social-kicker">Seu ciclo</span>
+                        <h2>Uma timeline mais fechada, mais util e mais proxima.</h2>
+                        <p class="lead">
+                            Aqui ficam as pessoas que ja fazem parte da sua orbita. E o lugar de acompanhar processo,
+                            retorno e recorrencia.
+                        </p>
                     </div>
 
+                    {% if posts %}
+                    <div class="story-strip">
+                        {% for post in posts|slice:":7" %}
+                        <a class="story-pill" href="{% url 'core_pg' post.user.nick %}">
+                            <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                            <strong>@{{ post.user.nick }}</strong>
+                            <span>{{ post.user.art_style|default_if_none:"criador" }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
                     {% endif %}
-                {% endfor %}
+                </article>
 
-                {% if request.user.nick == user.nick %}
-                    <a href="{% url 'delete_post' post.id %}">delete post</a>
+                {% if not posts %}
+                <article class="social-card profile-empty">
+                    <h3>Seu ciclo ainda está vazio.</h3>
+                    <p>Siga artistas e perfis para transformar esta página no seu feed principal.</p>
+                    <div class="feed-hero-actions" style="justify-content:center; margin-top:18px;">
+                        <a class="button" href="{% url 'search_pg' %}">Encontrar pessoas</a>
+                    </div>
+                </article>
+                {% else %}
+                    {% for post in posts %}
+                    <article class="feed-card">
+                        <div class="feed-card-top">
+                            <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                                <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                                <span class="feed-card-author-copy">
+                                    <strong>@{{ post.user.nick }}</strong>
+                                    <small>{{ post.user.art_style|default_if_none:"criador" }}</small>
+                                </span>
+                            </a>
+                            <span class="feed-time">{{ post.date|date:"d/m/Y H:i" }}</span>
+                        </div>
+
+                        <div class="feed-media">
+                            <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
+                        </div>
+
+                        <div class="feed-toolbar">
+                            <div class="feed-toolbar-actions">
+                                <button class="pill feed-action-icon like-btn" data-url="{% url 'like' post.id %}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg></button>
+                                <a class="ghost-button feed-action-icon" href="{% url 'core_pg' post.user.nick %}"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0"></path></svg></a>
+                            </div>
+                            <div class="feed-toolbar-meta">
+                                <span><strong>{{ post.likes_set.count }}</strong> curtidas</span>
+                                <span><strong>@{{ post.user.nick }}</strong> no seu circulo</span>
+                            </div>
+                        </div>
+
+                        {% if post.description %}
+                        <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
+                        {% endif %}
+
+                        <form class="feed-comment-form" action="{% url 'comment' post.id %}" method="POST">
+                            {% csrf_token %}
+                            <input class="field" type="text" name="comment-content" placeholder="Responder ou comentar">
+                            <button class="button" type="submit">Enviar</button>
+                        </form>
+                    </article>
+                    {% endfor %}
                 {% endif %}
             </div>
-        {% endfor %}
-</body>
-</html>
+
+            <aside class="social-rail">
+                <article class="social-card">
+                    <span class="social-kicker">Recorte</span>
+                    <div class="stack" style="gap: 12px; margin-top:14px;">
+                        <div class="social-stat">
+                            <strong>{{ posts|length }}</strong>
+                            <span class="muted">posts no ciclo</span>
+                        </div>
+                        <div class="social-stat">
+                            <strong>{{ user.following|default_if_none:"0" }}</strong>
+                            <span class="muted">perfis seguidos</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="social-card">
+                    <span class="social-kicker">Acoes</span>
+                    <div class="stack" style="gap:10px; margin-top:14px;">
+                        <a class="ghost-button" href="{% url 'search_pg' %}">Descobrir mais perfis</a>
+                        <a class="ghost-button" href="{% url 'explore_pg' %}">Voltar ao feed aberto</a>
+                    </div>
+                </article>
+            </aside>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrftoken = "{{ csrf_token }}";
+    document.querySelectorAll('.like-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                btn.classList.toggle('liked', Boolean(data.liked));
+            });
+        });
+    });
+</script>
+{% endblock %}
