@@ -24,7 +24,7 @@ def signup(request): #registro/cadastro usuario
         cargo = request.POST.get('cargo')
 
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
-        return render(request, 'users/login.html')
+        return render(request, 'users/explore.html')
 
 def login_pg(request):
     return render(request, 'users/login.html')

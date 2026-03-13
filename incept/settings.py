@@ -88,7 +88,6 @@ DATABASES = {
         'HOST': 'db.sloqpnvutcreuxstuldh.supabase.co', 
         'PORT': '5432', 
         },
-
     'local': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': BASE_DIR / 'db.sqlite3',
