@@ -298,6 +298,10 @@
         transform: scale(1.04);
     }
 
+    .hero-card.is-hidden {
+        display: none;
+    }
+
     .hero-content,
     .hero-outro {
         z-index: 10;
@@ -668,6 +672,30 @@
     }
 
 </style>
+{% if user.is_authenticated %}
+<script>
+    (() => {
+        const feedUrl = "{% url 'explore_pg' %}";
+        const referrer = document.referrer;
+
+        if (referrer) {
+            try {
+                const previousUrl = new URL(referrer);
+                const isSameOrigin = previousUrl.origin === window.location.origin;
+                const isHomePage = previousUrl.pathname === window.location.pathname;
+
+                if (isSameOrigin && !isHomePage && window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+            } catch (error) {
+            }
+        }
+
+        window.location.replace(feedUrl);
+    })();
+</script>
+{% endif %}
 {% endblock %}
 
 {% block topbar %}{% endblock %}
@@ -680,8 +708,7 @@
         </div>
         <div class="header-actions">
             {% if user.is_authenticated %}
-            <a class="premium-btn-muted" href="{% url 'core_pg' user.nick %}">@{{ user.nick }}</a>
-            <a class="premium-btn header-enter-button" href="{% url 'explore_pg' %}">Entrar</a>
+            <a class="premium-btn header-enter-button" href="{% url 'explore_pg' %}">Abrir feed</a>
             {% else %}
             <a class="premium-btn-muted header-enter-button" href="{% url 'login_pg' %}">Entrar</a>
             <a class="premium-btn" href="{% url 'signup_pg' %}">Criar conta</a>
@@ -796,16 +823,6 @@
         const revealTargets = document.querySelectorAll(".fade-up, [data-split]");
         let galleryCardNodes = [];
         let finalSequenceTimer = 0;
-        const missingGallerySources = new Set([
-            "{% static 'home/img-18.png' %}",
-            "{% static 'home/img-20.png' %}",
-            "{% static 'home/img-24.jpg' %}",
-            "{% static 'home/img-25.jpg' %}",
-            "{% static 'home/img-26.jpg' %}",
-            "{% static 'home/img-27.jpg' %}",
-            "{% static 'home/img-29.avif' %}"
-        ]);
-
         const galleryItems = [
             { src: "{% static 'home/img-01.png' %}", ratio: "1 / 1", size: 12.4, top: 48, left: 2, sizeTablet: 12.8, topTablet: 49, leftTablet: 2, sizeMobile: 0, rotate: -10, parallaxX: 12, parallaxY: 10, driftX: 20, driftY: 34, zoom: 0.14, fadeStart: 0.56, fadeRate: 2.3, float: 13, brightness: 0.94 },
             { src: "{% static 'home/img-02.jpg' %}", ratio: "1.5 / 1", size: 13.8, top: 23, left: 4, sizeTablet: 15.6, topTablet: 24, leftTablet: 6, sizeMobile: 0, rotate: 7, parallaxX: -14, parallaxY: 10, driftX: -28, driftY: 20, zoom: 0.18, fadeStart: 0.54, fadeRate: 2.3, float: 15, brightness: 0.92 },
@@ -824,20 +841,13 @@
             { src: "{% static 'home/img-15.jpg' %}", ratio: "1.55 / 1", size: 14.6, top: 53, left: 24, sizeTablet: 15, topTablet: 53, leftTablet: 24, sizeMobile: 12.8, topMobile: 82, leftMobile: 54, rotate: -4, parallaxX: 15, parallaxY: 10, driftX: 24, driftY: -10, zoom: 0.16, fadeStart: 0.55, fadeRate: 2.5, float: 13, brightness: 0.9 },
             { src: "{% static 'home/img-16.webp' %}", ratio: "0.82 / 1", size: 10.6, top: 58, left: 92, sizeTablet: 10.8, topTablet: 58, leftTablet: 90, sizeMobile: 0, rotate: 5, parallaxX: -15, parallaxY: 14, driftX: -22, driftY: -26, zoom: 0.2, fadeStart: 0.51, fadeRate: 2.8, float: 18, brightness: 0.95 },
             { src: "{% static 'home/img-17.jpg' %}", ratio: "1 / 1", size: 8.5, top: 88, left: 26, sizeTablet: 9.1, topTablet: 88, leftTablet: 25, sizeMobile: 0, rotate: -9, parallaxX: 10, parallaxY: 10, driftX: 16, driftY: -16, zoom: 0.14, fadeStart: 0.58, fadeRate: 2.1, float: 12, brightness: 0.92 },
-            { src: "{% static 'home/img-18.png' %}", ratio: "0.7 / 1", size: 11.5, top: 87, left: 68, sizeTablet: 12, topTablet: 87, leftTablet: 66, sizeMobile: 0, rotate: 9, parallaxX: -10, parallaxY: 15, driftX: -12, driftY: -26, zoom: 0.16, fadeStart: 0.57, fadeRate: 2.2, float: 15, brightness: 0.91 },
             { src: "{% static 'home/img-19.png' %}", ratio: "1.5 / 1", size: 13.6, top: 6, left: 48, sizeTablet: 14.2, topTablet: 7, leftTablet: 49, sizeMobile: 0, rotate: 7, parallaxX: -13, parallaxY: 9, driftX: -14, driftY: 22, zoom: 0.13, fadeStart: 0.58, fadeRate: 1.9, float: 16, brightness: 0.9 },
-            { src: "{% static 'home/img-20.png' %}", ratio: "1 / 1", size: 8.4, top: 35, left: 3, sizeTablet: 8.8, topTablet: 36, leftTablet: 5, sizeMobile: 0, rotate: -8, parallaxX: 10, parallaxY: 10, driftX: 18, driftY: -8, zoom: 0.12, fadeStart: 0.62, fadeRate: 1.8, float: 12, brightness: 0.94 },
             { src: "{% static 'home/img-21.jpg' %}", ratio: "0.72 / 1", size: 11.9, top: 8, left: 21, sizeTablet: 12.4, topTablet: 9, leftTablet: 22, sizeMobile: 8.4, topMobile: 22, leftMobile: 12, rotate: 5, parallaxX: -10, parallaxY: 14, driftX: -8, driftY: 20, zoom: 0.14, fadeStart: 0.6, fadeRate: 2, float: 14, brightness: 0.9 },
             { src: "{% static 'home/img-22.jpg' %}", ratio: "1.56 / 1", size: 13.6, top: 43, left: 75, sizeTablet: 14.2, topTablet: 43, leftTablet: 74, sizeMobile: 12.6, topMobile: 82, leftMobile: 28, rotate: -5, parallaxX: 14, parallaxY: 10, driftX: 22, driftY: -8, zoom: 0.16, fadeStart: 0.55, fadeRate: 2.4, float: 15, brightness: 0.93 },
             { src: "{% static 'home/img-23.jpg' %}", ratio: "1 / 1", size: 8.3, top: 51, left: 95, sizeTablet: 8.8, topTablet: 51, leftTablet: 93, sizeMobile: 0, rotate: 10, parallaxX: -11, parallaxY: 11, driftX: -12, driftY: -12, zoom: 0.13, fadeStart: 0.6, fadeRate: 2.1, float: 12, brightness: 0.94 },
-            { src: "{% static 'home/img-24.jpg' %}", ratio: "0.72 / 1", size: 10.8, top: 90, left: 92, sizeTablet: 11.2, topTablet: 88, leftTablet: 89, sizeMobile: 0, rotate: -7, parallaxX: 12, parallaxY: 14, driftX: 14, driftY: -24, zoom: 0.14, fadeStart: 0.62, fadeRate: 2, float: 14, brightness: 0.89 },
-            { src: "{% static 'home/img-25.jpg' %}", ratio: "0.82 / 1", size: 15.8, top: 91, left: 52, sizeTablet: 16.2, topTablet: 90, leftTablet: 50, sizeMobile: 0, rotate: -6, parallaxX: 12, parallaxY: 14, driftX: 18, driftY: -30, zoom: 0.18, fadeStart: 0.55, fadeRate: 2.3, float: 18, brightness: 0.93 },
-            { src: "{% static 'home/img-26.jpg' %}", ratio: "1 / 1", size: 8.5, top: 12, left: 94, sizeTablet: 9, topTablet: 13, leftTablet: 92, sizeMobile: 0, rotate: 9, parallaxX: -10, parallaxY: 10, driftX: -10, driftY: 16, zoom: 0.12, fadeStart: 0.6, fadeRate: 2.1, float: 12, brightness: 0.92 },
-            { src: "{% static 'home/img-27.jpg' %}", ratio: "1.52 / 1", size: 13.1, top: 93, left: 14, sizeTablet: 13.8, topTablet: 93, leftTablet: 15, sizeMobile: 0, rotate: -8, parallaxX: 16, parallaxY: 11, driftX: 22, driftY: -18, zoom: 0.15, fadeStart: 0.58, fadeRate: 2.2, float: 15, brightness: 0.91 },
             { src: "{% static 'home/img-28.avif' %}", ratio: "0.7 / 1", size: 10.4, top: 71, left: 1, sizeTablet: 10.8, topTablet: 70, leftTablet: 2, sizeMobile: 0, rotate: 6, parallaxX: -13, parallaxY: 14, driftX: -16, driftY: -10, zoom: 0.13, fadeStart: 0.63, fadeRate: 1.9, float: 13, brightness: 0.88 },
-            { src: "{% static 'home/img-29.avif' %}", ratio: "1 / 1", size: 8.2, top: 68, left: 2, sizeTablet: 8.6, topTablet: 69, leftTablet: 4, sizeMobile: 0, rotate: -10, parallaxX: 9, parallaxY: 12, driftX: 16, driftY: -12, zoom: 0.12, fadeStart: 0.63, fadeRate: 1.8, float: 11, brightness: 0.91 },
             { src: "{% static 'home/img-30.avif' %}", ratio: "0.72 / 1", size: 15.2, top: 66, left: 76, sizeTablet: 15.6, topTablet: 66, leftTablet: 74, sizeMobile: 0, rotate: 7, parallaxX: -10, parallaxY: 15, driftX: -14, driftY: -20, zoom: 0.14, fadeStart: 0.62, fadeRate: 1.9, float: 14, brightness: 0.9 }
-        ].filter((item) => !missingGallerySources.has(item.src));
+        ];
 
         const getViewportMode = () => {
             if (window.innerWidth <= 640) return "mobile";
@@ -894,6 +904,12 @@
                 `;
             }).join("");
             galleryCardNodes = Array.from(heroGallery.querySelectorAll(".hero-card"));
+            heroGallery.querySelectorAll("img").forEach((img) => {
+                img.addEventListener("error", () => {
+                    img.closest(".hero-card")?.classList.add("is-hidden");
+                    galleryCardNodes = galleryCardNodes.filter((node) => !node.classList.contains("is-hidden"));
+                }, { once: true });
+            });
         };
 
         splitTargets.forEach((target) => {
