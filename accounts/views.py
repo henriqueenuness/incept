@@ -1,6 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.utils import timezone
 from .models import User, Followers
 import base64
 from feed.models import Post
@@ -10,10 +9,14 @@ from django.db.models import F
 
 # Create your views here.
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'home.html')
 
 
 def signup_pg(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'users/signin.html')
     #quando for chamado, renderiza pagina de cadastro
 
@@ -25,9 +28,15 @@ def signup(request): #registro/cadastro usuario
         cargo = request.POST.get('cargo')
 
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
-        return render(request, 'users/login.html')
+        return render(request, 'users/login.html', {
+            'success_message': 'Conta criada. Agora entre para abrir o feed.',
+            'prefill_email': email,
+        })
+    return redirect('signup_pg')
 
 def login_pg(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'users/login.html')
 
 def login_auth(request): #login usuario
@@ -38,16 +47,20 @@ def login_auth(request): #login usuario
         if user is not None:
             if user.cargo == 'artista':
                 login(request, user)
-                return render(request, 'home.html')
+                return redirect('explore_pg')
             elif user.cargo == 'cliente':
                 login(request, user)
-                return render(request, 'home.html')
+                return redirect('explore_pg')
             # nesse caso, ambos fazem a mesma coisa, mas futuramente podemos encaminhar para paginas diferentes de acordo com a utilidade de cada funcao para o usuario.
             #por exemplo, um cliente nao vai precisar de botoes para criar conteudo
             
         else:
-            return render(request, 'users/signin.html')
+            return render(request, 'users/login.html', {
+                'auth_error': 'Email ou senha invalidos.',
+                'prefill_email': email,
+            })
             # se der algum erro, volta pro cadastro
+    return redirect('login_pg')
 
 
 
@@ -56,7 +69,7 @@ def login_auth(request): #login usuario
 
 def make_logout(request):
     logout(request)
-    return render(request, 'home.html')
+    return redirect('home')
 
 
 def explore_pg(request):
@@ -86,7 +99,6 @@ def edit_core_pg(request):
 
 def edit_core(request): #edit core
     if request.method == "POST":
-        nick = request.POST.get('nick')
         real_name = request.POST.get('real_name')
         bio = request.POST.get('bio')
         art_style = request.POST.get('art_style')
@@ -95,8 +107,6 @@ def edit_core(request): #edit core
         if core_picture:
             core_p = base64.b64encode(core_picture.read()).decode('utf-8')
             user.core_picture = core_p
-        if nick:
-            user.nick = nick #adicionar um cooldown dps de 7 dias
         user.real_name = real_name
         user.bio = bio
         user.art_style = art_style
