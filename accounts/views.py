@@ -9,10 +9,14 @@ from django.db.models import F
 
 # Create your views here.
 def home(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'home.html')
 
 
 def signup_pg(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'users/signin.html')
     #quando for chamado, renderiza pagina de cadastro
 
@@ -24,9 +28,15 @@ def signup(request): #registro/cadastro usuario
         cargo = request.POST.get('cargo')
 
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
-        return render(request, 'users/explore.html')
+        return render(request, 'users/login.html', {
+            'success_message': 'Conta criada. Agora entre para abrir o feed.',
+            'prefill_email': email,
+        })
+    return redirect('signup_pg')
 
 def login_pg(request):
+    if request.user.is_authenticated:
+        return redirect('explore_pg')
     return render(request, 'users/login.html')
 
 def login_auth(request): #login usuario
@@ -37,16 +47,20 @@ def login_auth(request): #login usuario
         if user is not None:
             if user.cargo == 'artista':
                 login(request, user)
-                return render(request, 'home.html')
+                return redirect('explore_pg')
             elif user.cargo == 'cliente':
                 login(request, user)
-                return render(request, 'home.html')
+                return redirect('explore_pg')
             # nesse caso, ambos fazem a mesma coisa, mas futuramente podemos encaminhar para paginas diferentes de acordo com a utilidade de cada funcao para o usuario.
             #por exemplo, um cliente nao vai precisar de botoes para criar conteudo
             
         else:
-            return render(request, 'users/signin.html')
+            return render(request, 'users/login.html', {
+                'auth_error': 'Email ou senha invalidos.',
+                'prefill_email': email,
+            })
             # se der algum erro, volta pro cadastro
+    return redirect('login_pg')
 
 
 
@@ -55,7 +69,7 @@ def login_auth(request): #login usuario
 
 def make_logout(request):
     logout(request)
-    return render(request, 'home.html')
+    return redirect('home')
 
 
 def explore_pg(request):
