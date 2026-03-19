@@ -82,33 +82,19 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 load_dotenv()
 DATABASES = {
 
-    'default' : {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME' : os.getenv("dbname"),
-        'USER' : os.getenv("user"),
-        'PASSWORD' : os.getenv("password"),
-        'HOST' : os.getenv("host"),
-        'PORT' : os.getenv("port"),
-
+        'NAME': os.getenv("dbname"),
+        'USER': os.getenv("user"),
+        'PASSWORD': os.getenv("password"),
+        'HOST': os.getenv("host"),
+        'PORT': os.getenv("port"),
     },
-
     'local': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-
 }
-
-
-
-'''    'fg': { 
-        'ENGINE': 'django.db.backends.postgresql', 
-        'NAME': 'postgres', 
-        'USER': 'postgres', 
-        'PASSWORD': 'incept2026*', 
-        'HOST': 'db.sloqpnvutcreuxstuldh.supabase.co', 
-        'PORT': '5432', 
-        },'''
 
 
 """    'render': {
@@ -156,7 +142,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
-"""STATICFILES_DIRS = [BASE_DIR / "static"]"""
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

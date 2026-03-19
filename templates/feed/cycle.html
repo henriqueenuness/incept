@@ -12,6 +12,32 @@
         margin: 0 12px;
         padding-top: 12px;
     }
+    .cycle-hero {
+        display: grid;
+        gap: 20px;
+    }
+    .cycle-hero-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .cycle-hero-block {
+        padding: 16px;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .cycle-hero-block strong {
+        display: block;
+        color: var(--text);
+        margin-bottom: 4px;
+        font-size: 1.18rem;
+    }
+    @media (max-width: 720px) {
+        .cycle-hero-meta {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -22,7 +48,7 @@
     <aside class="social-nav">
         <a class="social-nav-link" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
+            <span class="social-nav-label">Pagina Inicial</span>
         </a>
         <a class="social-nav-link" href="{% url 'search_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
@@ -38,13 +64,13 @@
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
             <span class="social-nav-label">Ciclo</span>
         </a>
-        <a class="social-nav-link" href="#">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementacao completa do backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
             <span class="social-nav-label">Mensagens</span>
         </a>
-        <a class="social-nav-link" href="#">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificacoes em breve" data-placeholder-copy="As notificacoes ainda precisam de eventos e persistencia no backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificações</span>
+            <span class="social-nav-label">Notificacoes</span>
         </a>
         {% if user.is_authenticated %}
         <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
@@ -60,17 +86,15 @@
             <span class="social-more-label">Mais</span>
         </summary>
         <div class="social-more-menu">
-            <a href="#">Configurações</a>
-            <a href="#">Sua atividade</a>
-            <a href="#">Salvos</a>
-            <a href="#">Alternar exibição</a>
-            <a href="#">Relatar um problema</a>
-            <a href="#">Trocar de conta</a>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
             <a href="{% url 'logout' %}">Sair</a>
         </div>
     </details>
 
-    <a class="messages-fab" href="#">
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area esta reservada na interface, mas o fluxo real ainda nao foi implementado.">
         <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
         <span>Mensagens</span>
     </a>
@@ -78,14 +102,21 @@
     <div class="app-main">
         <section class="social-layout">
             <div class="feed-stack">
-                <article class="social-card feed-hero">
+                <article class="social-card feed-hero cycle-hero">
                     <div class="feed-hero-copy">
                         <span class="social-kicker">Seu ciclo</span>
-                        <h2>Uma timeline mais fechada, mais util e mais proxima.</h2>
-                        <p class="lead">
-                            Aqui ficam as pessoas que ja fazem parte da sua orbita. E o lugar de acompanhar processo,
-                            retorno e recorrencia.
-                        </p>
+                        <h2>Uma linha mais proxima, mais util e com menos ruido.</h2>
+                        <p class="lead">Cycle agora assume o papel de feed de recorrencia: quem voce acompanha com mais contexto e mais continuidade.</p>
+                    </div>
+                    <div class="cycle-hero-meta">
+                        <div class="cycle-hero-block">
+                            <strong>{{ posts|length }}</strong>
+                            <span class="muted">posts no seu ciclo</span>
+                        </div>
+                        <div class="cycle-hero-block">
+                            <strong>{{ user.following|default_if_none:"0" }}</strong>
+                            <span class="muted">perfis acompanhados</span>
+                        </div>
                     </div>
 
                     {% if posts %}
@@ -103,15 +134,15 @@
 
                 {% if not posts %}
                 <article class="social-card profile-empty">
-                    <h3>Seu ciclo ainda está vazio.</h3>
-                    <p>Siga artistas e perfis para transformar esta página no seu feed principal.</p>
+                    <h3>Seu ciclo ainda esta vazio.</h3>
+                    <p>Siga artistas e perfis para transformar esta pagina no seu feed principal.</p>
                     <div class="feed-hero-actions" style="justify-content:center; margin-top:18px;">
                         <a class="button" href="{% url 'search_pg' %}">Encontrar pessoas</a>
                     </div>
                 </article>
                 {% else %}
                     {% for post in posts %}
-                    <article class="feed-card">
+                    <article class="feed-card" id="post-{{ post.id }}">
                         <div class="feed-card-top">
                             <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
                                 <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
@@ -123,18 +154,18 @@
                             <span class="feed-time">{{ post.date|date:"d/m/Y H:i" }}</span>
                         </div>
 
-                        <div class="feed-media">
+                        <button class="feed-media feed-media-button" type="button" data-open-lightbox data-image-src="data:image/png;base64,{{ post.image }}" data-image-alt="{{ post.description|default_if_none:post.user.nick }}">
                             <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
-                        </div>
+                        </button>
 
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
-                                <button class="pill feed-action-icon like-btn" data-url="{% url 'like' post.id %}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg></button>
-                                <a class="ghost-button feed-action-icon" href="{% url 'core_pg' post.user.nick %}"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0"></path></svg></a>
+                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg><span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span></button>
+                                <button class="feed-action-icon" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg><span class="feed-action-count" data-comment-count>{{ post.comments_set.count }}</span></button>
+                                <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
                             </div>
                             <div class="feed-toolbar-meta">
-                                <span><strong>{{ post.likes_set.count }}</strong> curtidas</span>
-                                <span><strong>@{{ post.user.nick }}</strong> no seu circulo</span>
+                                <span><strong>@{{ post.user.nick }}</strong> no seu ciclo</span>
                             </div>
                         </div>
 
@@ -142,11 +173,28 @@
                         <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
                         {% endif %}
 
-                        <form class="feed-comment-form" action="{% url 'comment' post.id %}" method="POST">
-                            {% csrf_token %}
-                            <input class="field" type="text" name="comment-content" placeholder="Responder ou comentar">
-                            <button class="button" type="submit">Enviar</button>
-                        </form>
+                        <div class="feed-comments-panel" id="comments-panel-{{ post.id }}" hidden>
+                            {% if comments %}
+                            <div class="feed-comments">
+                                {% for comment in comments %}
+                                    {% if comment.post_id == post.id %}
+                                    <div class="feed-comment">
+                                        <div class="feed-comment-head">
+                                            <strong>@{{ comment.user.nick }}</strong>
+                                            <span class="muted">{{ comment.date|date:"d/m H:i" }}</span>
+                                        </div>
+                                        <p>{{ comment.content }}</p>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <form class="feed-comment-form" action="{% url 'comment' post.id %}" method="POST">
+                                {% csrf_token %}
+                                <input class="field" type="text" name="comment-content" placeholder="Escreva um comentário">
+                                <button class="button" type="submit">Enviar</button>
+                            </form>
+                        </div>
                     </article>
                     {% endfor %}
                 {% endif %}
@@ -155,16 +203,8 @@
             <aside class="social-rail">
                 <article class="social-card">
                     <span class="social-kicker">Recorte</span>
-                    <div class="stack" style="gap: 12px; margin-top:14px;">
-                        <div class="social-stat">
-                            <strong>{{ posts|length }}</strong>
-                            <span class="muted">posts no ciclo</span>
-                        </div>
-                        <div class="social-stat">
-                            <strong>{{ user.following|default_if_none:"0" }}</strong>
-                            <span class="muted">perfis seguidos</span>
-                        </div>
-                    </div>
+                    <h3 style="margin:14px 0 8px;">Mais contexto, menos ruido.</h3>
+                    <p>Cycle agora se posiciona como uma camada mais intima do feed, voltada para recorrencia e acompanhamento.</p>
                 </article>
 
                 <article class="social-card">
@@ -195,7 +235,42 @@
             .then((response) => response.json())
             .then((data) => {
                 btn.classList.toggle('liked', Boolean(data.liked));
+                const likeCount = btn.querySelector('[data-like-count]');
+                if (likeCount) {
+                    likeCount.textContent = data.likes;
+                }
             });
+        });
+    });
+
+    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const form = document.getElementById(btn.dataset.target);
+            if (!form) {
+                return;
+            }
+            form.hidden = !form.hidden;
+            if (!form.hidden) {
+                const input = form.querySelector('input[name="comment-content"]');
+                if (input) {
+                    input.focus();
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-share-url]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const shareUrl = new URL(btn.dataset.shareUrl, window.location.href).toString();
+            try {
+                if (navigator.share) {
+                    await navigator.share({ url: shareUrl });
+                    return;
+                }
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (error) {
+                console.error(error);
+            }
         });
     });
 </script>

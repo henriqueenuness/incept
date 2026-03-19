@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from accounts.models import User, Followers
 from .models import Post, Likes, Comments
 from django.http import HttpResponse, JsonResponse
@@ -13,12 +13,14 @@ def cycle_pg(request):
     f = Followers.objects.filter(follower_id = user).values_list('user_id', flat=True)
     followings_ids = list(f)
     post = Post.objects.filter(user_id__in = followings_ids)
+    comments = Comments.objects.all()
     #return HttpResponse(", ".join(str(x) for x in followings_ids))
     return render(request, 'feed/cycle.html',
                     {'user' : user,
-                   'posts' : post,
-                   #'following': list(followings_ids)
-                   })
+                    'posts' : post,
+                    'comments': comments,
+                    #'following': list(followings_ids)
+                    })
 
 def search_user(request):
     if request.method=="GET":
@@ -72,11 +74,6 @@ def comment(request, id):
     content = request.POST.get('comment-content')
     if request.method == 'POST':
         Comments.objects.create(user=user, content=content, post=postid)
-
-    comments = Comments.objects.all()
-    post = Post.objects.all()
-    return render(request, 'feed/explore.html', {
-         "posts": post, 
-         "comments" : comments })
+    return redirect(request.META.get('HTTP_REFERER', 'explore_pg'))
 
 
