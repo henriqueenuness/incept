@@ -474,21 +474,34 @@
             overflow: hidden;
         }
         .social-more-menu a,
-        .social-more-menu button,
-        .social-more-menu span {
+        .social-more-menu button {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             width: 100%;
-            padding: 16px 22px;
+            padding: 12px 18px;
             color: var(--text);
             background: transparent;
             border: 0;
             text-align: left;
         }
+        .social-more-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .social-more-item svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0.9;
+        }
         .social-more-menu a + a,
         .social-more-menu a + button,
-        .social-more-menu span + a,
-        .social-more-menu span + button,
         .social-more-menu button + a,
         .social-more-menu button + button {
             border-top: 1px solid rgba(255, 255, 255, 0.06);
@@ -729,6 +742,23 @@
             aspect-ratio: 1 / 1;
             object-fit: cover;
         }
+        .feed-media-button,
+        .profile-tab-tile-button {
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: zoom-in;
+        }
+        .profile-tab-tile-button {
+            height: 100%;
+        }
+        .profile-tab-tile-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         .feed-toolbar,
         .feed-toolbar-meta {
             display: flex;
@@ -745,18 +775,62 @@
         .feed-toolbar-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 18px;
         }
         .feed-action-icon {
-            width: 42px;
-            min-width: 42px;
-            height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            min-width: 0;
+            height: auto;
             padding: 0;
-            border-radius: 14px;
+            border: 0;
+            background: transparent;
+            color: var(--text);
+            box-shadow: none;
+            gap: 8px;
         }
         .feed-action-icon svg {
-            width: 17px;
-            height: 17px;
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .feed-action-icon:hover {
+            transform: translateY(-1px);
+            background: transparent;
+        }
+        .feed-action-icon.like-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+        .feed-action-icon.like-btn.liked {
+            color: #ff8ba7;
+        }
+        .feed-action-count {
+            font-size: 0.88rem;
+            color: var(--muted);
+        }
+        .feed-action-icon.like-btn.liked .feed-action-count {
+            color: inherit;
+        }
+        .feed-comment-form[hidden] {
+            display: none;
+        }
+        .feed-comments-panel[hidden] {
+            display: none;
+        }
+        .feed-comment-form .field {
+            min-width: 0;
+        }
+        .feed-comments-panel {
+            display: grid;
+            gap: 14px;
+            margin-top: 14px;
         }
         .feed-comment-form {
             display: grid;
@@ -875,7 +949,63 @@
             padding: 46px 24px;
             text-align: center;
         }
-
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(2, 6, 13, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        .lightbox.is-open {
+            display: flex;
+        }
+        .lightbox-backdrop {
+            position: absolute;
+            inset: 0;
+            border: 0;
+            background: transparent;
+            cursor: zoom-out;
+        }
+        .lightbox-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(92vw, 1080px);
+            display: grid;
+            gap: 12px;
+        }
+        .lightbox-figure {
+            margin: 0;
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(11, 18, 30, 0.96);
+            box-shadow: var(--shadow);
+        }
+        .lightbox-figure img {
+            width: 100%;
+            max-height: 82vh;
+            object-fit: contain;
+            background: #050b14;
+        }
+        .lightbox-caption {
+            padding: 14px 18px 18px;
+            color: var(--muted);
+        }
+        .lightbox-close {
+            justify-self: end;
+            width: 44px;
+            min-width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 14px;
+            color: #f4f7fb;
+            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(10, 16, 27, 0.84);
+        }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
         @keyframes drift { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(-20px, 18px, 0); } }
 
@@ -984,6 +1114,129 @@
         {% endblock %}
         {% block content %}{% endblock %}
     </div>
+    <div class="lightbox" data-lightbox aria-hidden="true">
+        <button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Fechar imagem ampliada"></button>
+        <div class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="Imagem ampliada">
+            <button class="ghost-button lightbox-close" type="button" data-lightbox-close aria-label="Fechar">&times;</button>
+            <figure class="lightbox-figure">
+                <img src="" alt="" data-lightbox-image>
+                <figcaption class="lightbox-caption" data-lightbox-caption hidden></figcaption>
+            </figure>
+        </div>
+    </div>
     {% block scripts %}{% endblock %}
+    <script>
+        (() => {
+            const defaultAvatar = "data:image/svg+xml;utf8," + encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                    <defs>
+                        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                            <stop stop-color="#69e2ff"/>
+                            <stop offset="1" stop-color="#ff9c6b"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="120" height="120" rx="60" fill="#08111d"/>
+                    <circle cx="60" cy="44" r="20" fill="url(#g)" opacity="0.95"/>
+                    <path d="M26 98c6-18 20-28 34-28s28 10 34 28" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round"/>
+                </svg>
+            `);
+            const legacyAvatarLength = 10624;
+            const legacyAvatarPrefix = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERET";
+            const legacyAvatarSuffix = "NaKDEiMzaiZ3NUXc5DUpeIWaWW2z49mbFOxCT6f+0cprKoBvv7WZSJCtDHytGLm/Pc9sSEEmWDF/n//Z";
+            const isLegacyAvatar = (src) => {
+                if (!src || !src.startsWith('data:image/')) {
+                    return false;
+                }
+
+                const base64Marker = 'base64,';
+                const markerIndex = src.indexOf(base64Marker);
+                if (markerIndex === -1) {
+                    return false;
+                }
+
+                const payload = src.slice(markerIndex + base64Marker.length);
+                return payload.length === legacyAvatarLength
+                    && payload.startsWith(legacyAvatarPrefix)
+                    && payload.endsWith(legacyAvatarSuffix);
+            };
+
+            document.querySelectorAll('.avatar img, .avatar-lg img, .social-nav-avatar img').forEach((img) => {
+                const applyFallback = () => {
+                    img.src = defaultAvatar;
+                    img.dataset.fallbackApplied = 'true';
+                };
+
+                if (!img.getAttribute('src') || img.getAttribute('src').endsWith(',') || isLegacyAvatar(img.getAttribute('src'))) {
+                    applyFallback();
+                    return;
+                }
+
+                img.addEventListener('error', () => {
+                    if (img.dataset.fallbackApplied !== 'true') {
+                        applyFallback();
+                    }
+                });
+            });
+
+            const lightbox = document.querySelector('[data-lightbox]');
+            const lightboxImage = document.querySelector('[data-lightbox-image]');
+            const lightboxCaption = document.querySelector('[data-lightbox-caption]');
+
+            const openLightbox = (src, alt) => {
+                if (!src || !lightbox || !lightboxImage) {
+                    return;
+                }
+                lightboxImage.src = src;
+                lightboxImage.alt = alt || 'Imagem ampliada';
+                if (alt) {
+                    lightboxCaption.hidden = false;
+                    lightboxCaption.textContent = alt;
+                } else {
+                    lightboxCaption.hidden = true;
+                    lightboxCaption.textContent = '';
+                }
+                lightbox.classList.add('is-open');
+                lightbox.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeLightbox = () => {
+                if (!lightbox || !lightboxImage) {
+                    return;
+                }
+                lightbox.classList.remove('is-open');
+                lightbox.setAttribute('aria-hidden', 'true');
+                lightboxImage.src = '';
+                document.body.style.overflow = '';
+            };
+
+            document.querySelectorAll('[data-open-lightbox]').forEach((trigger) => {
+                trigger.addEventListener('click', () => {
+                    openLightbox(trigger.dataset.imageSrc, trigger.dataset.imageAlt);
+                });
+            });
+
+            document.querySelectorAll('[data-lightbox-close]').forEach((trigger) => {
+                trigger.addEventListener('click', closeLightbox);
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeLightbox();
+                }
+            });
+
+            document.querySelectorAll('.social-more').forEach((menu) => {
+                document.addEventListener('click', (event) => {
+                    if (!menu.open) {
+                        return;
+                    }
+                    if (!menu.contains(event.target)) {
+                        menu.open = false;
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

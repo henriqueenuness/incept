@@ -12,6 +12,55 @@
         margin: 0 12px;
         padding-top: 12px;
     }
+    .search-hero {
+        display: grid;
+        gap: 20px;
+    }
+    .search-form {
+        display: grid;
+        gap: 12px;
+    }
+    .search-filter-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .search-filter-chip {
+        min-height: 36px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+    }
+    .search-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .search-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .search-role::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 6px rgba(105, 226, 255, 0.12);
+    }
+    .search-role.is-client::before {
+        background: var(--accent-2);
+        box-shadow: 0 0 0 6px rgba(255, 156, 107, 0.12);
+    }
+    .search-card-copy {
+        display: grid;
+        gap: 12px;
+    }
 </style>
 {% endblock %}
 
@@ -22,7 +71,7 @@
     <aside class="social-nav">
         <a class="social-nav-link" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
+            <span class="social-nav-label">Pagina Inicial</span>
         </a>
         <a class="social-nav-link is-active" href="{% url 'search_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
@@ -38,13 +87,13 @@
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
             <span class="social-nav-label">Ciclo</span>
         </a>
-        <a class="social-nav-link" href="#">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area de mensagens ainda depende da implementacao do backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
             <span class="social-nav-label">Mensagens</span>
         </a>
-        <a class="social-nav-link" href="#">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificacoes em breve" data-placeholder-copy="As notificacoes ainda precisam de eventos reais no backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificações</span>
+            <span class="social-nav-label">Notificacoes</span>
         </a>
         {% if user.is_authenticated %}
         <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
@@ -60,17 +109,15 @@
             <span class="social-more-label">Mais</span>
         </summary>
         <div class="social-more-menu">
-            <a href="#">Configurações</a>
-            <a href="#">Sua atividade</a>
-            <a href="#">Salvos</a>
-            <a href="#">Alternar exibição</a>
-            <a href="#">Relatar um problema</a>
-            <a href="#">Trocar de conta</a>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
             <a href="{% url 'logout' %}">Sair</a>
         </div>
     </details>
 
-    <a class="messages-fab" href="#">
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area esta reservada na interface, mas o fluxo real ainda nao foi implementado.">
         <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
         <span>Mensagens</span>
     </a>
@@ -78,23 +125,31 @@
     <div class="app-main">
         <section class="social-layout">
             <div class="feed-stack">
-                <article class="social-card feed-hero">
+                <article class="social-card feed-hero search-hero">
                     <div class="feed-hero-copy">
                         <span class="social-kicker">Busca</span>
-                        <h2>Descubra perfis sem sair da linguagem do feed.</h2>
-                        <p class="lead">Menos pagina de formulario. Mais painel de descoberta dentro do proprio app.</p>
+                        <h2>Descubra perfis com leitura mais limpa e mais rapida.</h2>
+                        <p class="lead">Menos formulario, menos texto solto e uma identificacao mais clara entre artista e cliente.</p>
                     </div>
-                    <form class="feed-comment-form" action="{% url 'search_user' %}" method="GET">
+                    <form class="search-form" action="{% url 'search_user' %}" method="GET">
                         {% csrf_token %}
-                        <input class="field" name="search" placeholder="Quem você quer descobrir hoje?" value="{{ search }}">
-                        <button class="button" type="submit">Buscar</button>
+                        <div class="feed-comment-form" style="margin-top:0;">
+                            <input class="field" name="search" placeholder="Busque por nick, nome ou estilo" value="{{ search }}">
+                            <button class="button" type="submit">Buscar</button>
+                        </div>
+                        <div class="search-filter-row">
+                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="O filtro visual ja esta pronto, mas o filtro real ainda depende da busca no backend.">Artistas</button>
+                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="O filtro visual ja esta pronto, mas o filtro real ainda depende da busca no backend.">Clientes</button>
+                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="Os filtros por linguagem ainda precisam de suporte real no backend.">Ilustracao</button>
+                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="Os filtros por linguagem ainda precisam de suporte real no backend.">Video</button>
+                        </div>
                     </form>
                 </article>
 
                 {% if users %}
                     {% for user in users %}
                     <article class="feed-card">
-                        <div class="feed-card-header">
+                        <div class="search-card-head">
                             <a class="feed-card-author" href="{% url 'core_pg' user.nick %}">
                                 <span class="avatar-lg" style="width:64px; height:64px;"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
                                 <span class="feed-card-author-copy">
@@ -102,22 +157,24 @@
                                     <small>{{ user.real_name|default_if_none:"Sem nome publico" }}</small>
                                 </span>
                             </a>
-                            <span class="tag">{{ user.cargo }}</span>
+                            <span class="tag search-role {% if user.cargo == 'cliente' %}is-client{% endif %}">{{ user.cargo }}</span>
                         </div>
-                        <p class="feed-card-copy">{{ user.bio|default_if_none:"Este perfil ainda nao escreveu uma bio." }}</p>
-                        <div class="feed-toolbar">
-                            <div class="feed-toolbar-meta">
-                                {% if user.art_style %}
-                                <span>{{ user.art_style }}</span>
-                                {% endif %}
-                            </div>
-                            <div class="feed-toolbar-actions">
-                                <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Ver perfil</a>
-                                {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
-                                <button class="button follow-btn" data-url="{% url 'follow' user.user_id %}">
-                                    {% if user.user_id in following %}Seguindo{% else %}Seguir{% endif %}
-                                </button>
-                                {% endif %}
+                        <div class="search-card-copy">
+                            <p class="feed-card-copy">{{ user.bio|default_if_none:"Este perfil ainda nao escreveu uma bio." }}</p>
+                            <div class="feed-toolbar" style="margin-top:0;">
+                                <div class="feed-toolbar-meta">
+                                    {% if user.art_style %}
+                                    <span class="tag">{{ user.art_style }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="feed-toolbar-actions">
+                                    <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Ver perfil</a>
+                                    {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
+                                    <button class="button follow-btn" data-url="{% url 'follow' user.user_id %}">
+                                        {% if user.user_id in following %}Seguindo{% else %}Seguir{% endif %}
+                                    </button>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -137,13 +194,9 @@
 
             <aside class="social-rail">
                 <article class="social-card">
-                    <span class="social-kicker">Filtro</span>
-                    <div class="chip-row" style="margin-top:14px;">
-                        <span class="tag">artista</span>
-                        <span class="tag">processo</span>
-                        <span class="tag">ilustracao</span>
-                        <span class="tag">video</span>
-                    </div>
+                    <span class="social-kicker">Busca limpa</span>
+                    <h3 style="margin:14px 0 8px;">Visual mais objetivo.</h3>
+                    <p>Os perfis agora aparecem com tipo, bio curta e acesso rapido ao perfil sem excesso de texto.</p>
                 </article>
             </aside>
         </section>

@@ -1,0 +1,6 @@
+manage_local.py
+incept/settings_local.py
+db.sqlite3
+staticfiles/
+.env.local
+.env
