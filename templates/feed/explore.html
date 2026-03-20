@@ -294,6 +294,459 @@
     .onboarding-tag:hover {
         transform: translateY(-1px);
     }
+    .post-comments-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 240;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(3px);
+    }
+    .post-comments-modal.is-visible {
+        display: flex;
+    }
+    .post-comments-dialog {
+        width: min(1320px, 100%);
+        height: min(94vh, 1020px);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 456px;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: #111318;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
+    }
+    .post-comments-media {
+        min-width: 0;
+        background: #000;
+        display: grid;
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-media-inner {
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-close {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        padding: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 17, 22, 0.68);
+        color: rgba(255, 255, 255, 0.82);
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        z-index: 3;
+    }
+    .post-comments-close:hover {
+        background: rgba(15, 17, 22, 0.86);
+        color: #fff;
+    }
+    .post-comments-close svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-media-frame {
+        min-height: 0;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        position: relative;
+        align-items: center;
+        justify-items: center;
+        overflow: hidden;
+    }
+    .post-comments-media-frame img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        object-position: center center;
+        display: block;
+        margin: auto;
+        border-radius: 0;
+        background: #000;
+    }
+    .post-comments-side {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        background: #1a1d22;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+    .post-comments-side-head {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-side-head .feed-card-author-copy strong {
+        font-size: 0.94rem;
+    }
+    .post-comments-side-head .avatar {
+        width: 34px;
+        height: 34px;
+    }
+    .post-comments-side-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .post-comments-options-toggle {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+    }
+    .post-comments-options-toggle:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-options-toggle svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+    }
+    .post-comments-options-menu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, calc(100vw - 32px));
+        display: none;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #262a31;
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.38);
+        z-index: 260;
+    }
+    .post-comments-options-menu.is-visible {
+        display: grid;
+    }
+    .post-comments-option {
+        width: 100%;
+        padding: 13px 16px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: #f4f7fb;
+        text-align: center;
+        font-size: 0.93rem;
+        font-weight: 500;
+    }
+    .post-comments-option:last-child {
+        border-bottom: 0;
+    }
+    .post-comments-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-option.is-danger {
+        color: #ff8e8e;
+    }
+    .post-comments-side-body {
+        min-height: 0;
+        max-height: 100%;
+        overflow-y: auto;
+        padding: 16px 18px 22px;
+        display: grid;
+        align-content: start;
+        gap: 14px;
+    }
+    .post-comments-side-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+    }
+    .post-comments-empty {
+        padding: 18px 0;
+        color: rgba(255, 255, 255, 0.58);
+        background: transparent;
+        text-align: center;
+        border: 0;
+    }
+    .post-comments-form {
+        padding: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 0;
+        background: #1a1d22;
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+    .post-comments-form-row {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 16px 12px;
+        transition: padding 140ms ease;
+    }
+    .post-comments-form-row.is-overflowing {
+        align-items: end;
+    }
+    .post-comments-actions {
+        padding: 12px 16px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+    .post-comments-actions-left,
+    .post-comments-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .post-comments-icon {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #f7f8fa;
+    }
+    .post-comments-icon svg {
+        width: 29px;
+        height: 29px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-icon.like-btn svg {
+        width: 31px;
+        height: 31px;
+    }
+    .like-btn svg {
+        transition: fill 320ms cubic-bezier(0.22, 1, 0.36, 1), stroke 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        transform-origin: center;
+    }
+    .like-btn.liked svg {
+        fill: #ff304f;
+        stroke: #ff304f;
+        transform: scale(1.12);
+    }
+    .like-btn.liked:hover svg,
+    .like-btn:hover svg {
+        transform: scale(1.04);
+    }
+    .like-btn.is-animating svg {
+        animation: like-pop 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
+    @keyframes like-pop {
+        0% {
+            transform: scale(0.92);
+        }
+        35% {
+            transform: scale(1.18);
+        }
+        65% {
+            transform: scale(1.04);
+        }
+        100% {
+            transform: scale(1.12);
+        }
+    }
+    .post-comments-feedback {
+        padding: 0 16px 14px;
+        display: grid;
+        gap: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-feedback strong {
+        color: #f7f8fa;
+    }
+    .post-comments-feedback span {
+        color: rgba(255, 255, 255, 0.46);
+        font-size: 0.84rem;
+    }
+    .post-comments-input-icon {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.88);
+    }
+    .post-comments-input-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-comment {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-comment.is-pinned {
+        order: -1;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.09);
+    }
+    .post-comments-comment-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .post-comments-comment-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .post-comments-comment-copy {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+    }
+    .post-comments-comment-copy p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.92);
+        line-height: 1.5;
+        word-break: break-word;
+        font-size: 0.96rem;
+    }
+    .post-comments-comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: rgba(255, 255, 255, 0.44);
+        font-size: 0.74rem;
+        text-transform: lowercase;
+    }
+    .post-comments-comment-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .post-comments-comment-action {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.74rem;
+        font-weight: 600;
+        text-transform: none;
+    }
+    .post-comments-comment-action:hover,
+    .post-comments-comment-action.is-active {
+        color: rgba(255, 255, 255, 0.88);
+    }
+    .post-comments-pinned-badge {
+        display: none;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.09);
+        color: rgba(255, 255, 255, 0.84);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .post-comments-comment.is-pinned .post-comments-pinned-badge {
+        display: inline-flex;
+    }
+    .post-comments-pin {
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        padding: 4px;
+        opacity: 0;
+        transition: opacity 160ms ease, color 160ms ease;
+    }
+    .post-comments-comment:hover .post-comments-pin,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        opacity: 1;
+    }
+    .post-comments-pin:hover,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        color: #fff;
+    }
+    .post-comments-pin svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    .post-comments-form .field {
+        min-height: 26px;
+        padding: 6px 2px 6px 0;
+        border-radius: 0;
+        background: transparent;
+        border: 0;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        transition: color 140ms ease, box-shadow 140ms ease;
+    }
+    .post-comments-form textarea.field {
+        width: 100%;
+        resize: none;
+        overflow-y: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 68px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+        overscroll-behavior: contain;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar {
+        width: 6px;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+    }
+    .post-comments-form textarea.field.is-overflowing {
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    .post-comments-form .button {
+        min-height: auto;
+        padding: 0;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(243, 247, 251, 0.58);
+        box-shadow: none;
+    }
     @keyframes onboarding-stage-enter {
         0% {
             opacity: 0;
@@ -316,6 +769,26 @@
     }
     @media (max-width: 720px) {
         .explore-suggestion-grid {
+            grid-template-columns: 1fr;
+        }
+        .post-comments-modal {
+            padding: 0;
+        }
+        .post-comments-dialog {
+            width: 100%;
+            height: 100vh;
+            max-height: none;
+            border-radius: 0;
+            grid-template-columns: 1fr;
+        }
+        .post-comments-media-frame img {
+            max-width: 100%;
+            max-height: 46vh;
+        }
+        .post-comments-side {
+            min-height: 0;
+        }
+        .post-comments-form-row {
             grid-template-columns: 1fr;
         }
         .onboarding-stage {
@@ -428,7 +901,7 @@
 
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
-                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg><span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span></button>
+                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg><span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span></button>
                                 <button class="feed-action-icon" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg><span class="feed-action-count" data-comment-count>{{ post.comments_set.count }}</span></button>
                                 <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
                             </div>
@@ -439,31 +912,113 @@
                         <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
                         {% endif %}
 
-                        <div class="feed-comments-panel" id="comments-panel-{{ post.id }}" hidden>
-                            {% if comments %}
-                            <div class="feed-comments">
-                                {% for comment in comments %}
-                                    {% if comment.post_id == post.id %}
-                                    <div class="feed-comment">
-                                        <div class="feed-comment-head">
-                                            <strong>@{{ comment.user.nick }}</strong>
-                                            <span class="muted">{{ comment.date|date:"d/m H:i" }}</span>
+                    </article>
+                    <div class="post-comments-modal" id="comments-panel-{{ post.id }}" hidden aria-hidden="true" data-post-id="{{ post.id }}" data-post-owner-id="{{ post.user.user_id }}" data-comments-url="{% url 'comments_api' post.id %}">
+                        <div class="post-comments-dialog" role="dialog" aria-modal="true" aria-labelledby="comments-title-{{ post.id }}">
+                            <section class="post-comments-media">
+                                <div class="post-comments-media-inner">
+                                    <div class="post-comments-media-frame">
+                                        <button class="post-comments-close" type="button" data-comment-close aria-label="Fechar comentários">
+                                            <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
+                                        </button>
+                                        <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description|default_if_none:post.user.nick }}">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <aside class="post-comments-side">
+                                <div class="post-comments-side-head">
+                                    <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                                        <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                                        <span class="feed-card-author-copy">
+                                            <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }}</strong>
+                                        </span>
+                                    </a>
+                                    <div class="post-comments-side-head-actions">
+                                        <button class="post-comments-options-toggle" type="button" data-options-toggle aria-label="Mais opções">
+                                            <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+                                        </button>
+                                        <div class="post-comments-options-menu" data-options-menu>
+                                            <button class="post-comments-option is-danger" type="button">Denunciar</button>
+                                            {% if user.is_authenticated and following_ids and post.user.user_id in following_ids %}
+                                            <button class="post-comments-option" type="button" data-follow-menu data-url="{% url 'follow' post.user.user_id %}">Deixar de seguir</button>
+                                            {% else %}
+                                            <button class="post-comments-option" type="button" data-follow-menu data-url="{% url 'follow' post.user.user_id %}">Seguir</button>
+                                            {% endif %}
+                                            <button class="post-comments-option" type="button">Adicionar aos Favoritos</button>
+                                            <button class="post-comments-option" type="button" data-share-url="#post-{{ post.id }}">Compartilhar</button>
+                                            <button class="post-comments-option" type="button" data-copy-link="#post-{{ post.id }}">Copiar link</button>
+                                            <button class="post-comments-option" type="button" data-options-close>Cancelar</button>
                                         </div>
-                                        <p>{{ comment.content }}</p>
+                                    </div>
+                                </div>
+                                <div class="post-comments-side-body" data-comment-list>
+                                    {% for comment in comments %}
+                                        {% if comment.post_id == post.id %}
+                                        <article class="post-comments-comment" data-comment-entry>
+                                            <div class="post-comments-comment-avatar">
+                                                <img src="data:image/png;base64,{{ comment.user.core_picture }}" alt="{{ comment.user.nick }}">
+                                            </div>
+                                            <div class="post-comments-comment-head">
+                                                <div class="post-comments-comment-copy">
+                                                    <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
+                                                    <div class="post-comments-comment-meta">
+                                                        <span>há {{ comment.date|timesince }}</span>
+                                                        <div class="post-comments-comment-actions">
+                                                            <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
+                                                            <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@{{ comment.user.nick }}">Responder</button>
+                                                        </div>
+                                                        <span class="post-comments-pinned-badge">Fixado</span>
+                                                    </div>
+                                                </div>
+                                                {% if request.user.is_authenticated and request.user.user_id == post.user.user_id %}
+                                                <button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">
+                                                    <svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </article>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if post.comments_set.count == 0 %}
+                                    <div class="post-comments-empty" data-comment-empty>
+                                        Nenhum comentário ainda. Abra a conversa por aqui.
                                     </div>
                                     {% endif %}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                            {% if user.is_authenticated %}
-                            <form class="feed-comment-form" action="{% url 'comment' post.id %}" method="POST">
-                                {% csrf_token %}
-                                <input class="field" type="text" name="comment-content" placeholder="Escreva um comentário">
-                                <button class="button" type="submit">Enviar</button>
-                            </form>
-                            {% endif %}
+                                </div>
+                                {% if user.is_authenticated %}
+                                <form class="post-comments-form" action="{% url 'comment' post.id %}" method="POST" data-comment-form>
+                                    {% csrf_token %}
+                                    <div class="post-comments-actions">
+                                        <div class="post-comments-actions-left">
+                                            <button class="post-comments-icon like-btn" type="button" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}" aria-label="Curtir"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg></button>
+                                            <button class="post-comments-icon" type="button" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></button>
+                                            <button class="post-comments-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+                                        </div>
+                                        <div class="post-comments-actions-right">
+                                            <button class="post-comments-icon" type="button" aria-label="Salvar"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"></path></svg></button>
+                                        </div>
+                                    </div>
+                                    <div class="post-comments-feedback">
+                                        {% if post.likes_set.count %}
+                                        <strong>{{ post.likes_set.count }} curtida{{ post.likes_set.count|pluralize }}</strong>
+                                        {% else %}
+                                        <strong>Seja a primeira pessoa a curtir isso</strong>
+                                        {% endif %}
+                                        <span>há {{ post.date|timesince }}</span>
+                                    </div>
+                                    <div class="post-comments-form-row">
+                                        <span class="post-comments-input-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5s1.5 2 3.5 2 3.5-2 3.5-2"></path><path d="M9 9.5h.01"></path><path d="M15 9.5h.01"></path></svg>
+                                        </span>
+                                        <textarea class="field" name="comment-content" rows="1" placeholder="Escreva um comentário" data-comment-input></textarea>
+                                        <button class="button" type="submit">Postar</button>
+                                    </div>
+                                </form>
+                                {% endif %}
+                            </aside>
                         </div>
-                    </article>
+                    </div>
                     {% endfor %}
                 {% else %}
                 <section class="explore-fallback-grid">
@@ -610,25 +1165,47 @@
 {% block scripts %}
 <script>
     const csrftoken = "{{ csrf_token }}";
-    document.querySelectorAll('.like-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            fetch(btn.dataset.url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                btn.classList.toggle('liked', Boolean(data.liked));
-                const likeCount = btn.querySelector('[data-like-count]');
-                if (likeCount) {
-                    likeCount.textContent = data.likes;
+    const bindLikeButtons = () => {
+        document.querySelectorAll('.like-btn').forEach((btn) => {
+            if (btn.dataset.likeBound === 'true') {
+                return;
+            }
+            btn.dataset.likeBound = 'true';
+            btn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                try {
+                    const response = await fetch(btn.dataset.url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        }
+                    });
+                    if (!response.ok) {
+                        return;
+                    }
+                    const data = await response.json();
+                    const postId = btn.dataset.likePostId;
+                    document.querySelectorAll(`.like-btn[data-like-post-id="${postId}"]`).forEach((likeButton) => {
+                        likeButton.classList.toggle('liked', Boolean(data.liked));
+                        likeButton.classList.remove('is-animating');
+                        if (data.liked) {
+                            void likeButton.offsetWidth;
+                            likeButton.classList.add('is-animating');
+                            window.setTimeout(() => likeButton.classList.remove('is-animating'), 560);
+                        }
+                        const likeCount = likeButton.querySelector('[data-like-count]');
+                        if (likeCount) {
+                            likeCount.textContent = data.likes;
+                        }
+                    });
+                } catch (error) {
+                    console.error(error);
                 }
             });
         });
-    });
+    };
+    bindLikeButtons();
 
     const onboarding = document.querySelector('[data-onboarding]');
     const onboardingTrack = document.querySelector('[data-onboarding-track]');
@@ -755,18 +1332,292 @@
         });
     }
 
-    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const form = document.getElementById(btn.dataset.target);
-            if (!form) {
+    const commentModals = Array.from(document.querySelectorAll('.post-comments-modal'));
+    const commentPollingTimers = new Map();
+    const currentUserId = '{{ request.user.user_id|default:"" }}';
+    const escapeHtml = (value) => String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    const buildCommentMarkup = (modal, comment) => {
+        const canPin = currentUserId && modal.dataset.postOwnerId === currentUserId;
+        return `
+            <article class="post-comments-comment" data-comment-entry>
+                <div class="post-comments-comment-avatar">
+                    <img src="data:image/png;base64,${escapeHtml(comment.user.core_picture)}" alt="${escapeHtml(comment.user.nick)}">
+                </div>
+                        <div class="post-comments-comment-head">
+                            <div class="post-comments-comment-copy">
+                                <p><strong>@${escapeHtml(comment.user.nick)}</strong> ${escapeHtml(comment.content)}</p>
+                                <div class="post-comments-comment-meta">
+                                    <span>${escapeHtml(comment.created_relative)}</span>
+                                    <div class="post-comments-comment-actions">
+                                        <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
+                                        <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@${escapeHtml(comment.user.nick)}">Responder</button>
+                                    </div>
+                                    <span class="post-comments-pinned-badge">Fixado</span>
+                                </div>
+                            </div>
+                    ${canPin ? '<button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário"><svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg></button>' : ''}
+                </div>
+            </article>
+        `;
+    };
+    const bindCommentInteractions = (modal) => {
+        const entries = Array.from(modal.querySelectorAll('[data-comment-entry]'));
+        const container = modal.querySelector('[data-comment-list]');
+        if (!container) {
+            return;
+        }
+        entries.forEach((entry) => {
+            const pinButton = entry.querySelector('[data-comment-pin]');
+            if (!pinButton || pinButton.dataset.bound === 'true') {
                 return;
             }
-            form.hidden = !form.hidden;
-            if (!form.hidden) {
-                const input = form.querySelector('input[name="comment-content"]');
-                if (input) {
-                    input.focus();
+            pinButton.dataset.bound = 'true';
+            pinButton.addEventListener('click', () => {
+                const isPinned = entry.classList.contains('is-pinned');
+                entries.forEach((item) => item.classList.remove('is-pinned'));
+                if (!isPinned) {
+                    entry.classList.add('is-pinned');
+                    container.prepend(entry);
                 }
+            });
+        });
+        entries.forEach((entry) => {
+            const likeButton = entry.querySelector('[data-comment-like]');
+            const replyButton = entry.querySelector('[data-comment-reply]');
+            if (likeButton && likeButton.dataset.bound !== 'true') {
+                likeButton.dataset.bound = 'true';
+                likeButton.addEventListener('click', () => {
+                    const isActive = likeButton.classList.toggle('is-active');
+                    likeButton.textContent = isActive ? 'Curtido' : 'Curtir';
+                });
+            }
+            if (replyButton && replyButton.dataset.bound !== 'true') {
+                replyButton.dataset.bound = 'true';
+                replyButton.addEventListener('click', () => {
+                    const input = modal.querySelector('[data-comment-input]');
+                    if (!input) {
+                        return;
+                    }
+                    const prefix = `${replyButton.dataset.commentAuthor || ''} `;
+                    const currentValue = input.value.trim();
+                    input.value = currentValue.startsWith(prefix.trim()) ? input.value : `${prefix}${input.value}`.trim();
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.focus();
+                    const length = input.value.length;
+                    input.setSelectionRange(length, length);
+                });
+            }
+        });
+    };
+    const renderComments = (modal, comments) => {
+        const list = modal.querySelector('[data-comment-list]');
+        if (!list) {
+            return;
+        }
+        if (!comments.length) {
+            list.innerHTML = '<div class="post-comments-empty" data-comment-empty>Nenhum comentário ainda. Abra a conversa por aqui.</div>';
+            return;
+        }
+        list.innerHTML = comments.map((comment) => buildCommentMarkup(modal, comment)).join('');
+        bindCommentInteractions(modal);
+    };
+    const fetchComments = async (modal) => {
+        if (!modal?.dataset.commentsUrl) {
+            return;
+        }
+        try {
+            const response = await fetch(modal.dataset.commentsUrl, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            renderComments(modal, data.comments || []);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const setCommentModalState = (modal, shouldOpen) => {
+        if (!modal) {
+            return;
+        }
+        modal.hidden = !shouldOpen;
+        modal.classList.toggle('is-visible', shouldOpen);
+        modal.setAttribute('aria-hidden', String(!shouldOpen));
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
+        if (shouldOpen) {
+            fetchComments(modal);
+            if (!commentPollingTimers.has(modal)) {
+                const timer = window.setInterval(() => {
+                    if (modal.classList.contains('is-visible')) {
+                        fetchComments(modal);
+                    }
+                }, 5000);
+                commentPollingTimers.set(modal, timer);
+            }
+            const input = modal.querySelector('[name="comment-content"]');
+            if (input) {
+                window.setTimeout(() => input.focus(), 40);
+            }
+        } else if (commentPollingTimers.has(modal)) {
+            window.clearInterval(commentPollingTimers.get(modal));
+            commentPollingTimers.delete(modal);
+        }
+    };
+
+    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const modal = document.getElementById(btn.dataset.target);
+            commentModals.forEach((item) => {
+                if (item !== modal) {
+                    setCommentModalState(item, false);
+                }
+            });
+            setCommentModalState(modal, true);
+        });
+    });
+
+    document.querySelectorAll('[data-comment-close]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            setCommentModalState(btn.closest('.post-comments-modal'), false);
+        });
+    });
+
+    commentModals.forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                setCommentModalState(modal, false);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+        commentModals.forEach((modal) => {
+            if (modal.classList.contains('is-visible')) {
+                setCommentModalState(modal, false);
+            }
+        });
+    });
+
+    document.querySelectorAll('.post-comments-modal').forEach((modal) => {
+        bindCommentInteractions(modal);
+    });
+
+    document.querySelectorAll('[data-options-toggle]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const menu = button.parentElement.querySelector('[data-options-menu]');
+            document.querySelectorAll('[data-options-menu]').forEach((item) => {
+                if (item !== menu) {
+                    item.classList.remove('is-visible');
+                }
+            });
+            if (menu) {
+                menu.classList.toggle('is-visible');
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-options-close]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const menu = button.closest('[data-options-menu]');
+            if (menu) {
+                menu.classList.remove('is-visible');
+            }
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-options-menu]') || event.target.closest('[data-options-toggle]')) {
+            return;
+        }
+        document.querySelectorAll('[data-options-menu]').forEach((menu) => {
+            menu.classList.remove('is-visible');
+        });
+    });
+
+    document.querySelectorAll('[data-follow-menu]').forEach((button) => {
+        button.addEventListener('click', () => {
+            fetch(button.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                button.textContent = data.is_following ? 'Deixar de seguir' : 'Seguir';
+            });
+        });
+    });
+
+    document.querySelectorAll('[data-copy-link]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const shareUrl = new URL(button.dataset.copyLink, window.location.href).toString();
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-comment-input]').forEach((input) => {
+        const row = input.closest('.post-comments-form-row');
+        const resize = () => {
+            input.style.height = 'auto';
+            const nextHeight = Math.min(input.scrollHeight, 68);
+            input.style.height = `${nextHeight}px`;
+            const overflowing = input.scrollHeight > 68;
+            input.classList.toggle('is-overflowing', overflowing);
+            if (row) {
+                row.classList.toggle('is-overflowing', overflowing);
+            }
+        };
+        input.dataset.minHeight = '26';
+        input.addEventListener('input', resize);
+        resize();
+    });
+
+    document.querySelectorAll('[data-comment-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const modal = form.closest('.post-comments-modal');
+            const input = form.querySelector('[name="comment-content"]');
+            if (!modal || !input || !input.value.trim()) {
+                return;
+            }
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                if (!response.ok) {
+                    return;
+                }
+                input.value = '';
+                input.rows = 1;
+                input.style.height = `${input.dataset.minHeight || 26}px`;
+                await fetchComments(modal);
+                input.focus();
+            } catch (error) {
+                console.error(error);
             }
         });
     });
