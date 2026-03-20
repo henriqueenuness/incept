@@ -3,6 +3,8 @@ from accounts.models import User, Followers
 from .models import Post, Likes, Comments
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_GET, require_POST
+from django.utils.timesince import timesince
 
 # Create your views here.
 def search_pg(request):
@@ -68,12 +70,45 @@ def like(request, id):
     return JsonResponse({"likes": post.likes_set.count(),
                          "liked" : liked }) #
 
+def serialize_comment(comment):
+    return {
+        "id": comment.id,
+        "post_id": comment.post_id,
+        "content": comment.content,
+        "created_relative": f"há {timesince(comment.date).split(',')[0]}",
+        "user": {
+            "id": comment.user.user_id if comment.user else None,
+            "nick": comment.user.nick if comment.user else "usuario",
+            "core_picture": comment.user.core_picture if comment.user else "",
+        },
+    }
+
+@require_GET
+def comments_api(request, id):
+    post = get_object_or_404(Post, id=id)
+    comments = Comments.objects.filter(post=post).select_related("user").order_by("date")
+    return JsonResponse({
+        "comments": [serialize_comment(comment) for comment in comments],
+        "count": comments.count(),
+    })
+
+@require_POST
 def comment(request, id):
-    user=request.user
-    postid =get_object_or_404(Post, id=id)
-    content = request.POST.get('comment-content')
-    if request.method == 'POST':
-        Comments.objects.create(user=user, content=content, post=postid)
+    user = request.user
+    postid = get_object_or_404(Post, id=id)
+    content = (request.POST.get('comment-content') or '').strip()
+    comment = None
+    if content:
+        comment = Comments.objects.create(user=user, content=content, post=postid)
+
+    wants_json = request.headers.get("x-requested-with") == "XMLHttpRequest" or "application/json" in request.headers.get("accept", "")
+    if wants_json:
+        return JsonResponse({
+            "ok": bool(comment),
+            "comment": serialize_comment(comment) if comment else None,
+            "count": post.comments_set.count(),
+        })
+
     return redirect(request.META.get('HTTP_REFERER', 'explore_pg'))
 
 
