@@ -9,10 +9,10 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
-import dj_database_url, psycopg2, os
-from pathlib import Path
+import os
+import dj_database_url
 from dotenv import load_dotenv
+from pathlib import Path
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,8 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'batata_frita'
-#SECRET_KEY = 'django-insecure-s)a@ly@c2x#7i$6z%pxq*#4bzaa8n93ccuqg332luwjod1eh)1'
+SECRET_KEY = 'django-insecure-s)a@ly@c2x#7i$6z%pxq*#4bzaa8n93ccuqg332luwjod1eh)1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,14 +81,15 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 load_dotenv()
 DATABASES = {
 
-    'default': {
+    'default': { 
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("dbname"),
         'USER': os.getenv("user"),
         'PASSWORD': os.getenv("password"),
         'HOST': os.getenv("host"),
         'PORT': os.getenv("port"),
-    },
+        },
+
     'local': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -97,14 +97,7 @@ DATABASES = {
 }
 
 
-"""    'render': {
-        'ENGINE': 'django.db.backends.postgresql', 
-        'NAME': 'postergres',
-        'USER': 'incept_user',
-        'PASSWORD': 'o4xOMd7LRdahXVB7F17YBOkhNrQalTkz',
-        'HOST': 'dpg-d67sfijnv86c73e1u8mg-a',
-        'PORT':'5432',
-    }"""
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -142,14 +135,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
+"""STATICFILES_DIRS = [BASE_DIR / "static"]"""
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 LOGOUT_REDIRECT_URL = "login_pg"
-
-DATABASE_URL = 'postgressql://postgres:[incept2026*]@db.sloqpnvutcreuxstuldh.supabase.co:5432/postgres'
 
 
 
