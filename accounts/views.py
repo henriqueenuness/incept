@@ -2,6 +2,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Followers
 import base64
+from django.utils import timezone
+from datetime import datetime, timedelta
 from feed.models import Post, Comments
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
@@ -113,14 +115,33 @@ def edit_core(request): #edit core
         real_name = request.POST.get('real_name')
         bio = request.POST.get('bio')
         art_style = request.POST.get('art_style')
+        nick = request.POST.get('nick')
         core_picture = request.FILES.get('core_picture')
         user = request.user
         if core_picture:
             core_p = base64.b64encode(core_picture.read()).decode('utf-8')
             user.core_picture = core_p
+        if art_style:
+            user.art_style = art_style #sem isso, quando o usuario tenta usar edit core sem atualizar esse campo, ele considera como vazio
+        if nick:
+            if User.objects.filter(nick=nick).exclude(user_id=user.user_id).exists():
+                return HttpResponse("algúem já usa esse nick, tente outro")
+            if user.last_nick_change: #se tiver mudança
+                if timezone.now() - user.last_nick_change < timedelta(days=14): #se a ultima mudança for a menos de 14 dias atras
+                    dias = timedelta.days
+                    horas = timedelta.seconds // 3600
+                    return HttpResponse(f"faltam {dias} dias e {horas} horas para poder mudar o nick novamente")
+                else:
+                    user.nick = nick
+                    user.last_nick_change = timezone.now()
+            else:
+                user.nick = nick
+                user.last_nick_change = timezone.now()
+
+                    
+
         user.real_name = real_name
         user.bio = bio
-        user.art_style = art_style
         user.save()
         return render(request, 'users/core/edit-core.html', {'user': request.user})
 
