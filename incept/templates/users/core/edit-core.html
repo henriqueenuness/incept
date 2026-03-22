@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Incept | Editar Perfil{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shell {
+        width: calc(100% - 12px);
+        max-width: none;
+        margin: 0 6px 0 0;
+        padding-top: 12px;
+    }
+    .app-shell {
+        padding-left: 228px;
+    }
+    .app-main {
+        width: 100%;
+        display: grid;
+        justify-items: center;
+    }
+    .editor-page {
+        width: min(100%, 980px);
+        min-height: calc(100vh - 32px);
+        padding: 8px 24px 32px;
+        display: grid;
+        gap: 20px;
+    }
+    .editor-panel {
+        border-radius: 30px;
+        border: 1px solid rgba(183, 229, 255, 0.12);
+        background: linear-gradient(180deg, rgba(10, 20, 36, 0.92), rgba(7, 13, 24, 0.84));
+        box-shadow: var(--shadow);
+    }
+    .editor-panel {
+        padding: 24px;
+    }
+    .editor-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(243, 247, 251, 0.66);
+        font-size: 0.78rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+    .editor-kicker::before {
+        content: "";
+        width: 34px;
+        height: 1px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .editor-panel h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+    }
+    .editor-hero {
+        display: grid;
+        gap: 18px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 20px;
+    }
+    .editor-hero-top {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+    .editor-hero .avatar-lg {
+        width: 118px;
+        height: 118px;
+    }
+    .editor-meta {
+        display: grid;
+        gap: 10px;
+    }
+    .editor-meta .tag {
+        width: fit-content;
+    }
+    .editor-panel {
+        display: grid;
+        gap: 20px;
+    }
+    .editor-panel-head {
+        display: grid;
+        gap: 10px;
+        max-width: 60ch;
+    }
+    .editor-form {
+        display: grid;
+        gap: 16px;
+    }
+    .editor-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+    .editor-field {
+        display: grid;
+        gap: 10px;
+    }
+    .editor-field span {
+        font-size: 0.82rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .editor-actions,
+    .editor-danger {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .editor-danger {
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .editor-danger .ghost-button {
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+    .delete-account-wrap {
+        display: grid;
+        gap: 12px;
+        justify-items: end;
+    }
+    .delete-account-toggle {
+        width: 46px;
+        min-width: 46px;
+        height: 46px;
+        padding: 0;
+        border-radius: 14px;
+        color: #ffd1d1;
+        border-color: rgba(255, 151, 151, 0.22);
+    }
+    .delete-account-toggle svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .delete-account-confirm {
+        display: none;
+        width: min(100%, 360px);
+        gap: 10px;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 151, 151, 0.18);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .delete-account-confirm.is-open {
+        display: grid;
+    }
+    .delete-account-confirm p {
+        font-size: 0.92rem;
+    }
+    .delete-account-confirm .button[aria-disabled="true"] {
+        opacity: 0.45;
+        pointer-events: none;
+    }
+    @media (max-width: 980px) {
+        .app-shell {
+            padding-left: 0;
+        }
+        .editor-page {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+    @media (max-width: 720px) {
+        .editor-grid {
+            grid-template-columns: 1fr;
+        }
+        .editor-danger {
+            align-items: stretch;
+        }
+        .delete-account-wrap {
+            justify-items: start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Página Inicial</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link is-active" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden>
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden>
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificações</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <a href="#">Configurações</a>
+            <a href="#">Salvos</a>
+            <a href="#">Alternar exibição</a>
+            <a href="#">Relatar um problema</a>
+            <a href="{% url 'logout' %}">Sair</a>
+        </div>
+    </details>
+
+    <a class="messages-fab" href="#" hidden>
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+
+    <div class="app-main">
+        <section class="editor-page">
+                <article class="editor-panel">
+                    <div class="editor-hero">
+                        <div class="editor-hero-top">
+                            <div class="avatar-lg">
+                                <img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}">
+                            </div>
+                            <div class="editor-meta">
+                                <span class="editor-kicker">Perfil</span>
+                                <h2>@{{ user.nick }}</h2>
+                                <p>Refine sua presença pública com uma apresentação mais clara, coerente e profissional.</p>
+                                <span class="tag">{{ user.cargo }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editor-panel-head">
+                        <span class="editor-kicker">Editar perfil</span>
+                        <h2>Ajuste o perfil com mais precisão.</h2>
+                        <p>Atualize imagem, nome, bio e linguagem visual sem poluir a página. O foco aqui é clareza.</p>
+                    </div>
+
+                    <form class="editor-form" method="POST" action="{% url 'edit_core' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="editor-grid">
+                            <label class="editor-field">
+                                <span>Imagem de perfil</span>
+                                <input class="field" name="core_picture" accept="image/*" type="file">
+                            </label>
+                            <label class="editor-field">
+                                <span>Nick</span>
+                                <input class="field" name="nick" placeholder="Seu nome público" value="{{ user.nick }}">
+                            </label>
+                        </div>
+
+                        <div class="editor-grid">
+                            <label class="editor-field">
+                                <span>Nome</span>
+                                <input class="field" name="real_name" placeholder="Nome real (opcional)" value="{{ user.real_name }}">
+                            </label>
+                            <label class="editor-field">
+                                <span>Linguagem</span>
+                                <select class="select-field" name="art_style">
+                                    <option value="{{ user.art_style }}" selected disabled>{{ user.art_style|default_if_none:"Selecionar estilo" }}</option>
+                                    <optgroup label="Música">
+                                        <option value="música clássica">música clássica</option>
+                                        <option value="jazz">jazz</option>
+                                        <option value="blues">blues</option>
+                                        <option value="gospel">gospel</option>
+                                        <option value="soul">soul</option>
+                                        <option value="pop">pop</option>
+                                        <option value="rock">rock</option>
+                                        <option value="country">country</option>
+                                    </optgroup>
+                                    <optgroup label="Pintura e desenho">
+                                        <option value="desenhista 2D">desenhista 2D</option>
+                                        <option value="realismo">realismo</option>
+                                        <option value="cartoon">cartoon</option>
+                                        <option value="manga">manga</option>
+                                        <option value="chibi">chibi</option>
+                                        <option value="caricatura">caricatura</option>
+                                        <option value="doodleArt">doodleArt</option>
+                                        <option value="surrealismo">surrealismo</option>
+                                        <option value="modelador 3D">modelador 3D</option>
+                                    </optgroup>
+                                    <optgroup label="Audiovisual">
+                                        <option value="videomaker">videomaker</option>
+                                        <option value="editor de vídeos">editor de vídeos</option>
+                                        <option value="filmmaker">filmmaker</option>
+                                        <option value="roteirista">roteirista</option>
+                                        <option value="designer gráfico">designer gráfico</option>
+                                        <option value="editor de fotos">editor de fotos</option>
+                                        <option value="colorista">colorista</option>
+                                        <option value="motion designer">motion designer</option>
+                                    </optgroup>
+                                </select>
+                            </label>
+                        </div>
+
+                        <label class="editor-field">
+                            <span>Bio</span>
+                            <textarea class="textarea-field" name="bio" placeholder="Conte em poucas linhas como você quer ser percebido.">{{ user.bio }}</textarea>
+                        </label>
+
+                        <div class="editor-actions">
+                            <button class="button" type="submit">Salvar alterações</button>
+                            <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Voltar ao perfil</a>
+                        </div>
+                    </form>
+
+                    {% if user.is_authenticated %}
+                    <div class="editor-danger">
+                        <div class="editor-actions">
+                            <a class="ghost-button" href="{% url 'delete_core_picture' %}">Remover foto</a>
+                            <a class="ghost-button" href="{% url 'logout' %}">Sair</a>
+                        </div>
+                        <div class="delete-account-wrap">
+                            <button class="ghost-button delete-account-toggle" type="button" data-delete-toggle aria-label="Excluir conta">
+                                <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
+                            </button>
+                            <div class="delete-account-confirm" data-delete-confirm>
+                                <p>Para excluir a conta, escreva <strong>querodeletar</strong>.</p>
+                                <input class="field" type="text" data-delete-input placeholder="querodeletar">
+                                <a class="button" href="{% url 'delete_account' %}" data-delete-link aria-disabled="true">Confirmar exclusão</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </article>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const deleteToggle = document.querySelector('[data-delete-toggle]');
+    const deleteConfirm = document.querySelector('[data-delete-confirm]');
+    const deleteInput = document.querySelector('[data-delete-input]');
+    const deleteLink = document.querySelector('[data-delete-link]');
+
+    if (deleteToggle && deleteConfirm && deleteInput && deleteLink) {
+        deleteToggle.addEventListener('click', () => {
+            deleteConfirm.classList.toggle('is-open');
+            if (deleteConfirm.classList.contains('is-open')) {
+                deleteInput.focus();
+            }
+        });
+
+        deleteInput.addEventListener('input', () => {
+            const isValid = deleteInput.value.trim().toLowerCase() === 'querodeletar';
+            deleteLink.setAttribute('aria-disabled', String(!isValid));
+        });
+    }
+</script>
+{% endblock %}

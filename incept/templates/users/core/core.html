@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% block title %}Incept | @{{ perfil_user.nick }}{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shell {
+        width: calc(100% - 12px);
+        max-width: none;
+        margin: 0 6px 0 0;
+        padding-top: 12px;
+    }
+    .app-shell {
+        padding-left: 228px;
+    }
+    .app-main {
+        width: 100%;
+        display: grid;
+        justify-items: center;
+    }
+    .profile-page {
+        width: min(100%, 1520px);
+        margin: 0 auto;
+        padding-left: clamp(8px, 1.2vw, 18px);
+        padding-right: clamp(18px, 2.2vw, 36px);
+        min-height: calc(100vh - 32px);
+        padding-bottom: 24px;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+    .profile-columns {
+        display: grid;
+        grid-template-columns: minmax(0, 1280px);
+        justify-content: start;
+        align-items: stretch;
+    }
+    .profile-hero,
+    .profile-panel {
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+    .profile-hero::before,
+    .profile-panel::before {
+        display: none;
+    }
+    .profile-panel {
+        padding-top: 0;
+        max-width: 1280px;
+        margin: 0;
+        width: 100%;
+    }
+    .profile-summary-top {
+        justify-content: center;
+        text-align: center;
+    }
+    .profile-hero-grid {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+    .profile-meta-row {
+        align-items: center;
+    }
+    .profile-tabs {
+        margin: 8px auto 26px;
+        display: grid;
+        gap: 18px;
+    }
+    .profile-tab-button {
+        position: relative;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        text-align: center;
+        opacity: 0.72;
+        transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .profile-tab-button.is-active {
+        opacity: 1;
+    }
+    .profile-tab-button:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+    }
+    .profile-tab-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text);
+    }
+    .profile-tab-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .profile-tab-button strong {
+        display: none;
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+    .profile-tab-button p {
+        display: none;
+        font-size: 0.9rem;
+    }
+    .profile-tab-button.is-active strong,
+    .profile-tab-button.is-active p {
+        display: block;
+    }
+    .profile-tab-bar {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: start;
+        gap: 14px;
+        padding-top: 0;
+    }
+    .profile-tab-bar::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .profile-tab-panels {
+        display: grid;
+        position: relative;
+        margin-top: 10px;
+        padding-top: 26px;
+    }
+    .profile-tab-panels::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .profile-tab-panel {
+        display: none;
+    }
+    .profile-tab-panel.is-active {
+        display: block;
+    }
+    .profile-tab-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+    .profile-tab-tile {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        aspect-ratio: 4 / 5;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    }
+    .profile-tab-tile-empty {
+        display: grid;
+        place-items: center;
+        color: rgba(243, 247, 251, 0.34);
+    }
+    .profile-tab-tile-empty svg {
+        width: 28px;
+        height: 28px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .profile-empty {
+        min-height: 320px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+    }
+    .profile-tab-note {
+        max-width: 54ch;
+        margin: 0 auto;
+    }
+    @media (max-width: 980px) {
+        .app-shell {
+            padding-left: 0;
+        }
+        .profile-page {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .profile-columns {
+            grid-template-columns: 1fr;
+        }
+        .profile-tab-bar {
+            grid-template-columns: 1fr;
+        }
+        .profile-tab-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+    @media (max-width: 720px) {
+        .profile-tab-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Pagina Inicial</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementacao completa do backend.">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificacoes em breve" data-placeholder-copy="As notificacoes ainda precisam de eventos e persistencia no backend.">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificacoes</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
+            <a href="{% url 'logout' %}">Sair</a>
+        </div>
+    </details>
+
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area esta reservada na interface, mas o fluxo real ainda nao foi implementado.">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+
+    <div class="app-main">
+        <section class="profile-page">
+            <article class="profile-hero">
+                <div class="profile-hero-grid">
+                    <div class="profile-portrait">
+                        <span class="avatar-lg"><img src="data:image/png;base64,{{ perfil_user.core_picture }}" alt="{{ perfil_user.nick }}"></span>
+                    </div>
+
+                    <div class="profile-identity">
+                        <div class="profile-heading">
+                            <div class="profile-handle-block">
+                                <span class="social-kicker">Perfil</span>
+                                <h2>@{{ perfil_user.nick }}</h2>
+                                {% if perfil_user.real_name %}
+                                <span class="profile-subline">{{ perfil_user.real_name }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="profile-actions">
+                                {% if perfil_user.nick == user.nick %}
+                                    <a class="button" href="{% url 'edit_core_pg' %}">Editar</a>
+                                    {% if request.user.cargo != "cliente" %}
+                                    <a class="ghost-button" href="{% url 'new_post_pg' user.nick %}">Publicar</a>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="button follow-btn" data-url="{% url 'follow' perfil_user.user_id %}">
+                                        {% if is_following %}Seguindo{% else %}Seguir{% endif %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="profile-highlights">
+                            <div class="profile-highlight">
+                                <strong>{{ perfil_user.followers|default_if_none:"0" }}</strong>
+                                <span class="muted">seguidores</span>
+                            </div>
+                            <div class="profile-highlight">
+                                <strong>{{ perfil_user.following|default_if_none:"0" }}</strong>
+                                <span class="muted">seguindo</span>
+                            </div>
+                            <div class="profile-highlight">
+                                <strong>{% if perfil_user.cargo == "artista" %}{{ perfil_user.arts|default_if_none:"0" }}{% else %}-{% endif %}</strong>
+                                <span class="muted">posts</span>
+                            </div>
+                        </div>
+
+                        <p class="profile-bio">{{ perfil_user.bio|default_if_none:"Sem bio por enquanto." }}</p>
+
+                        <div class="profile-meta-row">
+                            {% if perfil_user.art_style %}
+                            <span class="tag">{{ perfil_user.art_style }}</span>
+                            {% endif %}
+                            <span class="tag">{{ perfil_user.cargo }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <section class="profile-columns">
+                <div class="profile-panel">
+                    <div class="profile-summary-top" style="margin-bottom: 18px;">
+                        <div class="profile-tab-note">
+                            <p>Imagens do perfil agora podem ser abertas em tela cheia e a interface remove informacao tecnica que nao agrega para o usuario.</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-tabs">
+                        <div class="profile-tab-bar">
+                            <button class="profile-tab-button is-active" type="button" data-profile-tab="posts">
+                                <div class="profile-tab-icon">
+                                    <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="m20 15-4-4L6 20"></path></svg>
+                                </div>
+                                <strong>Compartilhar fotos</strong>
+                                <p>Quando novas imagens entrarem no seu fluxo, elas passam a aparecer aqui como parte do perfil.</p>
+                            </button>
+                            <button class="profile-tab-button" type="button" data-profile-tab="saved">
+                                <div class="profile-tab-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M6 4h12a1.7 1.7 0 0 1 1.7 1.7V21l-7.7-4.4L4.3 21V5.7A1.7 1.7 0 0 1 6 4z"></path></svg>
+                                </div>
+                                <strong>Salvos so para voce</strong>
+                                <p>Guarde posts e referencias para rever depois. Esse espaco fica privado e nao envia aviso para ninguem.</p>
+                            </button>
+                            <button class="profile-tab-button" type="button" data-profile-tab="tagged">
+                                <div class="profile-tab-icon">
+                                    <svg viewBox="0 0 24 24"><path d="M21 11.5v6.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9.5"></path><path d="m21 3-9.5 9.5"></path><path d="M15 3h6v6"></path></svg>
+                                </div>
+                                <strong>Fotos com voce</strong>
+                                <p>Quando outras pessoas marcarem seu perfil em imagens, essa area passa a reunir essas aparicoes.</p>
+                            </button>
+                        </div>
+
+                        <div class="profile-tab-panels">
+                            <section class="profile-tab-panel is-active" data-profile-panel="posts">
+                                {% if imagens %}
+                                <div class="profile-tab-grid">
+                                    {% for img in imagens %}
+                                    <article class="profile-tab-tile">
+                                        <button class="feed-media profile-tab-tile-button" type="button" style="margin-top:0; border:0; border-radius:0; height:100%;" data-open-lightbox data-image-src="data:image/png;base64,{{ img.image }}" data-image-alt="{{ img.description }}">
+                                            <img src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
+                                        </button>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="profile-tab-grid">
+                                    {% for item in "1234"|make_list %}
+                                    <article class="profile-tab-tile profile-tab-tile-empty">
+                                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="m20 15-4-4L6 20"></path></svg>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                <div class="profile-empty">
+                                    <div>
+                                        <h3>Seu portfolio ainda esta em branco.</h3>
+                                        <p>Publique a primeira peca para dar volume ao perfil.</p>
+                                        {% if request.user.cargo == "artista" and perfil_user.nick == user.nick %}
+                                        <div class="feed-hero-actions" style="justify-content:center; margin-top:18px;">
+                                            <a class="button" href="{% url 'new_post_pg' user.nick %}">Criar primeiro post</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </section>
+
+                            <section class="profile-tab-panel" data-profile-panel="saved">
+                                <div class="profile-tab-grid">
+                                    {% for item in "1234"|make_list %}
+                                    <article class="profile-tab-tile profile-tab-tile-empty">
+                                        <svg viewBox="0 0 24 24"><path d="M6 4h12a1.7 1.7 0 0 1 1.7 1.7V21l-7.7-4.4L4.3 21V5.7A1.7 1.7 0 0 1 6 4z"></path></svg>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                <div class="profile-empty">
+                                    <div>
+                                        <h3>Nada salvo por enquanto.</h3>
+                                        <p>Salve referencias, imagens e posts que voce queira revisitar depois em um unico lugar.</p>
+                                        <div class="feed-hero-actions" style="justify-content:center; margin-top:18px;">
+                                            <a class="button" href="{% url 'explore_pg' %}">Explorar publicacoes</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="profile-tab-panel" data-profile-panel="tagged">
+                                <div class="profile-tab-grid">
+                                    {% for item in "1234"|make_list %}
+                                    <article class="profile-tab-tile profile-tab-tile-empty">
+                                        <svg viewBox="0 0 24 24"><path d="M21 11.5v6.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9.5"></path><path d="m21 3-9.5 9.5"></path><path d="M15 3h6v6"></path></svg>
+                                    </article>
+                                    {% endfor %}
+                                </div>
+                                <div class="profile-empty">
+                                    <div>
+                                        <h3>Nenhuma marcacao ainda.</h3>
+                                        <p>Quando outras pessoas incluirem seu perfil em posts e imagens, elas passam a aparecer aqui.</p>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrftoken = "{{ csrf_token }}";
+
+    document.querySelectorAll('.follow-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                btn.textContent = data.is_following ? 'Seguindo' : 'Seguir';
+            });
+        });
+    });
+
+    document.querySelectorAll('.like-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                btn.classList.toggle('liked', Boolean(data.liked));
+            });
+        });
+    });
+
+    const profileTabButtons = Array.from(document.querySelectorAll('[data-profile-tab]'));
+    const profileTabPanels = Array.from(document.querySelectorAll('[data-profile-panel]'));
+
+    profileTabButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.profileTab;
+            profileTabButtons.forEach((item) => item.classList.toggle('is-active', item === button));
+            profileTabPanels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.profilePanel === target));
+        });
+    });
+</script>
+{% endblock %}

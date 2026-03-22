@@ -1,0 +1,1640 @@
+{% extends "base.html" %}
+
+{% block title %}Incept | Pagina Inicial{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .shell {
+        width: calc(100% - 24px);
+        max-width: none;
+        margin: 0 12px;
+        padding-top: 12px;
+    }
+    .explore-suggestions {
+        display: grid;
+        gap: 14px;
+    }
+    .explore-suggestion-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+    .explore-suggestion-card {
+        padding: 18px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        display: grid;
+        gap: 14px;
+    }
+    .explore-suggestion-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .explore-suggestion-copy {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+    }
+    .explore-suggestion-copy strong {
+        color: var(--text);
+    }
+    .explore-suggestion-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .explore-fallback-grid {
+        display: grid;
+        gap: 14px;
+    }
+    .explore-fallback-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 220px;
+        padding: 22px;
+        border-radius: 30px;
+        border: 1px solid rgba(183, 229, 255, 0.12);
+        background:
+            linear-gradient(180deg, rgba(10, 20, 36, 0.86), rgba(7, 13, 24, 0.9)),
+            radial-gradient(circle at top right, rgba(105, 226, 255, 0.14), transparent 34%);
+        display: grid;
+        align-content: end;
+    }
+    .explore-fallback-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 38%),
+            var(--fallback-bg, linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0)));
+        opacity: 0.9;
+        pointer-events: none;
+    }
+    .explore-fallback-card > * {
+        position: relative;
+        z-index: 1;
+    }
+    .explore-fallback-card h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        letter-spacing: -0.04em;
+    }
+    .explore-fallback-card p {
+        max-width: 34ch;
+    }
+    .onboarding-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 120;
+        display: none;
+        background:
+            linear-gradient(180deg, rgba(4, 8, 14, 0.88), rgba(4, 8, 14, 0.92)),
+            radial-gradient(circle at top, rgba(105, 226, 255, 0.08), transparent 42%);
+        backdrop-filter: blur(10px);
+    }
+    .onboarding-overlay.is-visible {
+        display: block;
+    }
+    .onboarding-overlay.is-leaving .onboarding-stage {
+        animation: onboarding-stage-exit 820ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+    .onboarding-stage {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+        animation: onboarding-stage-enter 820ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .onboarding-aside,
+    .onboarding-main {
+        min-width: 0;
+        position: relative;
+    }
+    .onboarding-aside {
+        padding: 34px;
+        background: linear-gradient(180deg, rgba(8, 14, 24, 0.96), rgba(7, 12, 20, 0.94));
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        align-content: space-between;
+        gap: 26px;
+    }
+    .onboarding-brand {
+        font-size: 0.94rem;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(247, 248, 252, 0.92);
+    }
+    .onboarding-copy {
+        display: grid;
+        gap: 18px;
+        max-width: 34ch;
+    }
+    .onboarding-copy h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(2.2rem, 4.6vw, 4rem);
+        line-height: 0.94;
+        letter-spacing: -0.06em;
+    }
+    .onboarding-copy p {
+        color: rgba(234, 239, 255, 0.78);
+    }
+    .onboarding-progress {
+        display: flex;
+        gap: 10px;
+    }
+    .onboarding-progress-dot {
+        width: 42px;
+        height: 5px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.16);
+        transition: transform 240ms ease, background 240ms ease, box-shadow 240ms ease;
+    }
+    .onboarding-progress-dot.is-active {
+        background: #fff;
+        box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.06);
+        transform: scaleX(1.04);
+    }
+    .onboarding-main {
+        overflow: hidden;
+        background: rgba(6, 11, 18, 0.96);
+    }
+    .onboarding-track {
+        width: 200%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        transition: transform 620ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .onboarding-track.is-step-2 {
+        transform: translateX(-50%);
+    }
+    .onboarding-panel {
+        padding: 38px;
+        display: grid;
+        align-content: center;
+        gap: 22px;
+        min-width: 0;
+    }
+    .onboarding-panel-head {
+        display: grid;
+        gap: 12px;
+        max-width: 44ch;
+    }
+    .onboarding-panel-head h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.9rem, 3.6vw, 3rem);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+    }
+    .onboarding-tag-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .onboarding-tag {
+        min-height: 48px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .onboarding-tag.is-selected {
+        background: rgba(255, 255, 255, 0.16);
+        border-color: rgba(255, 255, 255, 0.26);
+        box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+    }
+    .onboarding-artist-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        max-height: min(48vh, 520px);
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+    .onboarding-artist-grid::-webkit-scrollbar {
+        width: 8px;
+    }
+    .onboarding-artist-grid::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+    }
+    .onboarding-artist-card {
+        padding: 18px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+    .onboarding-artist-card[hidden] {
+        display: none;
+    }
+    .onboarding-artist-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .onboarding-artist-copy {
+        min-width: 0;
+        display: grid;
+        gap: 4px;
+    }
+    .onboarding-artist-copy strong {
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .onboarding-artist-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .onboarding-search {
+        width: 100%;
+        max-width: 420px;
+    }
+    .onboarding-search-empty {
+        margin: 6px 0 0;
+        color: var(--muted);
+    }
+    .onboarding-search-empty[hidden] {
+        display: none;
+    }
+    .onboarding-follow-warning {
+        margin: 6px 0 0;
+        color: #ffb08b;
+    }
+    .onboarding-follow-warning[hidden] {
+        display: none;
+    }
+    .onboarding-action-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .onboarding-ghost {
+        min-height: 48px;
+        padding: 0 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+    }
+    .onboarding-ghost:hover,
+    .onboarding-tag:hover {
+        transform: translateY(-1px);
+    }
+    .post-comments-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 240;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(3px);
+    }
+    .post-comments-modal.is-visible {
+        display: flex;
+    }
+    .post-comments-dialog {
+        width: min(1320px, 100%);
+        height: min(94vh, 1020px);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 456px;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: #111318;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
+    }
+    .post-comments-media {
+        min-width: 0;
+        background: #000;
+        display: grid;
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-media-inner {
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-close {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        padding: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 17, 22, 0.68);
+        color: rgba(255, 255, 255, 0.82);
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        z-index: 3;
+    }
+    .post-comments-close:hover {
+        background: rgba(15, 17, 22, 0.86);
+        color: #fff;
+    }
+    .post-comments-close svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-media-frame {
+        min-height: 0;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        position: relative;
+        align-items: center;
+        justify-items: center;
+        overflow: hidden;
+    }
+    .post-comments-media-frame img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        object-position: center center;
+        display: block;
+        margin: auto;
+        border-radius: 0;
+        background: #000;
+    }
+    .post-comments-side {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        background: #1a1d22;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+    .post-comments-side-head {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-side-head .feed-card-author-copy strong {
+        font-size: 0.94rem;
+    }
+    .post-comments-side-head .avatar {
+        width: 34px;
+        height: 34px;
+    }
+    .post-comments-side-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .post-comments-options-toggle {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+    }
+    .post-comments-options-toggle:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-options-toggle svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+    }
+    .post-comments-options-menu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, calc(100vw - 32px));
+        display: none;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #262a31;
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.38);
+        z-index: 260;
+    }
+    .post-comments-options-menu.is-visible {
+        display: grid;
+    }
+    .post-comments-option {
+        width: 100%;
+        padding: 13px 16px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: #f4f7fb;
+        text-align: center;
+        font-size: 0.93rem;
+        font-weight: 500;
+    }
+    .post-comments-option:last-child {
+        border-bottom: 0;
+    }
+    .post-comments-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-option.is-danger {
+        color: #ff8e8e;
+    }
+    .post-comments-side-body {
+        min-height: 0;
+        max-height: 100%;
+        overflow-y: auto;
+        padding: 16px 18px 22px;
+        display: grid;
+        align-content: start;
+        gap: 14px;
+    }
+    .post-comments-side-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+    }
+    .post-comments-empty {
+        padding: 18px 0;
+        color: rgba(255, 255, 255, 0.58);
+        background: transparent;
+        text-align: center;
+        border: 0;
+    }
+    .post-comments-form {
+        padding: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 0;
+        background: #1a1d22;
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        flex-shrink: 0;
+    }
+    .post-comments-form-row {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 16px 12px;
+        transition: padding 140ms ease;
+    }
+    .post-comments-form-row.is-overflowing {
+        align-items: end;
+    }
+    .post-comments-actions {
+        padding: 12px 16px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+    .post-comments-actions-left,
+    .post-comments-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .post-comments-icon {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #f7f8fa;
+    }
+    .post-comments-icon svg {
+        width: 29px;
+        height: 29px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-icon.like-btn svg {
+        width: 31px;
+        height: 31px;
+    }
+    .like-btn svg {
+        transition: fill 320ms cubic-bezier(0.22, 1, 0.36, 1), stroke 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        transform-origin: center;
+    }
+    .like-btn.liked svg {
+        fill: #ff304f;
+        stroke: #ff304f;
+        transform: scale(1.12);
+    }
+    .like-btn.liked:hover svg,
+    .like-btn:hover svg {
+        transform: scale(1.04);
+    }
+    .like-btn.is-animating svg {
+        animation: like-pop 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
+    @keyframes like-pop {
+        0% {
+            transform: scale(0.92);
+        }
+        35% {
+            transform: scale(1.18);
+        }
+        65% {
+            transform: scale(1.04);
+        }
+        100% {
+            transform: scale(1.12);
+        }
+    }
+    .post-comments-feedback {
+        padding: 0 16px 14px;
+        display: grid;
+        gap: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-feedback strong {
+        color: #f7f8fa;
+    }
+    .post-comments-feedback span {
+        color: rgba(255, 255, 255, 0.46);
+        font-size: 0.84rem;
+    }
+    .post-comments-input-icon {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.88);
+    }
+    .post-comments-input-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-comment {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-comment.is-pinned {
+        order: -1;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.09);
+    }
+    .post-comments-comment-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .post-comments-comment-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .post-comments-comment-copy {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+    }
+    .post-comments-comment-copy p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.92);
+        line-height: 1.5;
+        word-break: break-word;
+        font-size: 0.96rem;
+    }
+    .post-comments-comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: rgba(255, 255, 255, 0.44);
+        font-size: 0.74rem;
+        text-transform: lowercase;
+    }
+    .post-comments-comment-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .post-comments-comment-action {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.74rem;
+        font-weight: 600;
+        text-transform: none;
+    }
+    .post-comments-comment-action:hover,
+    .post-comments-comment-action.is-active {
+        color: rgba(255, 255, 255, 0.88);
+    }
+    .post-comments-pinned-badge {
+        display: none;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.09);
+        color: rgba(255, 255, 255, 0.84);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .post-comments-comment.is-pinned .post-comments-pinned-badge {
+        display: inline-flex;
+    }
+    .post-comments-pin {
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        padding: 4px;
+        opacity: 0;
+        transition: opacity 160ms ease, color 160ms ease;
+    }
+    .post-comments-comment:hover .post-comments-pin,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        opacity: 1;
+    }
+    .post-comments-pin:hover,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        color: #fff;
+    }
+    .post-comments-pin svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    .post-comments-form .field {
+        min-height: 26px;
+        padding: 6px 2px 6px 0;
+        border-radius: 0;
+        background: transparent;
+        border: 0;
+        font-size: 0.92rem;
+        line-height: 1.35;
+        transition: color 140ms ease, box-shadow 140ms ease;
+    }
+    .post-comments-form textarea.field {
+        width: 100%;
+        resize: none;
+        overflow-y: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 68px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+        overscroll-behavior: contain;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar {
+        width: 6px;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+    }
+    .post-comments-form textarea.field.is-overflowing {
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    .post-comments-form .button {
+        min-height: auto;
+        padding: 0;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(243, 247, 251, 0.58);
+        box-shadow: none;
+    }
+    @keyframes onboarding-stage-enter {
+        0% {
+            opacity: 0;
+            transform: translate3d(0, 0, 0) scale(1.02);
+        }
+        100% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+    }
+    @keyframes onboarding-stage-exit {
+        0% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+        100% {
+            opacity: 0;
+            transform: translate3d(-100vw, 0, 0);
+        }
+    }
+    @media (max-width: 720px) {
+        .explore-suggestion-grid {
+            grid-template-columns: 1fr;
+        }
+        .post-comments-modal {
+            padding: 0;
+        }
+        .post-comments-dialog {
+            width: 100%;
+            height: 100vh;
+            max-height: none;
+            border-radius: 0;
+            grid-template-columns: 1fr;
+        }
+        .post-comments-media-frame img {
+            max-width: 100%;
+            max-height: 46vh;
+        }
+        .post-comments-side {
+            min-height: 0;
+        }
+        .post-comments-form-row {
+            grid-template-columns: 1fr;
+        }
+        .onboarding-stage {
+            grid-template-columns: 1fr;
+        }
+        .onboarding-aside {
+            padding: 22px 18px 12px;
+            gap: 18px;
+        }
+        .onboarding-panel {
+            padding: 18px;
+            align-content: start;
+        }
+        .onboarding-artist-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Pagina Inicial</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementacao completa do backend.">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificacoes em breve" data-placeholder-copy="As notificacoes ainda precisam de eventos e persistencia no backend.">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificacoes</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
+            <a href="{% url 'logout' %}">Sair</a>
+        </div>
+    </details>
+
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area esta reservada na interface, mas o fluxo real ainda nao foi implementado.">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+
+    <div class="app-main">
+        <section class="social-layout">
+            <div class="feed-stack">
+                {% if suggested_users %}
+                <div class="story-strip">
+                    {% for profile in suggested_users|slice:":7" %}
+                    <a class="story-pill" href="{% url 'core_pg' profile.nick %}">
+                        <span class="avatar"><img src="data:image/png;base64,{{ profile.core_picture }}" alt="{{ profile.nick }}"></span>
+                        <strong>@{{ profile.nick }}</strong>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if posts %}
+                    {% for post in posts %}
+                    <article class="feed-card" id="post-{{ post.id }}">
+                        <div class="feed-card-header">
+                            <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                                <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                                <span class="feed-card-author-copy">
+                                    <strong>@{{ post.user.nick }}</strong>
+                                    <small>{{ post.user.art_style|default_if_none:"artista" }}</small>
+                                </span>
+                            </a>
+                            <span class="feed-time">{{ post.date|date:"d/m/Y H:i" }}</span>
+                        </div>
+
+                        <button class="feed-media feed-media-button" type="button" data-open-lightbox data-image-src="data:image/png;base64,{{ post.image }}" data-image-alt="{{ post.description|default_if_none:post.user.nick }}">
+                            <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
+                        </button>
+
+                        <div class="feed-toolbar">
+                            <div class="feed-toolbar-actions">
+                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg><span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span></button>
+                                <button class="feed-action-icon" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg><span class="feed-action-count" data-comment-count>{{ post.comments_set.count }}</span></button>
+                                <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+                            </div>
+                            <div class="feed-toolbar-meta"></div>
+                        </div>
+
+                        {% if post.description %}
+                        <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
+                        {% endif %}
+
+                    </article>
+                    <div class="post-comments-modal" id="comments-panel-{{ post.id }}" hidden aria-hidden="true" data-post-id="{{ post.id }}" data-post-owner-id="{{ post.user.user_id }}" data-comments-url="{% url 'comments_api' post.id %}">
+                        <div class="post-comments-dialog" role="dialog" aria-modal="true" aria-labelledby="comments-title-{{ post.id }}">
+                            <section class="post-comments-media">
+                                <div class="post-comments-media-inner">
+                                    <div class="post-comments-media-frame">
+                                        <button class="post-comments-close" type="button" data-comment-close aria-label="Fechar comentários">
+                                            <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
+                                        </button>
+                                        <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description|default_if_none:post.user.nick }}">
+                                    </div>
+                                </div>
+                            </section>
+
+                            <aside class="post-comments-side">
+                                <div class="post-comments-side-head">
+                                    <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                                        <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                                        <span class="feed-card-author-copy">
+                                            <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }}</strong>
+                                        </span>
+                                    </a>
+                                    <div class="post-comments-side-head-actions">
+                                        <button class="post-comments-options-toggle" type="button" data-options-toggle aria-label="Mais opções">
+                                            <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+                                        </button>
+                                        <div class="post-comments-options-menu" data-options-menu>
+                                            <button class="post-comments-option is-danger" type="button">Denunciar</button>
+                                            {% if user.is_authenticated and following_ids and post.user.user_id in following_ids %}
+                                            <button class="post-comments-option" type="button" data-follow-menu data-url="{% url 'follow' post.user.user_id %}">Deixar de seguir</button>
+                                            {% else %}
+                                            <button class="post-comments-option" type="button" data-follow-menu data-url="{% url 'follow' post.user.user_id %}">Seguir</button>
+                                            {% endif %}
+                                            <button class="post-comments-option" type="button">Adicionar aos Favoritos</button>
+                                            <button class="post-comments-option" type="button" data-share-url="#post-{{ post.id }}">Compartilhar</button>
+                                            <button class="post-comments-option" type="button" data-copy-link="#post-{{ post.id }}">Copiar link</button>
+                                            <button class="post-comments-option" type="button" data-options-close>Cancelar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="post-comments-side-body" data-comment-list>
+                                    {% for comment in comments %}
+                                        {% if comment.post_id == post.id %}
+                                        <article class="post-comments-comment" data-comment-entry>
+                                            <div class="post-comments-comment-avatar">
+                                                <img src="data:image/png;base64,{{ comment.user.core_picture }}" alt="{{ comment.user.nick }}">
+                                            </div>
+                                            <div class="post-comments-comment-head">
+                                                <div class="post-comments-comment-copy">
+                                                    <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
+                                                    <div class="post-comments-comment-meta">
+                                                        <span>há {{ comment.date|timesince }}</span>
+                                                        <div class="post-comments-comment-actions">
+                                                            <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
+                                                            <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@{{ comment.user.nick }}">Responder</button>
+                                                        </div>
+                                                        <span class="post-comments-pinned-badge">Fixado</span>
+                                                    </div>
+                                                </div>
+                                                {% if request.user.is_authenticated and request.user.user_id == post.user.user_id %}
+                                                <button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">
+                                                    <svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </article>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if post.comments_set.count == 0 %}
+                                    <div class="post-comments-empty" data-comment-empty>
+                                        Nenhum comentário ainda. Abra a conversa por aqui.
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if user.is_authenticated %}
+                                <form class="post-comments-form" action="{% url 'comment' post.id %}" method="POST" data-comment-form>
+                                    {% csrf_token %}
+                                    <div class="post-comments-actions">
+                                        <div class="post-comments-actions-left">
+                                            <button class="post-comments-icon like-btn" type="button" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}" aria-label="Curtir"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg></button>
+                                            <button class="post-comments-icon" type="button" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></button>
+                                            <button class="post-comments-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+                                        </div>
+                                        <div class="post-comments-actions-right">
+                                            <button class="post-comments-icon" type="button" aria-label="Salvar"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"></path></svg></button>
+                                        </div>
+                                    </div>
+                                    <div class="post-comments-feedback">
+                                        {% if post.likes_set.count %}
+                                        <strong>{{ post.likes_set.count }} curtida{{ post.likes_set.count|pluralize }}</strong>
+                                        {% else %}
+                                        <strong>Seja a primeira pessoa a curtir isso</strong>
+                                        {% endif %}
+                                        <span>há {{ post.date|timesince }}</span>
+                                    </div>
+                                    <div class="post-comments-form-row">
+                                        <span class="post-comments-input-icon" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5s1.5 2 3.5 2 3.5-2 3.5-2"></path><path d="M9 9.5h.01"></path><path d="M15 9.5h.01"></path></svg>
+                                        </span>
+                                        <textarea class="field" name="comment-content" rows="1" placeholder="Escreva um comentário" data-comment-input></textarea>
+                                        <button class="button" type="submit">Postar</button>
+                                    </div>
+                                </form>
+                                {% endif %}
+                            </aside>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <section class="explore-fallback-grid">
+                    <article class="explore-fallback-card" style="--fallback-bg: radial-gradient(circle at 20% 20%, rgba(105, 226, 255, 0.12), transparent 28%), radial-gradient(circle at 80% 76%, rgba(255, 156, 107, 0.14), transparent 30%);">
+                        <span class="social-kicker">Descoberta inicial</span>
+                        <h3>Seu explore nao precisa comecar vazio.</h3>
+                        <p>Enquanto o feed real ainda nao tem volume, a interface abre espaco para pessoas e trilhas visuais sugeridas.</p>
+                    </article>
+                    <article class="explore-fallback-card" style="--fallback-bg: radial-gradient(circle at 78% 18%, rgba(255, 156, 107, 0.12), transparent 28%), radial-gradient(circle at 20% 82%, rgba(105, 226, 255, 0.12), transparent 28%);">
+                        <span class="social-kicker">Primeiras pistas</span>
+                        <h3>Ilustracao, editorial, 3D e musica.</h3>
+                        <p>Essas frentes ajudam a orientar a leitura inicial da rede mesmo antes do backend completar a recomendacao.</p>
+                    </article>
+                </section>
+                {% endif %}
+            </div>
+
+        </section>
+    </div>
+</section>
+{% if user.is_authenticated %}
+<div class="onboarding-overlay" data-onboarding>
+    <div class="onboarding-stage">
+        <aside class="onboarding-aside">
+            <div class="onboarding-brand">Incept</div>
+            <div class="onboarding-copy">
+                <span class="eyebrow">Primeira entrada</span>
+                <h2 data-onboarding-title>Me diga seus gostos.</h2>
+                <p data-onboarding-copy>Escolha alguns interesses para a descoberta n&atilde;o come&ccedil;ar vazia.</p>
+            </div>
+            <div class="onboarding-progress">
+                <span class="onboarding-progress-dot is-active" data-onboarding-dot="1"></span>
+                <span class="onboarding-progress-dot" data-onboarding-dot="2"></span>
+            </div>
+        </aside>
+
+        <div class="onboarding-main">
+            <div class="onboarding-track" data-onboarding-track>
+                <section class="onboarding-panel">
+                    <div class="onboarding-panel-head">
+                        <span class="social-kicker">Interesses</span>
+                        <h3>Marque as linguagens que mais puxam sua aten&ccedil;&atilde;o.</h3>
+                        <p>Isso ajuda a sua primeira explora&ccedil;&atilde;o a ter dire&ccedil;&atilde;o.</p>
+                    </div>
+                    <div class="onboarding-tag-grid">
+                        <button class="onboarding-tag" type="button" data-interest>#ilustra&ccedil;&atilde;o</button>
+                        <button class="onboarding-tag" type="button" data-interest>#manga</button>
+                        <button class="onboarding-tag" type="button" data-interest>#v&iacute;deo</button>
+                        <button class="onboarding-tag" type="button" data-interest>#m&uacute;sica</button>
+                        <button class="onboarding-tag" type="button" data-interest>#3d</button>
+                        <button class="onboarding-tag" type="button" data-interest>#editorial</button>
+                    </div>
+                    <div class="onboarding-action-row">
+                        <button class="button" type="button" data-onboarding-next>Continuar</button>
+                    </div>
+                </section>
+
+                <section class="onboarding-panel">
+                    <div class="onboarding-panel-head">
+                        <span class="social-kicker">Primeiras conex&otilde;es</span>
+                        <h3>Siga alguns artistas para o feed ganhar corpo.</h3>
+                        <p>Voc&ecirc; pode ajustar isso depois, mas pelo menos um perfil seguido precisa ter post para liberar a entrada.</p>
+                    </div>
+                    <input class="field onboarding-search" type="text" placeholder="Buscar por @nick" data-onboarding-search>
+                    <div class="onboarding-artist-grid">
+                        {% if suggested_users %}
+                        {% for profile in suggested_users %}
+                        <article class="onboarding-artist-card" data-onboarding-user="{{ profile.user_id }}" data-onboarding-search-text="{{ profile.nick|lower }}" data-has-post="{% if profile.user_id in users_with_posts %}true{% else %}false{% endif %}" data-following="{% if profile.user_id in following_ids %}true{% else %}false{% endif %}">
+                            <div class="onboarding-artist-head">
+                                <span class="avatar"><img src="data:image/png;base64,{{ profile.core_picture }}" alt="{{ profile.nick }}"></span>
+                                <div class="onboarding-artist-copy">
+                                    <strong>@{{ profile.nick }}</strong>
+                                </div>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button onboarding-follow-btn" type="button" data-url="{% url 'follow' profile.user_id %}">
+                                    {% if profile.user_id in following_ids %}Seguindo{% else %}Seguir{% endif %}
+                                </button>
+                            </div>
+                        </article>
+                        {% endfor %}
+                        {% else %}
+                        <article class="onboarding-artist-card">
+                            <div class="onboarding-artist-copy">
+                                <strong>@visualframe</strong>
+                                <span class="muted">editorial visual</span>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button" type="button">Seguir</button>
+                            </div>
+                        </article>
+                        <article class="onboarding-artist-card">
+                            <div class="onboarding-artist-copy">
+                                <strong>@mangastudio</strong>
+                                <span class="muted">manga e concept</span>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button" type="button">Seguir</button>
+                            </div>
+                        </article>
+                        <article class="onboarding-artist-card">
+                            <div class="onboarding-artist-copy">
+                                <strong>@setdesign</strong>
+                                <span class="muted">direcao de arte</span>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button" type="button">Seguir</button>
+                            </div>
+                        </article>
+                        <article class="onboarding-artist-card">
+                            <div class="onboarding-artist-copy">
+                                <strong>@soundform</strong>
+                                <span class="muted">musica e trilha</span>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button" type="button">Seguir</button>
+                            </div>
+                        </article>
+                        <article class="onboarding-artist-card">
+                            <div class="onboarding-artist-copy">
+                                <strong>@motiongrid</strong>
+                                <span class="muted">video e motion</span>
+                            </div>
+                            <div class="onboarding-artist-actions">
+                                <button class="button" type="button">Seguir</button>
+                            </div>
+                        </article>
+                        {% endif %}
+                    </div>
+                    <p class="onboarding-search-empty" data-onboarding-empty hidden>Nenhum perfil encontrado.</p>
+                    <p class="onboarding-follow-warning" data-onboarding-warning hidden>Siga pelo menos um perfil que j&aacute; tenha post para entrar no feed.</p>
+                    <div class="onboarding-action-row">
+                        <button class="onboarding-ghost" type="button" data-onboarding-back>Voltar</button>
+                        <button class="button" type="button" data-onboarding-finish>Entrar no feed</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrftoken = "{{ csrf_token }}";
+    const bindLikeButtons = () => {
+        document.querySelectorAll('.like-btn').forEach((btn) => {
+            if (btn.dataset.likeBound === 'true') {
+                return;
+            }
+            btn.dataset.likeBound = 'true';
+            btn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                try {
+                    const response = await fetch(btn.dataset.url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrftoken
+                        }
+                    });
+                    if (!response.ok) {
+                        return;
+                    }
+                    const data = await response.json();
+                    const postId = btn.dataset.likePostId;
+                    document.querySelectorAll(`.like-btn[data-like-post-id="${postId}"]`).forEach((likeButton) => {
+                        likeButton.classList.toggle('liked', Boolean(data.liked));
+                        likeButton.classList.remove('is-animating');
+                        if (data.liked) {
+                            void likeButton.offsetWidth;
+                            likeButton.classList.add('is-animating');
+                            window.setTimeout(() => likeButton.classList.remove('is-animating'), 560);
+                        }
+                        const likeCount = likeButton.querySelector('[data-like-count]');
+                        if (likeCount) {
+                            likeCount.textContent = data.likes;
+                        }
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        });
+    };
+    bindLikeButtons();
+
+    const onboarding = document.querySelector('[data-onboarding]');
+    const onboardingTrack = document.querySelector('[data-onboarding-track]');
+    const onboardingTitle = document.querySelector('[data-onboarding-title]');
+    const onboardingCopy = document.querySelector('[data-onboarding-copy]');
+    const onboardingDots = Array.from(document.querySelectorAll('[data-onboarding-dot]'));
+    const onboardingStateKey = 'inceptOnboardingSeen';
+
+    const onboardingContent = {
+        1: {
+            title: 'Me diga seus gostos.',
+            copy: 'Escolha alguns interesses para a descoberta n\u00e3o come\u00e7ar vazia.'
+        },
+        2: {
+            title: 'Siga alguns artistas.',
+            copy: 'Monte a primeira camada do seu feed antes de mergulhar na rede.'
+        }
+    };
+
+    const setOnboardingStep = (step) => {
+        if (!onboardingTrack || !onboardingTitle || !onboardingCopy) {
+            return;
+        }
+        onboardingTrack.classList.toggle('is-step-2', step === 2);
+        onboardingTitle.textContent = onboardingContent[step].title;
+        onboardingCopy.textContent = onboardingContent[step].copy;
+        onboardingDots.forEach((dot) => {
+            dot.classList.toggle('is-active', Number(dot.dataset.onboardingDot) === step);
+        });
+    };
+
+    if (onboarding && !window.localStorage.getItem(onboardingStateKey)) {
+        onboarding.classList.add('is-visible');
+        document.body.style.overflow = 'hidden';
+        setOnboardingStep(1);
+    }
+
+    document.querySelectorAll('[data-interest]').forEach((tag) => {
+        tag.addEventListener('click', () => {
+            tag.classList.toggle('is-selected');
+        });
+    });
+
+    const onboardingNext = document.querySelector('[data-onboarding-next]');
+    const onboardingBack = document.querySelector('[data-onboarding-back]');
+    const onboardingFinish = document.querySelector('[data-onboarding-finish]');
+
+    if (onboardingNext) {
+        onboardingNext.addEventListener('click', () => setOnboardingStep(2));
+    }
+
+    if (onboardingBack) {
+        onboardingBack.addEventListener('click', () => setOnboardingStep(1));
+    }
+
+    const onboardingCards = Array.from(document.querySelectorAll('.onboarding-artist-card[data-onboarding-user]'));
+    const onboardingSearch = document.querySelector('[data-onboarding-search]');
+    const onboardingEmpty = document.querySelector('[data-onboarding-empty]');
+    const onboardingWarning = document.querySelector('[data-onboarding-warning]');
+
+    const applyOnboardingSearch = () => {
+        const query = onboardingSearch ? onboardingSearch.value.trim().toLowerCase() : '';
+        let visibleCount = 0;
+
+        onboardingCards.forEach((card) => {
+            const haystack = card.dataset.onboardingSearchText || '';
+            const matches = !query || haystack.includes(query);
+            card.hidden = !matches;
+            if (matches) {
+                visibleCount += 1;
+            }
+        });
+
+        if (onboardingEmpty) {
+            onboardingEmpty.hidden = visibleCount !== 0;
+        }
+    };
+
+    if (onboardingSearch) {
+        onboardingSearch.addEventListener('input', applyOnboardingSearch);
+    }
+
+    applyOnboardingSearch();
+
+    const hasRequiredFollow = () => onboardingCards.some((card) => card.dataset.following === 'true' && card.dataset.hasPost === 'true');
+
+    document.querySelectorAll('.onboarding-follow-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            fetch(btn.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                const isFollowing = Boolean(data.is_following);
+                const card = btn.closest('.onboarding-artist-card');
+                btn.textContent = isFollowing ? 'Seguindo' : 'Seguir';
+                if (card) {
+                    card.dataset.following = isFollowing ? 'true' : 'false';
+                }
+                if (onboardingWarning) {
+                    onboardingWarning.hidden = hasRequiredFollow();
+                }
+            });
+        });
+    });
+
+    if (onboardingFinish && onboarding) {
+        onboardingFinish.addEventListener('click', () => {
+            if (!hasRequiredFollow()) {
+                if (onboardingWarning) {
+                    onboardingWarning.hidden = false;
+                }
+                return;
+            }
+            window.localStorage.setItem(onboardingStateKey, '1');
+            onboarding.classList.add('is-leaving');
+            window.setTimeout(() => {
+                onboarding.classList.remove('is-visible', 'is-leaving');
+                document.body.style.overflow = '';
+            }, 760);
+        });
+    }
+
+    const commentModals = Array.from(document.querySelectorAll('.post-comments-modal'));
+    const commentPollingTimers = new Map();
+    const currentUserId = '{{ request.user.user_id|default:"" }}';
+    const escapeHtml = (value) => String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    const buildCommentMarkup = (modal, comment) => {
+        const canPin = currentUserId && modal.dataset.postOwnerId === currentUserId;
+        return `
+            <article class="post-comments-comment" data-comment-entry>
+                <div class="post-comments-comment-avatar">
+                    <img src="data:image/png;base64,${escapeHtml(comment.user.core_picture)}" alt="${escapeHtml(comment.user.nick)}">
+                </div>
+                        <div class="post-comments-comment-head">
+                            <div class="post-comments-comment-copy">
+                                <p><strong>@${escapeHtml(comment.user.nick)}</strong> ${escapeHtml(comment.content)}</p>
+                                <div class="post-comments-comment-meta">
+                                    <span>${escapeHtml(comment.created_relative)}</span>
+                                    <div class="post-comments-comment-actions">
+                                        <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
+                                        <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@${escapeHtml(comment.user.nick)}">Responder</button>
+                                    </div>
+                                    <span class="post-comments-pinned-badge">Fixado</span>
+                                </div>
+                            </div>
+                    ${canPin ? '<button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário"><svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg></button>' : ''}
+                </div>
+            </article>
+        `;
+    };
+    const bindCommentInteractions = (modal) => {
+        const entries = Array.from(modal.querySelectorAll('[data-comment-entry]'));
+        const container = modal.querySelector('[data-comment-list]');
+        if (!container) {
+            return;
+        }
+        entries.forEach((entry) => {
+            const pinButton = entry.querySelector('[data-comment-pin]');
+            if (!pinButton || pinButton.dataset.bound === 'true') {
+                return;
+            }
+            pinButton.dataset.bound = 'true';
+            pinButton.addEventListener('click', () => {
+                const isPinned = entry.classList.contains('is-pinned');
+                entries.forEach((item) => item.classList.remove('is-pinned'));
+                if (!isPinned) {
+                    entry.classList.add('is-pinned');
+                    container.prepend(entry);
+                }
+            });
+        });
+        entries.forEach((entry) => {
+            const likeButton = entry.querySelector('[data-comment-like]');
+            const replyButton = entry.querySelector('[data-comment-reply]');
+            if (likeButton && likeButton.dataset.bound !== 'true') {
+                likeButton.dataset.bound = 'true';
+                likeButton.addEventListener('click', () => {
+                    const isActive = likeButton.classList.toggle('is-active');
+                    likeButton.textContent = isActive ? 'Curtido' : 'Curtir';
+                });
+            }
+            if (replyButton && replyButton.dataset.bound !== 'true') {
+                replyButton.dataset.bound = 'true';
+                replyButton.addEventListener('click', () => {
+                    const input = modal.querySelector('[data-comment-input]');
+                    if (!input) {
+                        return;
+                    }
+                    const prefix = `${replyButton.dataset.commentAuthor || ''} `;
+                    const currentValue = input.value.trim();
+                    input.value = currentValue.startsWith(prefix.trim()) ? input.value : `${prefix}${input.value}`.trim();
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.focus();
+                    const length = input.value.length;
+                    input.setSelectionRange(length, length);
+                });
+            }
+        });
+    };
+    const renderComments = (modal, comments) => {
+        const list = modal.querySelector('[data-comment-list]');
+        if (!list) {
+            return;
+        }
+        if (!comments.length) {
+            list.innerHTML = '<div class="post-comments-empty" data-comment-empty>Nenhum comentário ainda. Abra a conversa por aqui.</div>';
+            return;
+        }
+        list.innerHTML = comments.map((comment) => buildCommentMarkup(modal, comment)).join('');
+        bindCommentInteractions(modal);
+    };
+    const fetchComments = async (modal) => {
+        if (!modal?.dataset.commentsUrl) {
+            return;
+        }
+        try {
+            const response = await fetch(modal.dataset.commentsUrl, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                return;
+            }
+            const data = await response.json();
+            renderComments(modal, data.comments || []);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const setCommentModalState = (modal, shouldOpen) => {
+        if (!modal) {
+            return;
+        }
+        modal.hidden = !shouldOpen;
+        modal.classList.toggle('is-visible', shouldOpen);
+        modal.setAttribute('aria-hidden', String(!shouldOpen));
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
+        if (shouldOpen) {
+            fetchComments(modal);
+            if (!commentPollingTimers.has(modal)) {
+                const timer = window.setInterval(() => {
+                    if (modal.classList.contains('is-visible')) {
+                        fetchComments(modal);
+                    }
+                }, 5000);
+                commentPollingTimers.set(modal, timer);
+            }
+            const input = modal.querySelector('[name="comment-content"]');
+            if (input) {
+                window.setTimeout(() => input.focus(), 40);
+            }
+        } else if (commentPollingTimers.has(modal)) {
+            window.clearInterval(commentPollingTimers.get(modal));
+            commentPollingTimers.delete(modal);
+        }
+    };
+
+    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const modal = document.getElementById(btn.dataset.target);
+            commentModals.forEach((item) => {
+                if (item !== modal) {
+                    setCommentModalState(item, false);
+                }
+            });
+            setCommentModalState(modal, true);
+        });
+    });
+
+    document.querySelectorAll('[data-comment-close]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            setCommentModalState(btn.closest('.post-comments-modal'), false);
+        });
+    });
+
+    commentModals.forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                setCommentModalState(modal, false);
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') {
+            return;
+        }
+        commentModals.forEach((modal) => {
+            if (modal.classList.contains('is-visible')) {
+                setCommentModalState(modal, false);
+            }
+        });
+    });
+
+    document.querySelectorAll('.post-comments-modal').forEach((modal) => {
+        bindCommentInteractions(modal);
+    });
+
+    document.querySelectorAll('[data-options-toggle]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const menu = button.parentElement.querySelector('[data-options-menu]');
+            document.querySelectorAll('[data-options-menu]').forEach((item) => {
+                if (item !== menu) {
+                    item.classList.remove('is-visible');
+                }
+            });
+            if (menu) {
+                menu.classList.toggle('is-visible');
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-options-close]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const menu = button.closest('[data-options-menu]');
+            if (menu) {
+                menu.classList.remove('is-visible');
+            }
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-options-menu]') || event.target.closest('[data-options-toggle]')) {
+            return;
+        }
+        document.querySelectorAll('[data-options-menu]').forEach((menu) => {
+            menu.classList.remove('is-visible');
+        });
+    });
+
+    document.querySelectorAll('[data-follow-menu]').forEach((button) => {
+        button.addEventListener('click', () => {
+            fetch(button.dataset.url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                button.textContent = data.is_following ? 'Deixar de seguir' : 'Seguir';
+            });
+        });
+    });
+
+    document.querySelectorAll('[data-copy-link]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const shareUrl = new URL(button.dataset.copyLink, window.location.href).toString();
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-comment-input]').forEach((input) => {
+        const row = input.closest('.post-comments-form-row');
+        const resize = () => {
+            input.style.height = 'auto';
+            const nextHeight = Math.min(input.scrollHeight, 68);
+            input.style.height = `${nextHeight}px`;
+            const overflowing = input.scrollHeight > 68;
+            input.classList.toggle('is-overflowing', overflowing);
+            if (row) {
+                row.classList.toggle('is-overflowing', overflowing);
+            }
+        };
+        input.dataset.minHeight = '26';
+        input.addEventListener('input', resize);
+        resize();
+    });
+
+    document.querySelectorAll('[data-comment-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const modal = form.closest('.post-comments-modal');
+            const input = form.querySelector('[name="comment-content"]');
+            if (!modal || !input || !input.value.trim()) {
+                return;
+            }
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                if (!response.ok) {
+                    return;
+                }
+                input.value = '';
+                input.rows = 1;
+                input.style.height = `${input.dataset.minHeight || 26}px`;
+                await fetchComments(modal);
+                input.focus();
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    document.querySelectorAll('[data-share-url]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const shareUrl = new URL(btn.dataset.shareUrl, window.location.href).toString();
+            try {
+                if (navigator.share) {
+                    await navigator.share({ url: shareUrl });
+                    return;
+                }
+                await navigator.clipboard.writeText(shareUrl);
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+</script>
+{% endblock %}
