@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: incept
-    env: python
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn incept.wsgi:application
