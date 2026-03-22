@@ -45,7 +45,7 @@ urlpatterns = [
     path('delete/core-picture/', accounts_views.delete_core_picture, name='delete_core_picture'),
     path('core/edit-core/post', accounts_views.edit_core, name='edit_core'),
 
-    path("explore/comment/<id>/list", feed_views.comments_api, name="comments_api"),
+    path("explore/comment/<id>/list", feed_views.comments_api, name="comments_api"), #funcao criada pelo miguel
 
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
     path('core/follow/<id>/', accounts_views.follow, name='follow'),
