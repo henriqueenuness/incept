@@ -1335,6 +1335,17 @@
     const commentModals = Array.from(document.querySelectorAll('.post-comments-modal'));
     const commentPollingTimers = new Map();
     const currentUserId = '{{ request.user.user_id|default:"" }}';
+    const updateCommentCount = (modal, nextCount) => {
+        const postId = modal?.dataset?.postId;
+        if (!postId && postId !== '0') {
+            return;
+        }
+        document
+            .querySelectorAll(`[data-comment-toggle][data-target="comments-panel-${postId}"] [data-comment-count]`)
+            .forEach((node) => {
+                node.textContent = String(nextCount ?? 0);
+            });
+    };
     const escapeHtml = (value) => String(value || '')
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
@@ -1419,6 +1430,7 @@
         if (!list) {
             return;
         }
+        updateCommentCount(modal, comments.length);
         if (!comments.length) {
             list.innerHTML = '<div class="post-comments-empty" data-comment-empty>Nenhum comentário ainda. Abra a conversa por aqui.</div>';
             return;
@@ -1430,6 +1442,11 @@
         if (!modal?.dataset.commentsUrl) {
             return;
         }
+        const list = modal.querySelector('[data-comment-list]');
+        const scrollTopBefore = list ? list.scrollTop : 0;
+        const wasNearBottom = list
+            ? (list.scrollHeight - list.scrollTop - list.clientHeight) < 48
+            : false;
         try {
             const response = await fetch(modal.dataset.commentsUrl, {
                 headers: {
@@ -1441,6 +1458,9 @@
             }
             const data = await response.json();
             renderComments(modal, data.comments || []);
+            if (list) {
+                list.scrollTop = wasNearBottom ? list.scrollHeight : scrollTopBefore;
+            }
         } catch (error) {
             console.error(error);
         }

@@ -207,8 +207,13 @@
 {% block scripts %}
 <script>
     const csrftoken = "{{ csrf_token }}";
+    const shouldConfirmUnfollow = (label) => ['Seguindo', 'Deixar de seguir'].includes(label.trim());
     document.querySelectorAll('.follow-btn').forEach((btn) => {
         btn.addEventListener('click', () => {
+            if (shouldConfirmUnfollow(btn.textContent) && !window.confirm('Tem certeza que deseja deixar de seguir este usuário?')) {
+                return;
+            }
+
             fetch(btn.dataset.url, {
                 method: 'POST',
                 headers: {
