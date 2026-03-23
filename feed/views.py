@@ -95,11 +95,11 @@ def comments_api(request, id):
 @require_POST
 def comment(request, id):
     user = request.user
-    post = get_object_or_404(Post, id=id)
+    postid = get_object_or_404(Post, id=id)
     content = (request.POST.get('comment-content') or '').strip()
     comment = None
     if content:
-        comment = Comments.objects.create(user=user, content=content, post=post)
+        comment = Comments.objects.create(user=user, content=content, post=postid)
 
     wants_json = request.headers.get("x-requested-with") == "XMLHttpRequest" or "application/json" in request.headers.get("accept", "")
     if wants_json:

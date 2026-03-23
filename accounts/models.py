@@ -70,7 +70,7 @@ class User(AbstractBaseUser):
         null=True,
         default="",
     )
-
+    last_nick_change = models.DateTimeField(null=True, blank=True)
 
     objects = UserManager()
     USERNAME_FIELD = "email"
