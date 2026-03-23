@@ -4,3 +4,30 @@ db.sqlite3
 staticfiles/
 .env.local
 .env
+
+# Claude Code
+CLAUDE.md
+
+# Backup e push folders
+.codex-backup-*/
+.codex-push-*/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+venv/
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos pessoais
+Mensagens
+*.png
+*.jpg
+cosmos-copy/
+AGENTS.md

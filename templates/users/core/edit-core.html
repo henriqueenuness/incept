@@ -23,18 +23,22 @@
     .editor-page {
         width: min(100%, 980px);
         min-height: calc(100vh - 32px);
-        padding: 8px 24px 32px;
+        padding: 16px 24px 40px;
         display: grid;
-        gap: 20px;
+        gap: 28px;
+        align-items: start;
     }
     .editor-panel {
         border-radius: 30px;
         border: 1px solid rgba(183, 229, 255, 0.12);
         background: linear-gradient(180deg, rgba(10, 20, 36, 0.92), rgba(7, 13, 24, 0.84));
         box-shadow: var(--shadow);
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     .editor-panel {
-        padding: 24px;
+        padding: 32px;
     }
     .editor-kicker {
         display: inline-flex;
@@ -59,49 +63,94 @@
     }
     .editor-hero {
         display: grid;
-        gap: 18px;
-        padding-bottom: 20px;
+        gap: 24px;
+        padding-bottom: 28px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 20px;
+        margin-bottom: 8px;
     }
     .editor-hero-top {
         display: flex;
         align-items: center;
-        gap: 18px;
+        gap: 24px;
         flex-wrap: wrap;
     }
+    .editor-avatar-trigger {
+        position: relative;
+        width: 132px;
+        height: 132px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    }
     .editor-hero .avatar-lg {
-        width: 118px;
-        height: 118px;
+        width: 132px;
+        height: 132px;
+    }
+    .editor-avatar-trigger::after {
+        content: "Alterar foto";
+        position: absolute;
+        inset: auto 10px 10px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(7, 13, 24, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(243, 247, 251, 0.9);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .editor-avatar-trigger img {
+        transition: transform 180ms ease, filter 180ms ease;
+    }
+    .editor-avatar-trigger:hover img,
+    .editor-avatar-trigger:focus-visible img {
+        transform: scale(1.03);
+        filter: brightness(0.9);
+    }
+    .editor-avatar-trigger:hover::after,
+    .editor-avatar-trigger:focus-visible::after {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .editor-avatar-trigger:focus-visible {
+        outline: 2px solid rgba(183, 229, 255, 0.55);
+        outline-offset: 6px;
     }
     .editor-meta {
         display: grid;
-        gap: 10px;
+        gap: 12px;
     }
     .editor-meta .tag {
         width: fit-content;
     }
     .editor-panel {
         display: grid;
-        gap: 20px;
+        gap: 28px;
     }
     .editor-panel-head {
         display: grid;
-        gap: 10px;
+        gap: 12px;
         max-width: 60ch;
     }
     .editor-form {
         display: grid;
-        gap: 16px;
+        gap: 22px;
     }
     .editor-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
+        gap: 20px;
+    }
+    .editor-field-span {
+        grid-column: 1 / -1;
     }
     .editor-field {
         display: grid;
-        gap: 10px;
+        gap: 12px;
     }
     .editor-field span {
         font-size: 0.82rem;
@@ -109,20 +158,111 @@
         text-transform: uppercase;
         color: var(--muted);
     }
+    .editor-section {
+        display: grid;
+        gap: 16px;
+        padding: 22px;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.025);
+    }
+    .editor-section-head {
+        display: grid;
+        gap: 8px;
+    }
+    .editor-section-head h3 {
+        font-size: 1.15rem;
+        letter-spacing: -0.03em;
+    }
+    .editor-note {
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        color: rgba(243, 247, 251, 0.74);
+        font-size: 0.92rem;
+    }
+    .field[readonly] {
+        opacity: 0.72;
+        cursor: default;
+    }
+    .link-list {
+        display: grid;
+        gap: 12px;
+    }
+    .link-row {
+        display: grid;
+        gap: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .link-row[hidden] {
+        display: none !important;
+    }
+    .link-row button[data-remove-link] {
+        justify-self: flex-start;
+        border: 1px solid rgba(255, 93, 115, 0.35);
+        color: #ff5d73;
+        background: rgba(255, 93, 115, 0.12);
+        padding: 8px 14px;
+        border-radius: 12px;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+    .link-row button[data-remove-link]:hover {
+        background: #ff5d73;
+        color: #fff;
+    }
+    .link-card {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .link-card-content {
+        display: grid;
+        gap: 4px;
+    }
+    .link-card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .link-card-url {
+        font-size: 0.82rem;
+        color: rgba(243, 247, 251, 0.74);
+        word-break: break-all;
+    }
+    .link-actions {
+        display: flex;
+        justify-content: flex-start;
+    }
     .editor-actions,
     .editor-danger {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
     }
+    .editor-actions {
+        justify-content: flex-end;
+        padding-top: 8px;
+    }
     .editor-danger {
         align-items: center;
         justify-content: space-between;
-        padding-top: 18px;
+        padding-top: 22px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
     .editor-danger .ghost-button {
         border-color: rgba(255, 255, 255, 0.08);
+    }
+    .editor-danger > .editor-actions {
+        justify-content: flex-start;
+        padding-top: 0;
+    }
+    .editor-form input[type="file"] {
+        display: none;
     }
     .delete-account-wrap {
         display: grid;
@@ -166,6 +306,71 @@
         opacity: 0.45;
         pointer-events: none;
     }
+    .photo-modal[hidden] {
+        display: none;
+    }
+    .photo-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: rgba(2, 5, 12, 0.72);
+        backdrop-filter: blur(10px);
+    }
+    .photo-modal-dialog {
+        width: min(100%, 560px);
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(28, 31, 38, 0.98), rgba(17, 18, 24, 0.98));
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+    }
+    .photo-modal-header {
+        padding: 28px 24px 24px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .photo-modal-header h3 {
+        font-size: 1.8rem;
+        letter-spacing: -0.04em;
+    }
+    .photo-modal-action {
+        width: 100%;
+        padding: 22px 24px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: transparent;
+        color: #4f6dff;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+    }
+    .photo-modal-action:hover,
+    .photo-modal-action:focus-visible {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .photo-modal-link {
+        display: block;
+        width: 100%;
+        padding: 22px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        color: #ff5d73;
+        font-weight: 600;
+        text-align: center;
+    }
+    .photo-modal-cancel {
+        width: 100%;
+        padding: 20px 24px;
+        border: 0;
+        background: transparent;
+        color: rgba(243, 247, 251, 0.92);
+        font: inherit;
+        cursor: pointer;
+        text-align: center;
+    }
     @media (max-width: 980px) {
         .app-shell {
             padding-left: 0;
@@ -176,6 +381,9 @@
         }
     }
     @media (max-width: 720px) {
+        .editor-panel {
+            padding: 24px 18px;
+        }
         .editor-grid {
             grid-template-columns: 1fr;
         }
@@ -184,6 +392,12 @@
         }
         .delete-account-wrap {
             justify-items: start;
+        }
+        .editor-actions .button {
+            width: 100%;
+        }
+        .photo-modal {
+            padding: 12px;
         }
     }
 </style>
@@ -252,9 +466,11 @@
                 <article class="editor-panel">
                     <div class="editor-hero">
                         <div class="editor-hero-top">
-                            <div class="avatar-lg">
-                                <img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}">
-                            </div>
+                            <button class="editor-avatar-trigger" type="button" data-photo-modal-open aria-label="Alterar foto do perfil">
+                                <div class="avatar-lg">
+                                    <img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}">
+                                </div>
+                            </button>
                             <div class="editor-meta">
                                 <span class="editor-kicker">Perfil</span>
                                 <h2>@{{ user.nick }}</h2>
@@ -271,23 +487,38 @@
 
                     <form class="editor-form" method="POST" action="{% url 'edit_core' %}" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <input id="core-picture-input" name="core_picture" accept="image/*" type="file">
                         <div class="editor-grid">
-                            <label class="editor-field">
-                                <span>Imagem de perfil</span>
-                                <input class="field" name="core_picture" accept="image/*" type="file">
-                            </label>
                             <label class="editor-field">
                                 <span>Nick</span>
                                 <input class="field" name="nick" placeholder="Seu nome público" value="{{ user.nick }}">
                             </label>
-                        </div>
-
-                        <div class="editor-grid">
                             <label class="editor-field">
                                 <span>Nome</span>
                                 <input class="field" name="real_name" placeholder="Nome real (opcional)" value="{{ user.real_name }}">
                             </label>
-                            <label class="editor-field">
+                        </div>
+
+                        <section class="editor-section">
+                            <div class="editor-section-head">
+                                <span class="editor-kicker">Conta</span>
+                                <h3>Dados visiveis e contato</h3>
+                                <p>Seu email aparece aqui como referencia da conta. Os links abaixo ficam associados a este navegador.</p>
+                            </div>
+                            <div class="editor-grid">
+                                <label class="editor-field">
+                                    <span>Email</span>
+                                    <input class="field" type="email" value="{{ user.email }}" readonly>
+                                </label>
+                                <label class="editor-field">
+                                    <span>Site principal</span>
+                                    <input class="field" type="url" placeholder="https://seusite.com" data-profile-link="website">
+                                </label>
+                            </div>
+                        </section>
+
+                        <div class="editor-grid">
+                            <label class="editor-field editor-field-span">
                                 <span>Linguagem</span>
                                 <select class="select-field" name="art_style">
                                     <option value="{{ user.art_style }}" selected disabled>{{ user.art_style|default_if_none:"Selecionar estilo" }}</option>
@@ -326,21 +557,52 @@
                             </label>
                         </div>
 
+                        <section class="editor-section">
+                            <div class="editor-section-head">
+                                <span class="editor-kicker">Links</span>
+                                <h3>Links essenciais</h3>
+                                <p>Compartilhe páginas importantes do seu trabalho: portfólio, redes, projetos, comissões ou loja.</p>
+                            </div>
+                            <div class="link-list" data-link-list></div>
+                            <div class="link-row" data-link-row-template hidden>
+                                <label class="editor-field">
+                                    <span>Link</span>
+                                    <input class="field" type="text" placeholder="https://" data-link-url>
+                                </label>
+                                <label class="editor-field">
+                                    <span>Título (ex: Portfolio)</span>
+                                    <input class="field" type="text" placeholder="Portfolio, Loja, Insta" data-link-title>
+                                </label>
+                                <button class="ghost-button" type="button" data-remove-link>Remover</button>
+                            </div>
+                            <div class="link-actions">
+                                <button class="button" type="button" data-add-link>Adicionar outro link</button>
+                            </div>
+                        </section>
+
                         <label class="editor-field">
                             <span>Bio</span>
                             <textarea class="textarea-field" name="bio" placeholder="Conte em poucas linhas como você quer ser percebido.">{{ user.bio }}</textarea>
                         </label>
 
+                        <section class="editor-section">
+                            <div class="editor-section-head">
+                                <span class="editor-kicker">Seguranca</span>
+                                <h3>Senha da conta</h3>
+                            </div>
+                            <div class="editor-note">
+                                A troca de senha ainda nao tem fluxo pronto no backend deste projeto. Assim que existir uma rota real, esta secao pode ser conectada sem refazer a interface.
+                            </div>
+                        </section>
+
                         <div class="editor-actions">
                             <button class="button" type="submit">Salvar alterações</button>
-                            <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Voltar ao perfil</a>
                         </div>
                     </form>
 
                     {% if user.is_authenticated %}
                     <div class="editor-danger">
                         <div class="editor-actions">
-                            <a class="ghost-button" href="{% url 'delete_core_picture' %}">Remover foto</a>
                             <a class="ghost-button" href="{% url 'logout' %}">Sair</a>
                         </div>
                         <div class="delete-account-wrap">
@@ -359,14 +621,116 @@
         </section>
     </div>
 </section>
+
+<div class="photo-modal" data-photo-modal hidden>
+    <div class="photo-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="photo-modal-title">
+        <div class="photo-modal-header">
+            <h3 id="photo-modal-title">Alterar foto do perfil</h3>
+        </div>
+        <button class="photo-modal-action" type="button" data-photo-upload>Carrregar foto</button>
+        <a class="photo-modal-link" href="{% url 'delete_core_picture' %}">Remover foto atual</a>
+        <button class="photo-modal-cancel" type="button" data-photo-modal-close>Cancelar</button>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    const currentCorePicture = '{{ user.core_picture|escapejs }}';
+    const isDefaultCorePicture =
+        currentCorePicture.length === 10624 &&
+        currentCorePicture.startsWith('/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAUDBAQE') &&
+        currentCorePicture.endsWith('0cprKoBvv7WZSJCtDHytGLm/Pc9sSEEmWDF/n//Z');
+    const photoModal = document.querySelector('[data-photo-modal]');
+    const photoModalOpen = document.querySelector('[data-photo-modal-open]');
+    const photoModalClose = document.querySelector('[data-photo-modal-close]');
+    const photoUpload = document.querySelector('[data-photo-upload]');
+    const corePictureInput = document.querySelector('#core-picture-input');
+    const editorForm = document.querySelector('.editor-form');
     const deleteToggle = document.querySelector('[data-delete-toggle]');
     const deleteConfirm = document.querySelector('[data-delete-confirm]');
     const deleteInput = document.querySelector('[data-delete-input]');
     const deleteLink = document.querySelector('[data-delete-link]');
+
+    if (photoModal && photoModalOpen && photoModalClose && photoUpload && corePictureInput) {
+        const closePhotoModal = () => {
+            photoModal.hidden = true;
+        };
+
+        photoModalOpen.addEventListener('click', () => {
+            if (currentCorePicture && !isDefaultCorePicture) {
+                photoModal.hidden = false;
+                return;
+            }
+
+            corePictureInput.click();
+        });
+
+        photoModalClose.addEventListener('click', closePhotoModal);
+
+        photoModal.addEventListener('click', (event) => {
+            if (event.target === photoModal) {
+                closePhotoModal();
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !photoModal.hidden) {
+                closePhotoModal();
+            }
+        });
+
+        photoUpload.addEventListener('click', () => {
+            corePictureInput.click();
+            closePhotoModal();
+        });
+    }
+
+    const linkList = document.querySelector('[data-link-list]');
+    const linkRowTemplate = document.querySelector('[data-link-row-template]');
+    const addLinkBtn = document.querySelector('[data-add-link]');
+
+    if (editorForm && linkList && linkRowTemplate && addLinkBtn) {
+        // Clear legacy frontend-only link storage; links are visual-only until backend exists.
+        window.localStorage.removeItem('incept.profileLinks.{{ user.user_id }}');
+        linkRowTemplate.hidden = true;
+
+        const updateRowStates = () => {
+            Array.from(linkList.querySelectorAll('[data-link-row]')).forEach((row, index) => {
+                const removeBtn = row.querySelector('[data-remove-link]');
+                if (removeBtn) {
+                    removeBtn.style.display = index === 0 ? 'none' : '';
+                }
+            });
+        };
+
+        const createRow = (link = { title: '', url: '' }) => {
+            const clone = linkRowTemplate.cloneNode(true);
+            clone.hidden = false;
+            clone.removeAttribute('data-link-row-template');
+            clone.dataset.linkRow = '';
+            const titleInput = clone.querySelector('[data-link-title]');
+            const urlInput = clone.querySelector('[data-link-url]');
+            const removeBtn = clone.querySelector('[data-remove-link]');
+            titleInput.value = link.title || '';
+            urlInput.value = link.url || '';
+            removeBtn.addEventListener('click', () => {
+                clone.remove();
+                updateRowStates();
+            });
+            linkList.appendChild(clone);
+            updateRowStates();
+        };
+
+        const renderLinks = () => {
+            linkList.innerHTML = '';
+            createRow();
+        };
+
+        renderLinks();
+
+        addLinkBtn.addEventListener('click', () => createRow());
+    }
 
     if (deleteToggle && deleteConfirm && deleteInput && deleteLink) {
         deleteToggle.addEventListener('click', () => {
