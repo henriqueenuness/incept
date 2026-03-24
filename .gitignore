@@ -31,3 +31,6 @@ Mensagens
 *.jpg
 cosmos-copy/
 AGENTS.md
+
+# Firebase credentials
+serviceAccountKey.json

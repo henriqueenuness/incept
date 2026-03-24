@@ -9,3 +9,4 @@ djangorestframework>=3.16
 python-dotenv>=1.0
 pyrebase4>=4.7
 requests>=2.31
+firebase-admin>=6.0
