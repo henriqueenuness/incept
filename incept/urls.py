@@ -32,9 +32,7 @@ urlpatterns = [
     path('core/new-post/post', accounts_views.new_post, name='new_post'),
     path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
     
-
-
-    path('explore/', accounts_views.explore_pg, name='explore_pg'),
+    path('explore/', feed_views.explore_pg, name='explore_pg'),
     path('explore/like-post/<id>/', feed_views.like, name='like'),
     path('explore/comment/<id>', feed_views.comment, name = 'comment'),
     path('search/', feed_views.search_pg, name='search_pg'),

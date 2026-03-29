@@ -28,7 +28,10 @@ def signup(request): #registro/cadastro usuario
         email = request.POST.get('email')
         password = request.POST.get('password')
         cargo = request.POST.get('cargo')
-
+        if User.objects.filter(nick=nick).exists():
+            return HttpResponse("alguém já usa esse nick")
+        if User.objects.filter(email=email).exists():
+            return HttpResponse("esse email já foi cadastrado, deseja fazer login?")
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
         return render(request, 'users/login.html', {
             'success_message': 'Conta criada. Agora entre para abrir o feed.',
@@ -46,22 +49,11 @@ def login_auth(request): #login usuario
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, email=email, password=password)
-        if user is not None:
-            if user.cargo == 'artista':
-                login(request, user)
-                return redirect('explore_pg')
-            elif user.cargo == 'cliente':
-                login(request, user)
-                return redirect('explore_pg')
-            # nesse caso, ambos fazem a mesma coisa, mas futuramente podemos encaminhar para paginas diferentes de acordo com a utilidade de cada funcao para o usuario.
-            #por exemplo, um cliente nao vai precisar de botoes para criar conteudo
-            
-        else:
-            return render(request, 'users/login.html', {
-                'auth_error': 'Email ou senha invalidos.',
-                'prefill_email': email,
-            })
-            # se der algum erro, volta pro cadastro
+        if not user:
+            return HttpResponse("senha ou email incorretos, tente novamente")
+        login(request, user)
+        return redirect('explore_pg')
+
     return redirect('login_pg')
 
 
@@ -119,17 +111,21 @@ def edit_core(request): #edit core
         core_picture = request.FILES.get('core_picture')
         user = request.user
         if core_picture:
-            core_p = base64.b64encode(core_picture.read()).decode('utf-8')
-            user.core_picture = core_p
+            if core_picture.content_type.startswith('image/'):
+                core_p = base64.b64encode(core_picture.read()).decode('utf-8')
+                user.core_picture = core_p
         if art_style:
             user.art_style = art_style #sem isso, quando o usuario tenta usar edit core sem atualizar esse campo, ele considera como vazio
-        if nick:
+        if nick and nick != user.nick:
+    
             if User.objects.filter(nick=nick).exclude(user_id=user.user_id).exists():
                 return HttpResponse("algúem já usa esse nick, tente outro")
             if user.last_nick_change: #se tiver mudança
-                if timezone.now() - user.last_nick_change < timedelta(days=14): #se a ultima mudança for a menos de 14 dias atras
-                    dias = timedelta.days
-                    horas = timedelta.seconds // 3600
+                tempo_restante = timedelta(days=14) - (timezone.now() - user.last_nick_change)
+                if tempo_restante > timedelta(0): #se a ultima mudança for a menos de 14 dias atras
+                    
+                    dias = tempo_restante.days
+                    horas = tempo_restante.seconds // 3600
                     return HttpResponse(f"faltam {dias} dias e {horas} horas para poder mudar o nick novamente")
                 else:
                     user.nick = nick
@@ -149,7 +145,7 @@ def edit_core(request): #edit core
 def delete_account(request):
     user = request.user
     user.delete()
-    return signup_pg(request)
+    return redirect('home')
 
 def delete_core_picture(request):
     user = request.user
@@ -169,12 +165,26 @@ def new_post(request): #postar post
         img = request.FILES.get('post_image')
         u_id = request.user.user_id
         if img:
-            img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
+            if not img.content_type.startswith('image/'):
+                img_compativel = False
+                return HttpResponse("erro: formato de arquivo inválido")
+            else:
+                img_compativel = True
+                img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
 
             if Post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
                 return HttpResponse("erro: essa postagem já foi feita")
             else:
-                Post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
+                if description:
+                    if img_compativel == True:
+                        Post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
+                    else:
+                        Post.objects.create(description=description, user_id = u_id) #cria a postagem sem imagem
+                else:
+                    if img_compativel == True:
+                        Post.objects.create( image=img_b64, user_id = u_id) #cria a postagem
+                    else:
+                        Post.objects.create(user_id = u_id) #cria a postagem sem imagem
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
                 user.arts = Post.objects.filter(user=user).count()

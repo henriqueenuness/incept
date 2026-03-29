@@ -10,6 +10,22 @@ from django.utils.timesince import timesince
 def search_pg(request):
     return render(request, 'feed/search.html')
 
+def explore_pg(request):
+    post = Post.objects.all()
+    comments = Comments.objects.all()
+    suggested_users = User.objects.exclude(user_id=request.user.user_id).order_by('nick') if request.user.is_authenticated else User.objects.all().order_by('nick')
+    users_with_posts = list(Post.objects.values_list('user_id', flat=True).distinct())
+    following_ids = list(
+        Followers.objects.filter(follower_id=request.user.user_id).values_list('user_id', flat=True)
+    ) if request.user.is_authenticated else []
+    return render(request, 'feed/explore.html', {
+         "posts": post,
+         "comments": comments,
+         "suggested_users": suggested_users,
+         "users_with_posts": users_with_posts,
+         "following_ids": following_ids,
+    })
+
 def cycle_pg(request):
     user = request.user.user_id
     f = Followers.objects.filter(follower_id = user).values_list('user_id', flat=True)
