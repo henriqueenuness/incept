@@ -43,9 +43,11 @@ def cycle_pg(request):
 def search_user(request):
     if request.method=="GET":
         search = request.GET.get('search')
+        new_post_search = request.GET.get('new_post_search')
         users = []
+
         followings_ids = []
-        if search:
+        if search or new_post_search:
             users = User.objects.filter(nick__icontains=search)
             users_ids = list(users.values_list("user_id", flat=True))
             #se na lista de seguindo(following) do usuário logado tiver o id do usuário pesquisado, ele mostra "seguindo"
@@ -62,6 +64,16 @@ def search_user(request):
 
         else:
             users = ""
+        if new_post_search:
+            return HttpResponse("ebaaa")
+            return JsonResponse({
+                'users': list(users.values('nick', 'core_picture')),
+                'search': search,
+            })
+            return render(request, 'feed/search.html',
+                    {'users' : users,
+                    'search' : search,
+                    'following': followings_ids})
         return render(request, 'feed/search.html',
                     {'users' : users,
                     'search' : search,
@@ -122,7 +134,7 @@ def comment(request, id):
         return JsonResponse({
             "ok": bool(comment),
             "comment": serialize_comment(comment) if comment else None,
-            "count": post.comments_set.count(),
+            "count": Post.comments_set.count(),
         })
 
     return redirect(request.META.get('HTTP_REFERER', 'explore_pg'))

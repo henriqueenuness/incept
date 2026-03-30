@@ -48,6 +48,9 @@ urlpatterns = [
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
     path('core/follow/<id>/', accounts_views.follow, name='follow'),
 
+    path('interests/', accounts_views.interests_pg, name='interests_pg'),
+    path('new-artist/', accounts_views.new_artist, name='new_artist'),
+
 
 
 

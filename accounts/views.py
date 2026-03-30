@@ -28,15 +28,14 @@ def signup(request): #registro/cadastro usuario
         email = request.POST.get('email')
         password = request.POST.get('password')
         cargo = request.POST.get('cargo')
+
         if User.objects.filter(nick=nick).exists():
             return HttpResponse("alguém já usa esse nick")
         if User.objects.filter(email=email).exists():
             return HttpResponse("esse email já foi cadastrado, deseja fazer login?")
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
-        return render(request, 'users/login.html', {
-            'success_message': 'Conta criada. Agora entre para abrir o feed.',
-            'prefill_email': email,
-        })
+        login(request, new_user)
+        return render(request, 'users/interests.html')
     return redirect('signup_pg')
 
 def login_pg(request):
@@ -66,22 +65,8 @@ def make_logout(request):
     return redirect('home')
 
 
-def explore_pg(request):
-    post = Post.objects.all()
-    comments = Comments.objects.all()
-    suggested_users = User.objects.exclude(user_id=request.user.user_id).order_by('nick') if request.user.is_authenticated else User.objects.all().order_by('nick')
-    users_with_posts = list(Post.objects.values_list('user_id', flat=True).distinct())
-    following_ids = list(
-        Followers.objects.filter(follower_id=request.user.user_id).values_list('user_id', flat=True)
-    ) if request.user.is_authenticated else []
-    return render(request, 'feed/explore.html', {
-         "posts": post,
-         "comments": comments,
-         "suggested_users": suggested_users,
-         "users_with_posts": users_with_posts,
-         "following_ids": following_ids,
-    })
-
+def interests_pg(request):
+    return render(request, 'users/interests.html')
 
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
@@ -156,8 +141,18 @@ def delete_core_picture(request):
 
 def new_post_pg(request, nick):
     nick = request.user.user_id
-    return render(request, 'users/core/new_post.html', {"nick" : nick})
-
+    if request.user.cargo == 'artista':
+        return render(request, 'users/core/new_post.html', {"nick" : nick})
+    else:
+        return render(request, 'users/new_artist.html')
+    
+def new_artist(request):
+    user = request.user
+    if request.method == 'POST':
+        if user.cargo != 'artista':
+            user.cargo = 'artista'
+            user.save()
+            return redirect('explore_pg')
 
 def new_post(request): #postar post
     if request.method == 'POST':
@@ -193,7 +188,7 @@ def new_post(request): #postar post
                 return core_pg(request, nick)
             
         else:
-            return HttpResponse('erro: algo deu errado')
+            return HttpResponse('erro: algo deu errado na hora de criar seu post')
         
 def delete_post(request, id):
     user_post = Post.objects.get(id=id)

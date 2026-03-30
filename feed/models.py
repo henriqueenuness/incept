@@ -12,7 +12,14 @@ class Post(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE, #se apagar o usuario do db, apaga todas as imagens dele
-        null = True
+        null = True,
+        related_name='author'
+    )
+    collaborator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null = True,
+        related_name='collaborator'
     )
     date = models.DateTimeField(auto_now_add=True, null=True)
     class Meta:

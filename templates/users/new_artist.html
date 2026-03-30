@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>novo artista?</title>
+</head>
+<body>
+    <form action="{% url 'new_artist' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit">quero ser artista!</button></form>
+    <a href="{% url 'explore_pg' %}">continuar para explore</a>
+</body>
+</html>
