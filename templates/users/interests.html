@@ -7,7 +7,16 @@
 </head>
 <body>
     <h1>selecione 1 ou mais opções</h1>
-
+    <form action="{% url 'interests' %}" method="POST">
+        {% csrf_token %}
+        <input type="checkbox" name="interest" value="song">
+        <label for="song">song</label>
+        <input type="checkbox" name="interest" value="paint">
+        <label for="paint">paint</label>
+        <input type="checkbox" name="interest" value="media">
+        <label for="media">media</label>
+        <button type="submit">enviar</button>
+    </form>
     <a href="{% url 'explore_pg' %}">ir para feed</a>
 </body>
 </html>

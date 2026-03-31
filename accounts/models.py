@@ -90,3 +90,10 @@ class Followers(models.Model):
     )
     #eles pegam fk da mesma tabela, mas oq define como cada campo será preenchido é o models
     #related name garante que django consiga guardar os dois e diferenciar eles
+
+class Interests(models.Model):
+        user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+        interest = models.CharField(max_length=50, null=True)

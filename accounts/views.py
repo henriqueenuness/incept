@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Followers
+from .models import User, Followers, Interests
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -251,3 +251,12 @@ def follow(request, id):
         return render(request, 'home.html')
     else:
         return render(request, 'users/login.html')"""
+
+
+def interests(request):
+    if request.method == 'POST':
+        interesses = request.POST.getlist('interest')
+        user = request.user
+        for interesse in interesses:
+            Interests.objects.create(user=user, interest=interesse)
+        return redirect('explore_pg')

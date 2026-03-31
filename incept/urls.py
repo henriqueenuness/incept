@@ -49,6 +49,7 @@ urlpatterns = [
     path('core/follow/<id>/', accounts_views.follow, name='follow'),
 
     path('interests/', accounts_views.interests_pg, name='interests_pg'),
+    path('interests/post', accounts_views.interests, name='interests'),
     path('new-artist/', accounts_views.new_artist, name='new_artist'),
 
 
