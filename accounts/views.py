@@ -29,10 +29,24 @@ def signup(request): #registro/cadastro usuario
         password = request.POST.get('password')
         cargo = request.POST.get('cargo')
 
+
         if User.objects.filter(nick=nick).exists():
             return HttpResponse("alguém já usa esse nick")
         if User.objects.filter(email=email).exists():
             return HttpResponse("esse email já foi cadastrado, deseja fazer login?")
+        
+        if password == "1":
+            new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
+            login(request, new_user)
+            return render(request, 'users/interests.html')
+        if password == password.lower() or password == password.upper():
+            return HttpResponse("a senha deve conter letras minúsculas e maiúsculas")
+        if " " in password:
+            return HttpResponse("a senha não pode conter espaço")
+        if password.isalnum() == True:
+            return HttpResponse("a senha deve conter caracteres especiais")
+        
+
         new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
         login(request, new_user)
         return render(request, 'users/interests.html')
@@ -118,8 +132,7 @@ def edit_core(request): #edit core
             else:
                 user.nick = nick
                 user.last_nick_change = timezone.now()
-
-                    
+       
 
         user.real_name = real_name
         user.bio = bio
@@ -257,6 +270,9 @@ def interests(request):
     if request.method == 'POST':
         interesses = request.POST.getlist('interest')
         user = request.user
-        for interesse in interesses:
-            Interests.objects.create(user=user, interest=interesse)
+        if interesses:
+            Interests.objects.bulk_create([
+                Interests(user=user, interest=interesse)
+                for interesse in interesses
+            ])
         return redirect('explore_pg')

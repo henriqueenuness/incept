@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import dj_database_url
 from dotenv import load_dotenv
+from decouple import config
 from pathlib import Path
 import firebase_admin
 from firebase_admin import credentials
@@ -83,11 +84,12 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
+DATABASE_URL = os.getenv('DATABASE_URL')
 load_dotenv()
 DATABASES = {
+    'default' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4
 
-    'default': { 
+    'supabase': {                                    #supabase - suporte para ipv6
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("dbname"),
         'USER': os.getenv("user"),

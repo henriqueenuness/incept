@@ -25,6 +25,14 @@ class Post(models.Model):
     class Meta:
         ordering = ["-date"]
 
+
+class Hashtags(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+    )
+    hashtag = models.CharField(max_length=100)
+    
 class Likes(models.Model):
     #id do post
     #id do cara que curtiu
