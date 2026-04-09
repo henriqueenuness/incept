@@ -302,11 +302,77 @@
         const submit = document.getElementById("loginSubmit");
         if (!form || !submit) return;
 
-        form.addEventListener("submit", () => {
-            submit.classList.add("is-pending");
+        const errorMap = {
+            'senha ou email incorretos': 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.',
+        };
+
+        const friendlyError = (raw) => {
+            const key = Object.keys(errorMap).find((k) => raw.toLowerCase().includes(k.toLowerCase()));
+            return key ? errorMap[key] : (raw.trim() || 'Algo deu errado. Tente novamente.');
+        };
+
+        const showError = (msg) => {
+            let notice = form.querySelector('[data-auth-notice]');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.setAttribute('data-auth-notice', '');
+                notice.className = 'auth-notice auth-notice-error';
+                notice.style.animation = 'auth-notice-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+                const formGrid = form.querySelector('.form-grid');
+                formGrid.insertAdjacentElement('beforebegin', notice);
+            }
+            notice.textContent = friendlyError(msg);
+        };
+
+        const clearError = () => {
+            const notice = form.querySelector('[data-auth-notice]');
+            if (notice) notice.remove();
+        };
+
+        const resetSubmit = () => {
+            submit.classList.remove('is-pending');
+            submit.disabled = false;
+            submit.textContent = 'Entrar no feed';
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+            submit.classList.add('is-pending');
             submit.disabled = true;
-            submit.textContent = "Entrando...";
+            submit.textContent = 'Entrando...';
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    redirect: 'manual',
+                });
+
+                if (res.type === 'opaqueredirect' || res.redirected || res.status === 302) {
+                    window.location.href = "{% url 'explore_pg' %}";
+                    return;
+                }
+
+                const text = await res.text();
+                if (res.ok && !text.trim()) {
+                    window.location.href = "{% url 'explore_pg' %}";
+                    return;
+                }
+
+                resetSubmit();
+                showError(text.trim() || 'Algo deu errado. Tente novamente.');
+            } catch {
+                resetSubmit();
+                showError('Erro de conexão. Verifique sua internet e tente novamente.');
+            }
         });
     })();
 </script>
+<style>
+    @keyframes auth-notice-in {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+</style>
 {% endblock %}

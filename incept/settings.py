@@ -84,8 +84,8 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-DATABASE_URL = os.getenv('DATABASE_URL')
 load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
     'default' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4
 

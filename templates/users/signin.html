@@ -446,6 +446,25 @@
         color: rgba(255, 255, 255, 0.76);
     }
 
+    .auth-notice {
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #f7f8fc;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .auth-notice-error {
+        background: rgba(157, 38, 54, 0.28);
+        border-color: rgba(255, 99, 132, 0.34);
+    }
+
+    @keyframes auth-notice-in {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
     @keyframes auth-panel-in {
         0% {
             opacity: 0;
@@ -577,8 +596,9 @@
                 <input class="field" type="email" placeholder="Email" name="email" autocomplete="email" required>
                 <input class="field" type="password" placeholder="Senha" name="password" autocomplete="new-password" required>
             </div>
+            <div data-auth-notice-wrap></div>
             <div class="auth-role-actions auth-step-actions-single">
-                <button class="auth-submit auth-create-submit" type="submit">Criar conta</button>
+                <button class="auth-submit auth-create-submit" type="submit" id="signupSubmit">Criar conta</button>
             </div>
             <div class="auth-links">
                 <a href="{% url 'home' %}">Voltar para a home</a>
@@ -589,4 +609,85 @@
 </section>
 {% endblock %}
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+<script>
+    (() => {
+        const form = document.getElementById("signupForm");
+        const submit = document.getElementById("signupSubmit");
+        if (!form || !submit) return;
+
+        const noticeWrap = form.querySelector('[data-auth-notice-wrap]');
+
+        const errorMap = {
+            'alguém já usa esse nick': 'Este nome de usuário já está em uso. Tente outro.',
+            'esse email já foi cadastrado, deseja fazer login?': 'Este e-mail já possui uma conta. Que tal fazer login?',
+            'a senha deve conter letras minúsculas e maiúsculas': 'A senha precisa ter ao menos uma letra maiúscula e uma minúscula.',
+            'a senha não pode conter espaço': 'A senha não pode conter espaços.',
+            'a senha deve conter caracteres especiais': 'A senha precisa ter ao menos um caractere especial (ex: @, #, !).',
+        };
+
+        const friendlyError = (raw) => {
+            const key = Object.keys(errorMap).find((k) => raw.toLowerCase().includes(k.toLowerCase()));
+            return key ? errorMap[key] : (raw.trim() || 'Algo deu errado. Tente novamente.');
+        };
+
+        const showError = (msg) => {
+            let notice = noticeWrap.querySelector('.auth-notice');
+            if (!notice) {
+                notice = document.createElement('div');
+                notice.className = 'auth-notice auth-notice-error';
+                noticeWrap.appendChild(notice);
+            }
+            notice.style.animation = 'none';
+            notice.offsetHeight; /* reflow para reiniciar animação */
+            notice.style.animation = 'auth-notice-in 280ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+            notice.textContent = friendlyError(msg);
+        };
+
+        const clearError = () => {
+            noticeWrap.innerHTML = '';
+        };
+
+        const resetSubmit = () => {
+            submit.classList.remove('is-pending');
+            submit.disabled = false;
+            submit.textContent = 'Criar conta';
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+            submit.classList.add('is-pending');
+            submit.disabled = true;
+            submit.textContent = 'Criando conta...';
+
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    redirect: 'manual',
+                });
+
+                if (res.type === 'opaqueredirect' || res.redirected || res.status === 302) {
+                    window.location.href = "{% url 'interests' %}";
+                    return;
+                }
+
+                const text = await res.text();
+
+                /* Se a resposta contém HTML de uma página inteira (cadastro OK → render interests.html) */
+                if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+                    window.location.href = "{% url 'interests_pg' %}";
+                    return;
+                }
+
+                resetSubmit();
+                showError(text.trim() || 'Algo deu errado. Tente novamente.');
+            } catch {
+                resetSubmit();
+                showError('Erro de conexão. Verifique sua internet e tente novamente.');
+            }
+        });
+    })();
+</script>
+{% endblock %}

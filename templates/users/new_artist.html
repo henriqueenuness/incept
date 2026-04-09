@@ -1,14 +1,331 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>novo artista?</title>
-</head>
-<body>
-    <form action="{% url 'new_artist' %}" method="POST">
-        {% csrf_token %}
-        <button type="submit">quero ser artista!</button></form>
-    <a href="{% url 'explore_pg' %}">continuar para explore</a>
-</body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Incept | Seja um artista{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        background: #07111f;
+    }
+
+    .shell {
+        width: 100%;
+        max-width: none;
+        padding: 0;
+    }
+
+    .artist-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .artist-page::before,
+    .artist-page::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        pointer-events: none;
+        animation: art-float 16s ease-in-out infinite;
+    }
+
+    .artist-page::before {
+        width: 500px;
+        height: 500px;
+        top: -100px;
+        left: -80px;
+        background: radial-gradient(circle, rgba(105, 226, 255, 0.07), transparent 68%);
+        filter: blur(6px);
+    }
+
+    .artist-page::after {
+        width: 400px;
+        height: 400px;
+        bottom: -80px;
+        right: -60px;
+        background: radial-gradient(circle, rgba(255, 156, 107, 0.09), transparent 68%);
+        filter: blur(6px);
+        animation-delay: -7s;
+    }
+
+    @keyframes art-float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .artist-panel {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 680px);
+        display: grid;
+        gap: 28px;
+    }
+
+    .artist-head {
+        text-align: center;
+        display: grid;
+        gap: 10px;
+    }
+
+    .artist-brand {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+
+    .artist-brand-mark {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        box-shadow: 0 0 18px rgba(105, 226, 255, 0.5);
+    }
+
+    .artist-kicker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .artist-head h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(2.2rem, 5vw, 3.2rem);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        line-height: 1.1;
+    }
+
+    .artist-head p {
+        color: var(--muted);
+        font-size: 0.94rem;
+        line-height: 1.6;
+        max-width: 46ch;
+        margin: 0 auto;
+    }
+
+    .artist-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .artist-card {
+        position: relative;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 1px solid rgba(183, 229, 255, 0.1);
+        background: linear-gradient(180deg, rgba(11, 22, 40, 0.92), rgba(7, 14, 26, 0.88));
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 280px;
+        transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+        cursor: pointer;
+    }
+
+    .artist-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(183, 229, 255, 0.22);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    }
+
+    .artist-card-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        opacity: 0.32;
+        transition: opacity 220ms ease;
+    }
+
+    .artist-card:hover .artist-card-bg {
+        opacity: 0.44;
+    }
+
+    .artist-card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 30%, rgba(5, 10, 20, 0.9) 100%);
+    }
+
+    .artist-card-body {
+        position: relative;
+        z-index: 1;
+        padding: 24px;
+        display: grid;
+        gap: 14px;
+    }
+
+    .artist-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .artist-card-icon svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--text);
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .artist-card-copy {
+        display: grid;
+        gap: 4px;
+    }
+
+    .artist-card-copy strong {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.02em;
+    }
+
+    .artist-card-copy span {
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    /* Card artista — destaque em accent */
+    .artist-card.is-artist {
+        border-color: rgba(105, 226, 255, 0.14);
+    }
+
+    .artist-card.is-artist:hover {
+        border-color: rgba(105, 226, 255, 0.3);
+        box-shadow: 0 24px 60px rgba(105, 226, 255, 0.08);
+    }
+
+    .artist-card.is-artist .artist-card-icon {
+        background: rgba(105, 226, 255, 0.1);
+        border-color: rgba(105, 226, 255, 0.22);
+    }
+
+    .artist-card.is-artist .artist-card-icon svg {
+        stroke: var(--accent);
+    }
+
+    .artist-card-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 18px;
+        border-radius: 999px;
+        font: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: 0;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+        width: 100%;
+    }
+
+    .artist-card-action.primary {
+        background: linear-gradient(135deg, var(--accent), #b8f6ff);
+        color: #08111d;
+        box-shadow: 0 8px 24px rgba(105, 226, 255, 0.2);
+    }
+
+    .artist-card-action.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 32px rgba(105, 226, 255, 0.3);
+    }
+
+    .artist-card-action.secondary {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-decoration: none;
+    }
+
+    .artist-card-action.secondary:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.09);
+    }
+
+    @media (max-width: 540px) {
+        .artist-cards { grid-template-columns: 1fr; }
+        .artist-card { min-height: 220px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="artist-page">
+    <div class="artist-panel">
+        <div class="artist-head">
+            <div class="artist-brand">
+                <span class="artist-brand-mark"></span>
+                <span>Incept</span>
+            </div>
+            <span class="artist-kicker">Seu espaço aqui</span>
+            <h1>Você cria ou aprecia?</h1>
+            <p>Artistas compartilham seu trabalho e constroem um portfólio. Clientes exploram e se conectam com criadores.</p>
+        </div>
+
+        <div class="artist-cards">
+            <div class="artist-card is-artist">
+                <div class="artist-card-bg" style="background-image: url('{% static 'anime-girl-8663780_1280.jpg' %}');"></div>
+                <div class="artist-card-overlay"></div>
+                <div class="artist-card-body">
+                    <div class="artist-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </div>
+                    <div class="artist-card-copy">
+                        <strong>Sou artista</strong>
+                        <span>Publique seu trabalho e ganhe visibilidade.</span>
+                    </div>
+                    <form action="{% url 'new_artist' %}" method="POST">
+                        {% csrf_token %}
+                        <button class="artist-card-action primary" type="submit">Quero ser artista</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="artist-card">
+                <div class="artist-card-bg" style="background-image: url('{% static 'leitoranime.jpg' %}');"></div>
+                <div class="artist-card-overlay"></div>
+                <div class="artist-card-body">
+                    <div class="artist-card-icon">
+                        <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                    <div class="artist-card-copy">
+                        <strong>Só explorar</strong>
+                        <span>Descubra artistas e acompanhe quem admira.</span>
+                    </div>
+                    <a class="artist-card-action secondary" href="{% url 'explore_pg' %}">Continuar como cliente</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

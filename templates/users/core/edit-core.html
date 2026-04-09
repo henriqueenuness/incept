@@ -152,11 +152,28 @@
         display: grid;
         gap: 12px;
     }
+    .editor-field-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
     .editor-field span {
         font-size: 0.82rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--muted);
+    }
+    .editor-char-counter {
+        font-size: 0.78rem;
+        color: rgba(243, 247, 251, 0.5);
+        transition: color 180ms ease;
+    }
+    .editor-char-counter.near-limit {
+        color: #ff9c6b;
+    }
+    .editor-char-counter.at-limit {
+        color: #ff5d73;
     }
     .editor-section {
         display: grid;
@@ -256,6 +273,7 @@
     }
     .editor-danger .ghost-button {
         border-color: rgba(255, 255, 255, 0.08);
+        color: var(--text);
     }
     .editor-danger > .editor-actions {
         justify-content: flex-start;
@@ -452,7 +470,7 @@
             <a href="#">Salvos</a>
             <a href="#">Alternar exibição</a>
             <a href="#">Relatar um problema</a>
-            <a href="{% url 'logout' %}">Sair</a>
+            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
         </div>
     </details>
 
@@ -581,8 +599,11 @@
                         </section>
 
                         <label class="editor-field">
-                            <span>Bio</span>
-                            <textarea class="textarea-field" name="bio" placeholder="Conte em poucas linhas como você quer ser percebido.">{{ user.bio }}</textarea>
+                            <div class="editor-field-header">
+                                <span>Bio</span>
+                                <span class="editor-char-counter" data-bio-counter>0/255</span>
+                            </div>
+                            <textarea class="textarea-field" name="bio" placeholder="Conte em poucas linhas como você quer ser percebido." maxlength="255" data-bio-input>{{ user.bio }}</textarea>
                         </label>
 
                         <section class="editor-section">
@@ -603,6 +624,7 @@
                     {% if user.is_authenticated %}
                     <div class="editor-danger">
                         <div class="editor-actions">
+                            <button class="ghost-button" type="button" data-logout-trigger>Fazer Logout</button>
                         </div>
                         <div class="delete-account-wrap">
                             <button class="ghost-button delete-account-toggle" type="button" data-delete-toggle aria-label="Excluir conta">
@@ -743,6 +765,23 @@
             const isValid = deleteInput.value.trim().toLowerCase() === 'querodeletar';
             deleteLink.setAttribute('aria-disabled', String(!isValid));
         });
+    }
+
+    const bioInput = document.querySelector('[data-bio-input]');
+    const bioCounter = document.querySelector('[data-bio-counter]');
+
+    if (bioInput && bioCounter) {
+        const updateCounter = () => {
+            const length = bioInput.value.length;
+            const maxLength = 255;
+            bioCounter.textContent = `${length}/${maxLength}`;
+
+            bioCounter.classList.toggle('near-limit', length >= 230 && length < maxLength);
+            bioCounter.classList.toggle('at-limit', length >= maxLength);
+        };
+
+        bioInput.addEventListener('input', updateCounter);
+        updateCounter();
     }
 </script>
 {% endblock %}

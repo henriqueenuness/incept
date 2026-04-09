@@ -464,6 +464,40 @@
         background: transparent;
         color: rgba(243, 247, 251, 0.58);
         box-shadow: none;
+        transition: color 180ms ease;
+    }
+    .post-comments-form .button.has-content {
+        color: #69e2ff;
+    }
+    .feed-comments-preview {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+    }
+    .feed-comment-preview-item {
+        padding: 8px 0;
+    }
+    .feed-comment-preview-item p {
+        margin: 0;
+        color: #edf4fb;
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+    .feed-comment-preview-item strong {
+        color: var(--text);
+    }
+    .feed-comment-view-all {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.88rem;
+        text-align: left;
+        cursor: pointer;
+        transition: color 180ms ease;
+    }
+    .feed-comment-view-all:hover {
+        color: var(--text);
     }
     @media (max-width: 720px) {
         .cycle-hero-meta {
@@ -542,7 +576,7 @@
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
-            <a href="{% url 'logout' %}">Sair</a>
+            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
         </div>
     </details>
 
@@ -595,6 +629,23 @@
                         <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
                         {% endif %}
 
+                        {% if post.comments_set.count > 0 %}
+                        <div class="feed-comments-preview">
+                            {% for comment in comments %}
+                                {% if comment.post_id == post.id and forloop.counter <= 2 %}
+                                <div class="feed-comment-preview-item">
+                                    <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if post.comments_set.count > 2 %}
+                            <button class="feed-comment-view-all" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}">
+                                Ver todos os {{ post.comments_set.count }} comentários
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
                     </article>
                     <div class="post-comments-modal" id="comments-panel-{{ post.id }}" hidden aria-hidden="true" data-post-id="{{ post.id }}" data-post-owner-id="{{ post.user.user_id }}" data-comments-url="{% url 'comments_api' post.id %}">
                         <div class="post-comments-dialog" role="dialog" aria-modal="true" aria-labelledby="cycle-comments-title-{{ post.id }}">
@@ -643,10 +694,6 @@
                                                     <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
                                                     <div class="post-comments-comment-meta">
                                                         <span>há {{ comment.date|timesince }}</span>
-                                                        <div class="post-comments-comment-actions">
-                                                            <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
-                                                            <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@{{ comment.user.nick }}">Responder</button>
-                                                        </div>
                                                         <span class="post-comments-pinned-badge">Fixado</span>
                                                     </div>
                                                 </div>
@@ -1012,6 +1059,9 @@
 
     document.querySelectorAll('[data-comment-input]').forEach((input) => {
         const row = input.closest('.post-comments-form-row');
+        const form = input.closest('[data-comment-form]');
+        const submitButton = form ? form.querySelector('.button[type="submit"]') : null;
+
         const resize = () => {
             input.style.height = 'auto';
             const nextHeight = Math.min(input.scrollHeight, 68);
@@ -1022,9 +1072,32 @@
                 row.classList.toggle('is-overflowing', overflowing);
             }
         };
+
+        const updateSubmitButton = () => {
+            const hasContent = input.value.trim().length > 0;
+            if (submitButton) {
+                submitButton.classList.toggle('has-content', hasContent);
+            }
+        };
+
         input.dataset.minHeight = '26';
-        input.addEventListener('input', resize);
+        input.addEventListener('input', () => {
+            resize();
+            updateSubmitButton();
+        });
+
+        // Enter para enviar (Shift+Enter para nova linha)
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (form && input.value.trim().length > 0) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
         resize();
+        updateSubmitButton();
     });
 
     document.querySelectorAll('[data-comment-form]').forEach((form) => {

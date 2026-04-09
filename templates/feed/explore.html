@@ -296,21 +296,23 @@
     }
     .post-comments-modal {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
         z-index: 240;
         display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 18px;
         background: rgba(0, 0, 0, 0.42);
         backdrop-filter: blur(3px);
     }
     .post-comments-modal.is-visible {
         display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .post-comments-dialog {
-        width: min(1320px, 100%);
-        height: min(94vh, 1020px);
+        width: min(1320px, calc(100vw - 40px));
+        height: min(88vh, 820px);
         display: grid;
         grid-template-columns: minmax(0, 1fr) 456px;
         overflow: hidden;
@@ -746,6 +748,40 @@
         background: transparent;
         color: rgba(243, 247, 251, 0.58);
         box-shadow: none;
+        transition: color 180ms ease;
+    }
+    .post-comments-form .button.has-content {
+        color: #69e2ff;
+    }
+    .feed-comments-preview {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+    }
+    .feed-comment-preview-item {
+        padding: 8px 0;
+    }
+    .feed-comment-preview-item p {
+        margin: 0;
+        color: #edf4fb;
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+    .feed-comment-preview-item strong {
+        color: var(--text);
+    }
+    .feed-comment-view-all {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.88rem;
+        text-align: left;
+        cursor: pointer;
+        transition: color 180ms ease;
+    }
+    .feed-comment-view-all:hover {
+        color: var(--text);
     }
     @keyframes onboarding-stage-enter {
         0% {
@@ -766,6 +802,115 @@
             opacity: 0;
             transform: translate3d(-100vw, 0, 0);
         }
+    }
+    .display-settings-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 250;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.62);
+        backdrop-filter: blur(8px);
+    }
+    .display-settings-modal.is-visible {
+        display: flex;
+    }
+    .display-settings-dialog {
+        width: min(340px, 100%);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #1a1d24;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
+        overflow: hidden;
+    }
+    .display-settings-header {
+        padding: 18px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+    .display-settings-header h3 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.1rem;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin: 0;
+    }
+    .display-settings-close {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        padding: 0;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.72);
+        display: grid;
+        place-items: center;
+    }
+    .display-settings-close:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+    }
+    .display-settings-close svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+    .display-settings-body {
+        padding: 8px;
+    }
+    .display-settings-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 16px 14px;
+        border-radius: 16px;
+        transition: background 180ms ease;
+    }
+    .display-settings-option:hover {
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .display-settings-option-label {
+        color: var(--text);
+        font-size: 0.98rem;
+        font-weight: 500;
+    }
+    .toggle-switch {
+        position: relative;
+        width: 48px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+        border: 0;
+        cursor: pointer;
+        transition: background 240ms ease;
+    }
+    .toggle-switch::before {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .toggle-switch.is-active {
+        background: var(--accent);
+    }
+    .toggle-switch.is-active::before {
+        transform: translateX(20px);
     }
     @media (max-width: 720px) {
         .explore-suggestion-grid {
@@ -856,9 +1001,9 @@
         <div class="social-more-menu">
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibicao em breve" data-placeholder-copy="A preferencia de exibicao ainda nao e armazenada por usuario."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="social-more-item" type="button" data-display-settings-toggle><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
-            <a href="{% url 'logout' %}">Sair</a>
+            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
         </div>
     </details>
 
@@ -868,19 +1013,41 @@
     </a>
 
     <div class="app-main">
-        <section class="social-layout">
-            <div class="feed-stack">
-                {% if suggested_users %}
-                <div class="story-strip">
-                    {% for profile in suggested_users|slice:":7" %}
-                    <a class="story-pill" href="{% url 'core_pg' profile.nick %}">
-                        <span class="avatar"><img src="data:image/png;base64,{{ profile.core_picture }}" alt="{{ profile.nick }}"></span>
-                        <strong>@{{ profile.nick }}</strong>
-                    </a>
+        {% if suggested_users %}
+        <div class="story-strip-wrapper">
+            <button class="story-nav-btn prev" type="button" data-story-prev hidden aria-label="Anterior">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path></svg>
+            </button>
+            <div class="story-strip-container">
+                <div class="story-strip" data-story-strip>
+                    {% comment %} Primeiro mostra quem o usuário segue {% endcomment %}
+                    {% for profile in suggested_users %}
+                        {% if profile.user_id in following_ids %}
+                        <a class="story-pill" href="{% url 'core_pg' profile.nick %}">
+                            <span class="avatar"><img src="data:image/png;base64,{{ profile.core_picture }}" alt="{{ profile.nick }}"></span>
+                            <strong>{{ profile.nick }}</strong>
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    {% comment %} Depois mostra quem o usuário não segue {% endcomment %}
+                    {% for profile in suggested_users %}
+                        {% if profile.user_id not in following_ids %}
+                        <a class="story-pill" href="{% url 'core_pg' profile.nick %}">
+                            <span class="avatar"><img src="data:image/png;base64,{{ profile.core_picture }}" alt="{{ profile.nick }}"></span>
+                            <strong>{{ profile.nick }}</strong>
+                        </a>
+                        {% endif %}
                     {% endfor %}
                 </div>
-                {% endif %}
+            </div>
+            <button class="story-nav-btn next" type="button" data-story-next aria-label="Próximo">
+                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg>
+            </button>
+        </div>
+        {% endif %}
 
+        <section class="social-layout">
+            <div class="feed-stack">
                 {% if posts %}
                     {% for post in posts %}
                     <article class="feed-card" id="post-{{ post.id }}">
@@ -892,7 +1059,7 @@
                                     <small>{{ post.user.art_style|default_if_none:"artista" }}</small>
                                 </span>
                             </a>
-                            <span class="feed-time">{{ post.date|date:"d/m/Y H:i" }}</span>
+                            <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
                         </div>
 
                         <button class="feed-media feed-media-button" type="button" data-open-lightbox data-image-src="data:image/png;base64,{{ post.image }}" data-image-alt="{{ post.description|default_if_none:post.user.nick }}">
@@ -910,6 +1077,23 @@
 
                         {% if post.description %}
                         <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
+                        {% endif %}
+
+                        {% if post.comments_set.count > 0 %}
+                        <div class="feed-comments-preview">
+                            {% for comment in comments %}
+                                {% if comment.post_id == post.id and forloop.counter <= 2 %}
+                                <div class="feed-comment-preview-item">
+                                    <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if post.comments_set.count > 2 %}
+                            <button class="feed-comment-view-all" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}">
+                                Ver todos os {{ post.comments_set.count }} comentários
+                            </button>
+                            {% endif %}
+                        </div>
                         {% endif %}
 
                     </article>
@@ -964,10 +1148,6 @@
                                                     <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
                                                     <div class="post-comments-comment-meta">
                                                         <span>há {{ comment.date|timesince }}</span>
-                                                        <div class="post-comments-comment-actions">
-                                                            <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
-                                                            <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@{{ comment.user.nick }}">Responder</button>
-                                                        </div>
                                                         <span class="post-comments-pinned-badge">Fixado</span>
                                                     </div>
                                                 </div>
@@ -1160,11 +1340,113 @@
     </div>
 </div>
 {% endif %}
+
+<div class="display-settings-modal" data-display-settings-modal aria-hidden="true">
+    <div class="display-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="display-settings-title">
+        <div class="display-settings-header">
+            <h3 id="display-settings-title">Alternar exibição</h3>
+            <button class="display-settings-close" type="button" data-display-settings-close aria-label="Fechar">
+                <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
+            </button>
+        </div>
+        <div class="display-settings-body">
+            <div class="display-settings-option">
+                <span class="display-settings-option-label">Modo escuro</span>
+                <button class="toggle-switch is-active" type="button" data-dark-mode-toggle aria-label="Alternar modo escuro"></button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
     const csrftoken = "{{ csrf_token }}";
+
+    const storyStrip = document.querySelector('[data-story-strip]');
+    const storyPrevBtn = document.querySelector('[data-story-prev]');
+    const storyNextBtn = document.querySelector('[data-story-next]');
+    let storyScrollPosition = 0;
+
+    const updateStoryNavButtons = () => {
+        if (!storyStrip || !storyPrevBtn || !storyNextBtn) return;
+
+        const container = storyStrip.parentElement;
+        const containerWidth = container.offsetWidth; // 990px
+        const contentWidth = storyStrip.scrollWidth;
+        const maxScroll = Math.max(0, contentWidth - containerWidth);
+
+        storyPrevBtn.hidden = storyScrollPosition <= 0;
+        storyNextBtn.hidden = maxScroll <= 0 || storyScrollPosition >= maxScroll;
+    };
+
+    const scrollStories = (direction) => {
+        if (!storyStrip) return;
+
+        const container = storyStrip.parentElement;
+        const containerWidth = container.offsetWidth; // 990px
+        const scrollAmount = containerWidth; // Scroll exatamente 9 contas
+
+        if (direction === 'next') {
+            storyScrollPosition += scrollAmount;
+        } else {
+            storyScrollPosition -= scrollAmount;
+        }
+
+        const maxScroll = storyStrip.scrollWidth - containerWidth;
+        storyScrollPosition = Math.max(0, Math.min(storyScrollPosition, maxScroll));
+
+        storyStrip.style.transform = `translateX(-${storyScrollPosition}px)`;
+        updateStoryNavButtons();
+    };
+
+    if (storyPrevBtn) {
+        storyPrevBtn.addEventListener('click', () => scrollStories('prev'));
+    }
+
+    if (storyNextBtn) {
+        storyNextBtn.addEventListener('click', () => scrollStories('next'));
+    }
+
+    window.addEventListener('resize', updateStoryNavButtons);
+
+    // Inicializa após o DOM estar totalmente carregado
+    setTimeout(() => {
+        updateStoryNavButtons();
+    }, 100);
+
+    const formatRelativeTime = (timestamp) => {
+        const now = Date.now() / 1000;
+        const diff = Math.floor(now - timestamp);
+
+        if (diff < 60) return 'Agora';
+        if (diff < 3600) {
+            const mins = Math.floor(diff / 60);
+            return `${mins}min`;
+        }
+        if (diff < 86400) {
+            const hours = Math.floor(diff / 3600);
+            return `${hours}h`;
+        }
+        if (diff < 604800) {
+            const days = Math.floor(diff / 86400);
+            return `${days}d`;
+        }
+        if (diff < 2592000) {
+            const weeks = Math.floor(diff / 604800);
+            return `${weeks}sem`;
+        }
+        const months = Math.floor(diff / 2592000);
+        return `${months}m`;
+    };
+
+    document.querySelectorAll('[data-timestamp]').forEach((el) => {
+        const timestamp = parseFloat(el.dataset.timestamp);
+        if (timestamp) {
+            el.textContent = formatRelativeTime(timestamp);
+        }
+    });
+
     const bindLikeButtons = () => {
         document.querySelectorAll('.like-btn').forEach((btn) => {
             if (btn.dataset.likeBound === 'true') {
@@ -1595,6 +1877,9 @@
 
     document.querySelectorAll('[data-comment-input]').forEach((input) => {
         const row = input.closest('.post-comments-form-row');
+        const form = input.closest('[data-comment-form]');
+        const submitButton = form ? form.querySelector('.button[type="submit"]') : null;
+
         const resize = () => {
             input.style.height = 'auto';
             const nextHeight = Math.min(input.scrollHeight, 68);
@@ -1605,9 +1890,32 @@
                 row.classList.toggle('is-overflowing', overflowing);
             }
         };
+
+        const updateSubmitButton = () => {
+            const hasContent = input.value.trim().length > 0;
+            if (submitButton) {
+                submitButton.classList.toggle('has-content', hasContent);
+            }
+        };
+
         input.dataset.minHeight = '26';
-        input.addEventListener('input', resize);
+        input.addEventListener('input', () => {
+            resize();
+            updateSubmitButton();
+        });
+
+        // Enter para enviar (Shift+Enter para nova linha)
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                if (form && input.value.trim().length > 0) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }
+        });
+
         resize();
+        updateSubmitButton();
     });
 
     document.querySelectorAll('[data-comment-form]').forEach((form) => {
@@ -1656,5 +1964,58 @@
             }
         });
     });
+
+    const displaySettingsModal = document.querySelector('[data-display-settings-modal]');
+    const displaySettingsToggle = document.querySelector('[data-display-settings-toggle]');
+    const displaySettingsClose = document.querySelector('[data-display-settings-close]');
+    const darkModeToggle = document.querySelector('[data-dark-mode-toggle]');
+
+    const openDisplaySettings = () => {
+        if (!displaySettingsModal) return;
+        displaySettingsModal.classList.add('is-visible');
+        displaySettingsModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    };
+
+    const closeDisplaySettings = () => {
+        if (!displaySettingsModal) return;
+        displaySettingsModal.classList.remove('is-visible');
+        displaySettingsModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    };
+
+    if (displaySettingsToggle) {
+        displaySettingsToggle.addEventListener('click', openDisplaySettings);
+    }
+
+    if (displaySettingsClose) {
+        displaySettingsClose.addEventListener('click', closeDisplaySettings);
+    }
+
+    if (displaySettingsModal) {
+        displaySettingsModal.addEventListener('click', (event) => {
+            if (event.target === displaySettingsModal) {
+                closeDisplaySettings();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && displaySettingsModal?.classList.contains('is-visible')) {
+            closeDisplaySettings();
+        }
+    });
+
+    const darkModeKey = 'inceptDarkMode';
+    const isDarkMode = window.localStorage.getItem(darkModeKey) !== 'false';
+
+    if (darkModeToggle) {
+        darkModeToggle.classList.toggle('is-active', isDarkMode);
+
+        darkModeToggle.addEventListener('click', () => {
+            const isActive = darkModeToggle.classList.toggle('is-active');
+            window.localStorage.setItem(darkModeKey, isActive ? 'true' : 'false');
+        });
+    }
 </script>
 {% endblock %}
