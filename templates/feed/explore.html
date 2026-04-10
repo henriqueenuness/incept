@@ -961,7 +961,7 @@
     <aside class="social-nav">
         <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Pagina Inicial</span>
+            <span class="social-nav-label">Página Inicial</span>
         </a>
         <a class="social-nav-link" href="{% url 'search_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
@@ -977,13 +977,13 @@
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
             <span class="social-nav-label">Ciclo</span>
         </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementacao completa do backend.">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
             <span class="social-nav-label">Mensagens</span>
         </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificacoes em breve" data-placeholder-copy="As notificacoes ainda precisam de eventos e persistencia no backend.">
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificações em breve" data-placeholder-copy="As notificações ainda precisam de eventos e persistência no backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificacoes</span>
+            <span class="social-nav-label">Notificações</span>
         </a>
         {% if user.is_authenticated %}
         <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
@@ -999,15 +999,15 @@
             <span class="social-more-label">Mais</span>
         </summary>
         <div class="social-more-menu">
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configuracoes em breve" data-placeholder-copy="Salvar preferencias do usuario ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A area visual existe, mas salvar de verdade ainda depende de persistencia no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configurações em breve" data-placeholder-copy="Salvar preferências do usuário ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
             <button class="social-more-item" type="button" data-display-settings-toggle><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
             <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
         </div>
     </details>
 
-    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A area esta reservada na interface, mas o fluxo real ainda nao foi implementado.">
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A área está reservada na interface, mas o fluxo real ainda não foi implementado.">
         <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
         <span>Mensagens</span>
     </a>
@@ -1212,13 +1212,13 @@
                 <section class="explore-fallback-grid">
                     <article class="explore-fallback-card" style="--fallback-bg: radial-gradient(circle at 20% 20%, rgba(105, 226, 255, 0.12), transparent 28%), radial-gradient(circle at 80% 76%, rgba(255, 156, 107, 0.14), transparent 30%);">
                         <span class="social-kicker">Descoberta inicial</span>
-                        <h3>Seu explore nao precisa comecar vazio.</h3>
-                        <p>Enquanto o feed real ainda nao tem volume, a interface abre espaco para pessoas e trilhas visuais sugeridas.</p>
+                        <h3>Seu explore não precisa começar vazio.</h3>
+                        <p>Enquanto o feed real ainda não tem volume, a interface abre espaço para pessoas e trilhas visuais sugeridas.</p>
                     </article>
                     <article class="explore-fallback-card" style="--fallback-bg: radial-gradient(circle at 78% 18%, rgba(255, 156, 107, 0.12), transparent 28%), radial-gradient(circle at 20% 82%, rgba(105, 226, 255, 0.12), transparent 28%);">
                         <span class="social-kicker">Primeiras pistas</span>
-                        <h3>Ilustracao, editorial, 3D e musica.</h3>
-                        <p>Essas frentes ajudam a orientar a leitura inicial da rede mesmo antes do backend completar a recomendacao.</p>
+                        <h3>Ilustração, editorial, 3D e música.</h3>
+                        <p>Essas frentes ajudam a orientar a leitura inicial da rede mesmo antes do backend completar a recomendação.</p>
                     </article>
                 </section>
                 {% endif %}
@@ -1319,7 +1319,7 @@
                         <article class="onboarding-artist-card">
                             <div class="onboarding-artist-copy">
                                 <strong>@soundform</strong>
-                                <span class="muted">musica e trilha</span>
+                                <span class="muted">música e trilha</span>
                             </div>
                             <div class="onboarding-artist-actions">
                                 <button class="button" type="button">Seguir</button>

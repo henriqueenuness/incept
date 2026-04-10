@@ -274,7 +274,7 @@
             {% csrf_token %}
             <span class="eyebrow">Acesso</span>
             <h2>Entrar</h2>
-            <p>Use seu email e senha para abrir a area autenticada da plataforma.</p>
+            <p>Use seu email e senha para abrir a área autenticada da plataforma.</p>
             {% if auth_error %}
             <div class="auth-notice auth-notice-error">{{ auth_error }}</div>
             {% endif %}
@@ -288,7 +288,7 @@
             <button class="auth-submit" type="submit" id="loginSubmit">Entrar no feed</button>
             <div class="auth-links">
                 <a href="{% url 'home' %}">Voltar para a home</a>
-                <p>Nao tem conta? <a href="{% url 'signup_pg' %}">Criar agora</a></p>
+                <p>Não tem conta? <a href="{% url 'signup_pg' %}">Criar agora</a></p>
             </div>
         </form>
     </div>
