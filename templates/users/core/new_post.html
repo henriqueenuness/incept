@@ -278,6 +278,14 @@
                             <textarea class="textarea-field" name="post_description" placeholder="Conte sobre seu trabalho... (opcional)" maxlength="500" data-description-input></textarea>
                         </label>
 
+                        <label class="composer-field">
+                            <div class="composer-field-header">
+                                <span>Collab</span>
+                                <span class="composer-char-counter" data-char-counter>0/25</span>
+                            </div>
+                            <textarea class="textarea-field" name="collab" placeholder="Coloque aqui o nick de quem fez a arte com você (sem @)" maxlength="25" data-description-input></textarea>
+                        </label>
+
                         <div class="composer-actions">
                             <button class="button" type="submit" data-submit-post disabled>Publicar</button>
                             <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Cancelar</a>

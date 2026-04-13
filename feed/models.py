@@ -59,3 +59,11 @@ class Comments(models.Model):
         null=True
     )
     content = models.CharField(max_length=255)
+
+class Media(models.Model):
+    post = models.ForeignKey(
+        Post,
+        related_name= "media",
+        on_delete=models.CASCADE,
+    )
+    base64 = models.TextField(null=True)

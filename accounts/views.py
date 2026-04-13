@@ -32,6 +32,8 @@ def signup(request): #registro/cadastro usuario
 
         if User.objects.filter(nick=nick).exists():
             return HttpResponse("alguém já usa esse nick")
+        if " " in nick:
+            return HttpResponse("o campo nick não deve conter espaços. Tente: - ; _ ; . ")
         if User.objects.filter(email=email).exists():
             return HttpResponse("esse email já foi cadastrado, deseja fazer login?")
         
@@ -172,6 +174,7 @@ def new_post(request): #postar post
         description = request.POST.get('post_description')
         img = request.FILES.get('post_image')
         u_id = request.user.user_id
+        collab = request.POST.get('collab')
         if img:
             if not img.content_type.startswith('image/'):
                 img_compativel = False
@@ -179,7 +182,9 @@ def new_post(request): #postar post
             else:
                 img_compativel = True
                 img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
-
+            if collab:
+                if User.objects.filter(nick=collab).exists():
+                    collaborator = collab.user_id
             if Post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
                 return HttpResponse("erro: essa postagem já foi feita")
             else:
@@ -192,14 +197,14 @@ def new_post(request): #postar post
                     if img_compativel == True:
                         Post.objects.create( image=img_b64, user_id = u_id) #cria a postagem
                     else:
-                        Post.objects.create(user_id = u_id) #cria a postagem sem imagem
+                        Post.objects.create(user_id = u_id) #cria a postagem sem imagem nao ta funcionando
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
                 user.arts = Post.objects.filter(user=user).count()
                 user.save() #salva a quantidade de artes do user
                 nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
                 return core_pg(request, nick)
-            
+        
         else:
             return HttpResponse('erro: algo deu errado na hora de criar seu post')
         
