@@ -912,6 +912,25 @@
     .toggle-switch.is-active::before {
         transform: translateX(20px);
     }
+    /* Overrides do modal "Alternar exibição" no modo claro */
+    [data-theme="light"] .display-settings-dialog {
+        background: #ffffff;
+        border-color: rgba(0, 60, 120, 0.12);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.12);
+    }
+    [data-theme="light"] .display-settings-close {
+        color: rgba(13, 26, 43, 0.60);
+    }
+    [data-theme="light"] .display-settings-close:hover {
+        background: rgba(0, 0, 0, 0.06);
+        color: #0d1a2b;
+    }
+    [data-theme="light"] .display-settings-option:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="light"] .toggle-switch {
+        background: rgba(0, 0, 0, 0.15);
+    }
     @media (max-width: 720px) {
         .explore-suggestion-grid {
             grid-template-columns: 1fr;
@@ -951,6 +970,180 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* ── MODO CLARO — Explore ───────────────────────────── */
+    /* Cards de sugestão */
+    [data-theme="light"] .explore-suggestion-card {
+        background: rgba(255, 255, 255, 0.72);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    /* Fallback cards */
+    [data-theme="light"] .explore-fallback-card {
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    /* Onboarding aside */
+    [data-theme="light"] .onboarding-aside {
+        background: linear-gradient(180deg, rgba(220,234,248,0.96), rgba(210,228,248,0.92));
+        border-right-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .onboarding-brand {
+        color: var(--text);
+    }
+    [data-theme="light"] .onboarding-progress-dot {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .onboarding-progress-dot.is-active {
+        background: var(--accent);
+        box-shadow: 0 0 0 8px rgba(0, 131, 176, 0.12);
+    }
+    [data-theme="light"] .onboarding-tag {
+        background: rgba(0, 60, 120, 0.06);
+        border-color: rgba(0, 60, 120, 0.14);
+        color: var(--text);
+    }
+    [data-theme="light"] .onboarding-tag.is-selected {
+        background: rgba(0, 131, 176, 0.14);
+        border-color: rgba(0, 131, 176, 0.30);
+    }
+    [data-theme="light"] .onboarding-artist-grid::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .onboarding-artist-card {
+        background: rgba(255, 255, 255, 0.80);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .onboarding-follow-btn {
+        background: rgba(0, 60, 120, 0.08);
+        border-color: rgba(0, 131, 176, 0.20);
+        color: var(--text);
+    }
+    /* Modal de comentários (explore também tem) */
+    [data-theme="light"] .post-comments-modal {
+        background: rgba(160, 190, 220, 0.50);
+    }
+    [data-theme="light"] .post-comments-dialog {
+        background: #f5f8fc;
+        border-color: rgba(0, 60, 120, 0.10);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-media {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-media-frame img {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-close {
+        background: rgba(240, 245, 252, 0.92);
+        border-color: rgba(0, 60, 120, 0.16);
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-close:hover {
+        background: rgba(220, 234, 248, 0.98);
+    }
+    [data-theme="light"] .post-comments-side {
+        background: #ffffff;
+        border-left: 1px solid rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-side-head {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-options-toggle {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-options-toggle:hover {
+        background: rgba(0, 0, 0, 0.06);
+    }
+    [data-theme="light"] .post-comments-options-menu {
+        background: #ffffff;
+        border-color: rgba(0, 60, 120, 0.12);
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-option {
+        color: var(--text);
+        border-bottom-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-option:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="light"] .post-comments-option.is-danger {
+        color: #c0392b;
+    }
+    [data-theme="light"] .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .post-comments-empty {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form {
+        background: #ffffff;
+        border-top-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-feedback {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-feedback strong {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-feedback span {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-input-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment {
+        background: rgba(0, 60, 120, 0.04);
+        border-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-comment.is-pinned {
+        background: rgba(0, 131, 176, 0.07);
+        border-color: rgba(0, 131, 176, 0.18);
+    }
+    [data-theme="light"] .post-comments-comment-avatar {
+        background: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-comment-copy p {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-comment-meta {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment-action {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment-action:hover,
+    [data-theme="light"] .post-comments-comment-action.is-active {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-pinned-badge {
+        background: rgba(0, 131, 176, 0.12);
+        color: #0083b0;
+    }
+    [data-theme="light"] .post-comments-pin {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-pin:hover,
+    [data-theme="light"] .post-comments-comment.is-pinned .post-comments-pin {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-form textarea.field {
+        scrollbar-color: rgba(0, 60, 120, 0.18) transparent;
+    }
+    [data-theme="light"] .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.16);
+    }
+    [data-theme="light"] .post-comments-form .button {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form .button.has-content {
+        color: var(--accent);
+    }
+    [data-theme="light"] .feed-comment-preview-item p {
+        color: var(--text);
+    }
+    /* ── FIM MODO CLARO ─────────────────────────────────── */
 </style>
 {% endblock %}
 
@@ -2014,15 +2207,30 @@
         }
     });
 
-    const darkModeKey = 'inceptDarkMode';
-    const isDarkMode = window.localStorage.getItem(darkModeKey) !== 'false';
+    /* Toggle de tema por conta de usuário */
+    const themeUserNick = "{{ user.nick|escapejs|default:'' }}";
+    const themeKey = themeUserNick ? ("inceptTheme_" + themeUserNick) : null;
 
-    if (darkModeToggle) {
-        darkModeToggle.classList.toggle('is-active', isDarkMode);
+    const applyTheme = (isLight) => {
+        if (isLight) {
+            document.documentElement.setAttribute("data-theme", "light");
+        } else {
+            document.documentElement.removeAttribute("data-theme");
+        }
+    };
 
-        darkModeToggle.addEventListener('click', () => {
-            const isActive = darkModeToggle.classList.toggle('is-active');
-            window.localStorage.setItem(darkModeKey, isActive ? 'true' : 'false');
+    if (darkModeToggle && themeKey) {
+        const stored = localStorage.getItem(themeKey);
+        const isCurrentlyDark = stored !== "light"; // padrão = dark
+
+        // Sincroniza o botão (is-active = dark mode ligado)
+        darkModeToggle.classList.toggle("is-active", isCurrentlyDark);
+
+        darkModeToggle.addEventListener("click", () => {
+            const darkNow = darkModeToggle.classList.toggle("is-active");
+            const lightNow = !darkNow;
+            applyTheme(lightNow);
+            localStorage.setItem(themeKey, lightNow ? "light" : "dark");
         });
     }
 </script>

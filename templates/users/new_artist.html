@@ -276,6 +276,52 @@
         .artist-cards { grid-template-columns: 1fr; }
         .artist-card { min-height: 220px; }
     }
+
+    /* ── MODO CLARO ─────────────────────────────────────── */
+    [data-theme="light"] body {
+        background: linear-gradient(180deg, #dde8f5 0%, #e8f0f9 54%, #f0f5fc 100%);
+    }
+    [data-theme="light"] .artist-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(230,242,255,0.82));
+        border-color: rgba(0, 60, 120, 0.12);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+    [data-theme="light"] .artist-card:hover {
+        border-color: rgba(0, 131, 176, 0.28);
+        box-shadow: 0 24px 60px rgba(0, 60, 120, 0.14);
+    }
+    [data-theme="light"] .artist-card-overlay {
+        background: linear-gradient(180deg, transparent 20%, rgba(220,234,248,0.60) 100%);
+    }
+    [data-theme="light"] .artist-card-icon {
+        background: rgba(0, 60, 120, 0.07);
+        border-color: rgba(0, 60, 120, 0.16);
+    }
+    [data-theme="light"] .artist-card.is-artist {
+        border-color: rgba(0, 131, 176, 0.18);
+    }
+    [data-theme="light"] .artist-card.is-artist:hover {
+        border-color: rgba(0, 131, 176, 0.36);
+        box-shadow: 0 24px 60px rgba(0, 131, 176, 0.10);
+    }
+    [data-theme="light"] .artist-card.is-artist .artist-card-icon {
+        background: rgba(0, 131, 176, 0.10);
+        border-color: rgba(0, 131, 176, 0.24);
+    }
+    [data-theme="light"] .artist-card-action.primary {
+        background: linear-gradient(135deg, var(--accent), #38c6f0);
+        color: #fff;
+        box-shadow: 0 8px 24px rgba(0, 131, 176, 0.24);
+    }
+    [data-theme="light"] .artist-card-action.secondary {
+        background: rgba(0, 60, 120, 0.06);
+        border-color: rgba(0, 60, 120, 0.16);
+        color: var(--text);
+    }
+    [data-theme="light"] .artist-card-action.secondary:hover {
+        background: rgba(0, 60, 120, 0.10);
+    }
+    /* ── FIM MODO CLARO ──────────────────────────────────── */
 </style>
 {% endblock %}
 

@@ -61,6 +61,23 @@
         display: grid;
         gap: 12px;
     }
+
+    /* ── MODO CLARO — Busca ─────────────────────────────── */
+    [data-theme="light"] .search-filter-chip {
+        background: rgba(0, 60, 120, 0.05);
+        border-color: rgba(0, 60, 120, 0.14);
+        color: var(--text);
+    }
+    [data-theme="light"] .search-filter-chip:hover {
+        background: rgba(0, 60, 120, 0.09);
+    }
+    [data-theme="light"] .search-role::before {
+        box-shadow: 0 0 0 6px rgba(0, 131, 176, 0.12);
+    }
+    [data-theme="light"] .search-role.is-client::before {
+        box-shadow: 0 0 0 6px rgba(224, 92, 26, 0.12);
+    }
+    /* ── FIM MODO CLARO ─────────────────────────────────── */
 </style>
 {% endblock %}
 

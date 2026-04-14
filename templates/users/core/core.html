@@ -237,6 +237,37 @@
         color: rgba(243, 247, 251, 0.7);
         font-size: 0.94rem;
     }
+    /* ── MODO CLARO — Perfil ───────────────────────────── */
+    [data-theme="light"] .profile-tab-icon {
+        background: rgba(0, 60, 120, 0.05);
+        border-color: rgba(0, 60, 120, 0.12);
+    }
+    [data-theme="light"] .profile-tab-tile-empty {
+        color: var(--muted);
+    }
+    [data-theme="light"] .profile-tab-bar::before {
+        border-top-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .profile-tab-panels::before {
+        border-top-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .profile-tab-tile {
+        background: linear-gradient(180deg, rgba(0,60,120,0.05), rgba(0,60,120,0.02));
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .profile-link-card {
+        background: rgba(255, 255, 255, 0.80);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .profile-link-item {
+        background: rgba(0, 60, 120, 0.04);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .profile-link-empty {
+        color: var(--muted);
+    }
+    /* ── FIM MODO CLARO ─────────────────────────────────── */
+
     @media (max-width: 980px) {
         .app-shell {
             padding-left: 0;
@@ -393,12 +424,6 @@
 
             <section class="profile-columns">
                 <div class="profile-panel">
-                    <div class="profile-summary-top" style="margin-bottom: 18px;">
-                        <div class="profile-tab-note">
-                            <p>Imagens do perfil agora podem ser abertas em tela cheia e a interface remove informação técnica que não agrega para o usuário.</p>
-                        </div>
-                    </div>
-
                     <div class="profile-tabs">
                         <div class="profile-tab-bar">
                             <button class="profile-tab-button is-active" type="button" data-profile-tab="posts">

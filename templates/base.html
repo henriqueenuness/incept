@@ -24,6 +24,225 @@
             --content-width: 1180px;
         }
 
+        /* ── MODO CLARO ─────────────────────────────────────── */
+        [data-theme="light"] {
+            --bg:           #f0f4f8;
+            --panel:        rgba(255, 255, 255, 0.78);
+            --panel-strong: rgba(255, 255, 255, 0.96);
+            --line:         rgba(0, 60, 120, 0.12);
+            --line-strong:  rgba(0, 60, 120, 0.28);
+            --text:         #0d1a2b;
+            --muted:        #4a6580;
+            --accent:       #0083b0;
+            --accent-2:     #e05c1a;
+            --accent-3:     #6aa00a;
+            --shadow:       0 30px 80px rgba(0, 0, 0, 0.10);
+        }
+        [data-theme="light"] body {
+            background: linear-gradient(180deg, #dde8f5 0%, #e8f0f9 54%, #f0f5fc 100%);
+            color: var(--text);
+        }
+
+        /* Topbar */
+        [data-theme="light"] .topbar {
+            background: rgba(240, 244, 248, 0.88);
+            border-color: rgba(0, 60, 120, 0.12);
+        }
+
+        /* Botões */
+        [data-theme="light"] .pill,
+        [data-theme="light"] .ghost-button {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: var(--line);
+            color: var(--text);
+        }
+        [data-theme="light"] .button {
+            color: #fff;
+        }
+
+        /* Cards, painéis e perfil */
+        [data-theme="light"] .social-card,
+        [data-theme="light"] .profile-hero,
+        [data-theme="light"] .profile-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(240,248,255,0.78));
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .social-card::before,
+        [data-theme="light"] .profile-hero::before,
+        [data-theme="light"] .profile-panel::before {
+            background: linear-gradient(135deg, rgba(255,255,255,0.5), transparent 34%, transparent 66%, rgba(0,131,176,0.06));
+        }
+
+        /* Avatar — borda em modo claro */
+        [data-theme="light"] .avatar,
+        [data-theme="light"] .avatar-lg {
+            background: linear-gradient(135deg, rgba(0, 131, 176, 0.30), rgba(224, 92, 26, 0.22));
+        }
+        [data-theme="light"] .avatar img,
+        [data-theme="light"] .avatar-lg img {
+            background: #e8f0f8;
+        }
+
+        /* Ring do story-pill (perfis na tira de artistas) */
+        [data-theme="light"] .story-pill .avatar {
+            background: linear-gradient(135deg, #0083b0, #38b2e0, #e05c1a);
+            box-shadow: 0 4px 12px rgba(0, 131, 176, 0.30);
+        }
+
+        /* Botões de navegação da tira de stories */
+        [data-theme="light"] .story-nav-btn {
+            background: rgba(240, 244, 248, 0.96);
+            color: #0d1a2b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        [data-theme="light"] .story-nav-btn:hover {
+            background: rgba(220, 234, 248, 0.98);
+        }
+
+        /* Feed */
+        [data-theme="light"] .feed-card {
+            border-bottom-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .feed-card-copy {
+            color: var(--text);
+        }
+        [data-theme="light"] .feed-media {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .feed-media img {
+            background: #e8f0f8;
+        }
+        [data-theme="light"] .feed-comment {
+            border-top-color: rgba(0, 60, 120, 0.08);
+        }
+        [data-theme="light"] .feed-comment p {
+            color: var(--text);
+        }
+        [data-theme="light"] .feed-comment-preview-item p {
+            color: var(--text);
+        }
+
+        /* Stats e highlights */
+        [data-theme="light"] .stat {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .social-stat {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .profile-highlight {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+
+        /* Inputs e campos */
+        [data-theme="light"] .field,
+        [data-theme="light"] .select-field,
+        [data-theme="light"] .textarea-field {
+            background: rgba(255, 255, 255, 0.80);
+            border-color: rgba(0, 60, 120, 0.16);
+            color: var(--text);
+        }
+        [data-theme="light"] .field:focus,
+        [data-theme="light"] .select-field:focus,
+        [data-theme="light"] .textarea-field:focus {
+            background: #fff;
+            border-color: rgba(0, 60, 120, 0.36);
+        }
+
+        /* Tags e chips */
+        [data-theme="light"] .tag {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 60, 120, 0.12);
+            color: var(--text);
+        }
+        [data-theme="light"] .comment {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 60, 120, 0.08);
+        }
+
+        /* Imagem de post com gradiente */
+        [data-theme="light"] .post-image-wrap {
+            background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+        }
+
+        /* Kicker (subtítulo em caixa alta) */
+        [data-theme="light"] .social-kicker {
+            color: var(--muted);
+        }
+
+        /* Auth card */
+        [data-theme="light"] .auth-card {
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        /* Profile bio */
+        [data-theme="light"] .profile-bio {
+            color: var(--text);
+        }
+
+        /* Tabelas */
+        [data-theme="light"] th,
+        [data-theme="light"] td {
+            border-bottom-color: rgba(0, 60, 120, 0.10);
+        }
+
+        /* Orbs decorativos */
+        [data-theme="light"] .orb {
+            background: rgba(0, 131, 176, 0.04);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+
+        /* Menu "Mais" */
+        [data-theme="light"] .social-more-menu {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(0, 60, 120, 0.12);
+            box-shadow: 0 26px 80px rgba(0, 0, 0, 0.14);
+        }
+        [data-theme="light"] .social-more-menu a,
+        [data-theme="light"] .social-more-menu button {
+            color: var(--text);
+        }
+        [data-theme="light"] .social-more-menu a:hover,
+        [data-theme="light"] .social-more-menu button:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        [data-theme="light"] .social-more-menu a + a,
+        [data-theme="light"] .social-more-menu a + button,
+        [data-theme="light"] .social-more-menu button + a,
+        [data-theme="light"] .social-more-menu button + button {
+            border-top-color: rgba(0, 60, 120, 0.08);
+        }
+
+        /* Modal de logout */
+        [data-theme="light"] .logout-modal {
+            background: rgba(200, 220, 240, 0.72);
+        }
+        [data-theme="light"] .logout-modal-dialog {
+            background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(240,248,255,0.99));
+            border-color: rgba(0, 60, 120, 0.12);
+        }
+
+        /* Lightbox */
+        [data-theme="light"] .lightbox {
+            background: rgba(180, 205, 230, 0.90);
+        }
+        [data-theme="light"] .lightbox-figure {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(0, 60, 120, 0.10);
+        }
+        [data-theme="light"] .lightbox-figure img {
+            background: #e8f0f8;
+        }
+        [data-theme="light"] .lightbox-close {
+            background: rgba(240, 245, 252, 0.95);
+            border-color: rgba(0, 60, 120, 0.18);
+            color: var(--text);
+        }
+        /* ── FIM MODO CLARO ──────────────────────────────────── */
+
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
@@ -1272,6 +1491,15 @@
     </div>
     {% block scripts %}{% endblock %}
     <script>
+        /* Inicialização do tema por conta — roda antes de qualquer paint */
+        (function() {
+            var nick = "{{ user.nick|escapejs|default:'' }}";
+            if (!nick) return;
+            var stored = localStorage.getItem("inceptTheme_" + nick);
+            if (stored === "light") {
+                document.documentElement.setAttribute("data-theme", "light");
+            }
+        })();
         (() => {
             const defaultAvatar = "data:image/svg+xml;utf8," + encodeURIComponent(`
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">

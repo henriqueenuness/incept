@@ -499,6 +499,133 @@
     .feed-comment-view-all:hover {
         color: var(--text);
     }
+
+    /* ── MODO CLARO — Modal de comentários ─────────────── */
+    [data-theme="light"] .post-comments-modal {
+        background: rgba(160, 190, 220, 0.50);
+    }
+    [data-theme="light"] .post-comments-dialog {
+        background: #f5f8fc;
+        border-color: rgba(0, 60, 120, 0.10);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-media {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-media-frame img {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-close {
+        background: rgba(240, 245, 252, 0.92);
+        border-color: rgba(0, 60, 120, 0.16);
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-close:hover {
+        background: rgba(220, 234, 248, 0.98);
+        color: #0d1a2b;
+    }
+    [data-theme="light"] .post-comments-side {
+        background: #ffffff;
+        border-left: 1px solid rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-side-head {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-options-toggle {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-options-toggle:hover {
+        background: rgba(0, 0, 0, 0.06);
+    }
+    [data-theme="light"] .post-comments-options-menu {
+        background: #ffffff;
+        border-color: rgba(0, 60, 120, 0.12);
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-option {
+        color: var(--text);
+        border-bottom-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-option:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="light"] .post-comments-option.is-danger {
+        color: #c0392b;
+    }
+    [data-theme="light"] .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .post-comments-empty {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form {
+        background: #ffffff;
+        border-top-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-feedback {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-feedback strong {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-feedback span {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-input-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment {
+        background: rgba(0, 60, 120, 0.04);
+        border-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-comment.is-pinned {
+        background: rgba(0, 131, 176, 0.07);
+        border-color: rgba(0, 131, 176, 0.18);
+    }
+    [data-theme="light"] .post-comments-comment-avatar {
+        background: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-comment-copy p {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-comment-meta {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment-action {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment-action:hover,
+    [data-theme="light"] .post-comments-comment-action.is-active {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-pinned-badge {
+        background: rgba(0, 131, 176, 0.12);
+        color: #0083b0;
+    }
+    [data-theme="light"] .post-comments-pin {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-pin:hover,
+    [data-theme="light"] .post-comments-comment.is-pinned .post-comments-pin {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-form textarea.field {
+        scrollbar-color: rgba(0, 60, 120, 0.18) transparent;
+    }
+    [data-theme="light"] .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.16);
+    }
+    [data-theme="light"] .post-comments-form .button {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form .button.has-content {
+        color: var(--accent);
+    }
+    /* ── FIM MODO CLARO ─────────────────────────────────── */
+
     @media (max-width: 720px) {
         .cycle-hero-meta {
             grid-template-columns: 1fr;
