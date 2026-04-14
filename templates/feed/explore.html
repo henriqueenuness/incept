@@ -1055,7 +1055,11 @@
                             <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
                                 <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
                                 <span class="feed-card-author-copy">
-                                    <strong>@{{ post.user.nick }}</strong>
+                                    {% if post.collaborator_id %}
+                                        <strong>@{{ post.user.nick }} e @{{ post.collaborator.nick }}</strong>
+                                    {% else %}
+                                        <strong>@{{ post.user.nick }}</strong>
+                                    {% endif %}
                                     <small>{{ post.user.art_style|default_if_none:"artista" }}</small>
                                 </span>
                             </a>
@@ -1115,7 +1119,11 @@
                                     <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
                                         <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
                                         <span class="feed-card-author-copy">
+                                            {% if post.collaborator_id %}
+                                            <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }} e @{{ post.collaborator.nick }}</strong>
+                                            {% else %}
                                             <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }}</strong>
+                                            {% endif %}
                                         </span>
                                     </a>
                                     <div class="post-comments-side-head-actions">

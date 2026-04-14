@@ -182,22 +182,27 @@ def new_post(request): #postar post
             else:
                 img_compativel = True
                 img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
-            if collab:
-                if User.objects.filter(nick=collab).exists():
-                    collaborator = collab.user_id
+            
             if Post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
+                img_compativel = False #nao muda muita coisa, mas é bom garantir
                 return HttpResponse("erro: essa postagem já foi feita")
+                
             else:
+                post_data = {'user_id': u_id}
+
                 if description:
-                    if img_compativel == True:
-                        Post.objects.create(description=description, image=img_b64, user_id = u_id) #cria a postagem
-                    else:
-                        Post.objects.create(description=description, user_id = u_id) #cria a postagem sem imagem
-                else:
-                    if img_compativel == True:
-                        Post.objects.create( image=img_b64, user_id = u_id) #cria a postagem
-                    else:
-                        Post.objects.create(user_id = u_id) #cria a postagem sem imagem nao ta funcionando
+                    post_data['description'] = description
+
+                if img_compativel:
+                    post_data['image'] = img_b64
+
+                if collab:
+                    collaborator = User.objects.filter(nick=collab).first()
+                    if collaborator:
+                        collaborator_id = collaborator.user_id
+                        post_data['collaborator_id'] = collaborator_id
+
+                Post.objects.create(**post_data)
                 #parte que adiciona 1 ao numero de postagens do usuario
                 user = request.user
                 user.arts = Post.objects.filter(user=user).count()
@@ -207,6 +212,8 @@ def new_post(request): #postar post
         
         else:
             return HttpResponse('erro: algo deu errado na hora de criar seu post')
+        
+
         
 def delete_post(request, id):
     user_post = Post.objects.get(id=id)
