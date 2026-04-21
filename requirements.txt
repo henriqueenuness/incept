@@ -10,4 +10,4 @@ python-dotenv>=1.0
 python-decouple>=3.8
 pyrebase4>=4.7
 requests>=2.31
-firebase-admin>=6.0
+waitress>=3.0.1
