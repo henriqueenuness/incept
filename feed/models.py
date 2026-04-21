@@ -67,3 +67,15 @@ class Media(models.Model):
         on_delete=models.CASCADE,
     )
     base64 = models.TextField(null=True)
+
+
+class Saved(models.Model):
+     user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+     post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        null = True
+    )

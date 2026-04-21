@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from accounts.models import User, Followers
-from .models import Post, Likes, Comments
+from .models import Post, Likes, Comments, Saved
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -97,6 +97,18 @@ def like(request, id):
         liked = True
     return JsonResponse({"likes": post.likes_set.count(),
                          "liked" : liked }) #
+
+def save(request, id):
+    user = request.user.user_id
+    post = get_object_or_404(Post, id=id)
+    if Saved.objects.filter(user=user, post=post).exists():
+        Saved.objects.filter(user=user, post=post).delete()
+        saved = False
+    else:
+        Saved.objects.create(post=post, user_id = user)
+        saved = True
+    return JsonResponse({"saved" : saved,
+                         "post_id" : post.id })
 
 def serialize_comment(comment):
     return {

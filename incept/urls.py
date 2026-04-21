@@ -35,6 +35,7 @@ urlpatterns = [
     path('explore/', feed_views.explore_pg, name='explore_pg'),
     path('explore/like-post/<id>/', feed_views.like, name='like'),
     path('explore/comment/<id>', feed_views.comment, name = 'comment'),
+    path('explore/save-post/<id>/', feed_views.save, name='save'),
     path('search/', feed_views.search_pg, name='search_pg'),
     path('search/user', feed_views.search_user, name='search_user'),
     path('cycle/', feed_views.cycle_pg, name='cycle_pg'),

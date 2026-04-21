@@ -4,7 +4,7 @@ from .models import User, Followers, Interests
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
-from feed.models import Post, Comments
+from feed.models import Post, Comments, Saved
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
 
@@ -88,10 +88,15 @@ def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
     logged_user = request.user
     imagens = Post.objects.filter(user=user)
+    salvos = Saved.objects.filter(user=user)
+    salvos_id = list(salvos.values_list('post_id', flat=True))
+    posts_salvos = Post.objects.filter(id__in=salvos_id) #pega os objetos de cada id listado acima
     is_following = Followers.objects.filter( follower_id=logged_user.user_id, user_id=user.user_id ).exists() if logged_user.is_authenticated else False
     return render(request, "users/core/core.html", {
         "perfil_user" : user, #perfil do cabra que foi pesquisado. Isso garante que na hora de colocar dados na pagina, possa ser diferenciado user.nick de perfil_user.nick
          "imagens": imagens,
+         "salvos": salvos,
+         "posts_salvos" : posts_salvos,
           "is_following": is_following })
 
 
