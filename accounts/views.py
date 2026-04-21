@@ -221,10 +221,13 @@ def new_post(request): #postar post
 
         
 def delete_post(request, id):
-    user_post = Post.objects.get(id=id)
-    user_post.delete()
     user = request.user
     nick = user.nick
+    post = Post.objects.get(id=id)
+    if post.user_id != user.user_id:
+        return HttpResponse('erro: você não é o dono deste post')
+    
+    post.delete()
     user.arts = Post.objects.filter(user=user).count()
     user.save()
     return core_pg(request, nick)
