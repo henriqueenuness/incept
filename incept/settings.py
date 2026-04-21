@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-s)a@ly@c2x#7i$6z%pxq*#4bzaa8n93ccuqg332luwjod1eh)1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000','https://incept-7o6d.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000','https://incept-7o6d.onrender.com','incept-xvzj.onrender.com']
 
 
 # Application definition
