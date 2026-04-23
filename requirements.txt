@@ -11,3 +11,6 @@ python-decouple>=3.8
 pyrebase4>=4.7
 requests>=2.31
 waitress>=3.0.1
+channels>=4.2.0
+channels-redis>=4.2.0
+daphne>=4.1.2

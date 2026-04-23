@@ -331,7 +331,7 @@
         {% if user.is_authenticated %}
         <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
             <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
-            <span class="social-nav-label">Perfil</span>
+            <span class="social-nav-label">Core</span>
         </a>
         {% endif %}
     </aside>
@@ -343,7 +343,7 @@
         </summary>
         <div class="social-more-menu">
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configurações em breve" data-placeholder-copy="Salvar preferências do usuário ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Nexus</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibição em breve" data-placeholder-copy="A preferência de exibição ainda não é armazenada por usuário."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
             <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
@@ -366,7 +366,6 @@
                     <div class="profile-identity">
                         <div class="profile-heading">
                             <div class="profile-handle-block">
-                                <span class="social-kicker">Perfil</span>
                                 <h2>@{{ perfil_user.nick }}</h2>
                                 {% if perfil_user.real_name %}
                                 <span class="profile-subline">{{ perfil_user.real_name }}</span>
@@ -406,7 +405,6 @@
 
                         <section class="profile-link-card" data-profile-links hidden>
                             <div class="profile-link-head">
-                                <span class="social-kicker">Contato e links</span>
                                 <p data-profile-links-empty class="profile-link-empty">Este perfil ainda não configurou links extras.</p>
                             </div>
                             <div class="profile-link-grid" data-profile-links-grid hidden></div>

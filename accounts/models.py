@@ -97,3 +97,4 @@ class Interests(models.Model):
         on_delete=models.CASCADE,
     )
         interest = models.CharField(max_length=50, null=True)
+

@@ -144,7 +144,6 @@
             <div class="feed-stack">
                 <article class="social-card feed-hero search-hero">
                     <div class="feed-hero-copy">
-                        <span class="social-kicker">Busca</span>
                         <h2>Descubra perfis com leitura mais limpa e mais rápida.</h2>
                         <p class="lead">Menos formulário, menos texto solto e uma identificação mais clara entre artista e cliente.</p>
                     </div>
@@ -172,6 +171,9 @@
                                 <span class="feed-card-author-copy">
                                     <strong>@{{ user.nick }}</strong>
                                     <small>{{ user.real_name|default_if_none:"Sem nome publico" }}</small>
+                                    {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
+                                    <small class="feed-card-copy">{% if user.user_id in following %}Seguindo{% endif %}</small>
+                                    {% endif %}
                                 </span>
                             </a>
                             <span class="tag search-role {% if user.cargo == 'cliente' %}is-client{% endif %}">{{ user.cargo }}</span>
@@ -182,14 +184,6 @@
                                 <div class="feed-toolbar-meta">
                                     {% if user.art_style %}
                                     <span class="tag">{{ user.art_style }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="feed-toolbar-actions">
-                                    <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Ver perfil</a>
-                                    {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
-                                    <button class="button follow-btn" data-url="{% url 'follow' user.user_id %}">
-                                        {% if user.user_id in following %}Seguindo{% else %}Seguir{% endif %}
-                                    </button>
                                     {% endif %}
                                 </div>
                             </div>
@@ -211,7 +205,6 @@
 
             <aside class="social-rail">
                 <article class="social-card">
-                    <span class="social-kicker">Busca limpa</span>
                     <h3 style="margin:14px 0 8px;">Visual mais objetivo.</h3>
                     <p>Os perfis agora aparecem com tipo, bio curta e acesso rapido ao perfil sem excesso de texto.</p>
                 </article>

@@ -911,7 +911,7 @@
     <aside class="social-nav">
         <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
+            <span class="social-nav-label">Explore</span>
         </a>
         <a class="social-nav-link" href="{% url 'search_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
@@ -925,11 +925,11 @@
         {% endif %}
         <a class="social-nav-link" href="{% url 'cycle_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
-            <span class="social-nav-label">Ciclo</span>
+            <span class="social-nav-label">Cycle</span>
         </a>
         <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
-            <span class="social-nav-label">Mensagens</span>
+            <span class="social-nav-label">Chat</span>
         </a>
         <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificações em breve" data-placeholder-copy="As notificações ainda precisam de eventos e persistência no backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
@@ -938,7 +938,7 @@
         {% if user.is_authenticated %}
         <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
             <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
-            <span class="social-nav-label">Perfil</span>
+            <span class="social-nav-label">Core</span>
         </a>
         {% endif %}
     </aside>
