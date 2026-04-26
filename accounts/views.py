@@ -180,6 +180,9 @@ def new_post(request): #postar post
         img = request.FILES.get('post_image')
         u_id = request.user.user_id
         collab = request.POST.get('collab')
+        like_number = request.POST.get('like_number')
+        comment = request.POST.get('comment')
+        share = request.POST.get('share')
         if img:
             if not img.content_type.startswith('image/'):
                 img_compativel = False
@@ -200,6 +203,15 @@ def new_post(request): #postar post
 
                 if img_compativel:
                     post_data['image'] = img_b64
+
+                if like_number:
+                    post_data['like_number'] = like_number
+
+                if comment:
+                    post_data['comment'] = comment
+
+                if share:
+                    post_data['share'] = share
 
                 if collab:
                     collaborator = User.objects.filter(nick=collab).first()

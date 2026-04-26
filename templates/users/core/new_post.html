@@ -292,11 +292,20 @@
                         {% csrf_token %}
                         <div class="composer-upload-row">
                             <label class="composer-field composer-file-wrap" data-file-wrap>
-                                <span>Imagem</span>
+                                <span>Arquivo</span>
                                 <input class="field composer-file-input" type="file" name="post_image" accept="image/*" data-post-image>
                             </label>
 
                             <div class="composer-upload-controls" data-upload-controls>
+                                <input type="checkbox" name="like_number" value="True" checked>
+                                <label for="like_number">número de likes</label>
+                                <span for="like_number">ao desativar, o número de likes não será exibido</span>
+                                <input type="checkbox" name="comment" value="True" checked>
+                                <label for="comment">comentários</label>
+                                <span for="comment">ao desativar, não será possível fazer comentários na arte</span>
+                                <input type="checkbox" name="share" value="True" checked>
+                                <label for="share">compartilhar</label>
+                                <span for="share">ao desativar, não será possível compartilhar a arte</span>
                                 <button class="ghost-button" type="button" data-change-image>Trocar imagem</button>
                                 <button class="ghost-button" type="button" data-remove-image>Remover imagem</button>
                             </div>

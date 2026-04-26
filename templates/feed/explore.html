@@ -1022,9 +1022,17 @@
 
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
-                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg><span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span></button>
+                                <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg>
+                                    {% if post.like_number %}
+                                    <span class="feed-action-count" data-like-count>{{ post.likes_set.count }}</span>
+                                    {% endif %}
+                                </button>
+                                {% if post.comment %}
                                 <button class="feed-action-icon" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg><span class="feed-action-count" data-comment-count>{{ post.comments_set.count }}</span></button>
+                                {% endif %}
+                                {% if post.share %}
                                 <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+                                {% endif %}
                                 <a href="{% url 'save' post.id %}"><button class="feed-action-icon save-btn" data-url="{% url 'save' post.id %}" data-save-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button></a>
                             </div>
                             <div class="feed-toolbar-meta"></div>
@@ -1096,33 +1104,41 @@
                                     </div>
                                 </div>
                                 <div class="post-comments-side-body" data-comment-list>
-                                    {% for comment in comments %}
-                                        {% if comment.post_id == post.id %}
-                                        <article class="post-comments-comment" data-comment-entry>
-                                            <div class="post-comments-comment-avatar">
-                                                <img src="data:image/png;base64,{{ comment.user.core_picture }}" alt="{{ comment.user.nick }}">
-                                            </div>
-                                            <div class="post-comments-comment-head">
-                                                <div class="post-comments-comment-copy">
-                                                    <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
-                                                    <div class="post-comments-comment-meta">
-                                                        <span>há {{ comment.date|timesince }}</span>
-                                                        <span class="post-comments-pinned-badge">Fixado</span>
-                                                    </div>
+                                    {% if post.comment %}
+                                        {% for comment in comments %}
+                                            {% if comment.post_id == post.id %}
+                                            <article class="post-comments-comment" data-comment-entry>
+                                                <div class="post-comments-comment-avatar">
+                                                    <img src="data:image/png;base64,{{ comment.user.core_picture }}" alt="{{ comment.user.nick }}">
                                                 </div>
-                                                {% if request.user.is_authenticated and request.user.user_id == post.user.user_id %}
-                                                <button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">
-                                                    <svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>
-                                                </button>
-                                                {% endif %}
-                                            </div>
-                                        </article>
-                                        {% endif %}
-                                    {% endfor %}
+                                                <div class="post-comments-comment-head">
+                                                    <div class="post-comments-comment-copy">
+                                                        <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
+                                                        <div class="post-comments-comment-meta">
+                                                            <span>há {{ comment.date|timesince }}</span>
+                                                            <span class="post-comments-pinned-badge">Fixado</span>
+                                                        </div>
+                                                    </div>
+                                                    {% if request.user.is_authenticated and request.user.user_id == post.user.user_id %}
+                                                    <button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">
+                                                        <svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>
+                                                    </button>
+                                                    {% endif %}
+                                                </div>
+                                            </article>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                     {% if post.comments_set.count == 0 %}
-                                    <div class="post-comments-empty" data-comment-empty>
-                                        Nenhum comentário ainda. Abra a conversa por aqui.
-                                    </div>
+                                        {% if not post.comment %}
+                                            <div class="post-comments-empty" data-comment-empty>
+                                                O artista desativou os comentários.
+                                            </div>
+                                        {% else %}
+                                            <div class="post-comments-empty" data-comment-empty>
+                                                Nenhum comentário ainda. Abra a conversa por aqui.
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 {% if user.is_authenticated %}

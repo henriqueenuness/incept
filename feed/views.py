@@ -136,6 +136,9 @@ def comments_api(request, id):
 def comment(request, id):
     user = request.user
     postid = get_object_or_404(Post, id=id)
+    cancomment = postid.comment
+    if not cancomment:
+        return JsonResponse({"os comentários estão desativados para esta arte"}, status=400)
     content = (request.POST.get('comment-content') or '').strip()
     comment = None
     if content:

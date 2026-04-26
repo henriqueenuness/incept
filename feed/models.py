@@ -24,6 +24,9 @@ class Post(models.Model):
     date = models.DateTimeField(auto_now_add=True, null=True)
     class Meta:
         ordering = ["-date"]
+    comment = models.BooleanField(default=False, null=False)
+    like_number = models.BooleanField(default=False, null=False)
+    share = models.BooleanField(default=False, null=False)
 
 
 class Hashtags(models.Model):
