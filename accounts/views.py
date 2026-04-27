@@ -4,7 +4,7 @@ from .models import User, Followers, Interests
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
-from feed.models import Post, Comments, Saved
+from feed.models import Post, Comments, Saved ,Media
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
 
@@ -174,49 +174,49 @@ def new_artist(request):
             user.save()
             return redirect('explore_pg')
 
-def new_post(request): #postar post
+def new_post(request):  # postar post
     if request.method == 'POST':
         description = request.POST.get('post_description')
-        img = request.FILES.get('post_image')
+        images = request.FILES.getlist('post_images') 
         u_id = request.user.user_id
         collab = request.POST.get('collab')
-        if img:
-            if not img.content_type.startswith('image/'):
-                img_compativel = False
-                return HttpResponse("erro: formato de arquivo inválido")
-            else:
-                img_compativel = True
-                img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
-            
-            if Post.objects.filter(image=img_b64).exists(): #se ja tiver uma postagem com aquela imagem, ela não é feita
-                img_compativel = False #nao muda muita coisa, mas é bom garantir
-                return HttpResponse("erro: essa postagem já foi feita")
-                
-            else:
-                post_data = {'user_id': u_id}
 
-                if description:
-                    post_data['description'] = description
+        post_data = {'user_id': u_id}
+        if description:
+            post_data['description'] = description
 
-                if img_compativel:
-                    post_data['image'] = img_b64
+        if collab:
+            collaborator = User.objects.filter(nick=collab).first()
+            if collaborator:
+                post_data['collaborator_id'] = collaborator.user_id
 
-                if collab:
-                    collaborator = User.objects.filter(nick=collab).first()
-                    if collaborator:
-                        collaborator_id = collaborator.user_id
-                        post_data['collaborator_id'] = collaborator_id
-
-                Post.objects.create(**post_data)
-                #parte que adiciona 1 ao numero de postagens do usuario
-                user = request.user
-                user.arts = Post.objects.filter(user=user).count()
-                user.save() #salva a quantidade de artes do user
-                nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
-                return core_pg(request, nick)
         
-        else:
-            return HttpResponse('erro: algo deu errado na hora de criar seu post')
+        post = Post.objects.create(**post_data)
+
+        # Itera sobre as imagens enviadas
+        for img in images:
+            if not img.content_type.startswith('image/'):
+                return HttpResponse("erro: formato de arquivo inválido")
+
+            img_b64 = base64.b64encode(img.read()).decode('utf-8')
+
+            # Verifica se já existe uma Media com essa imagem para esse post
+            if Media.objects.filter(post=post, base64=img_b64).exists():
+                continue 
+
+            
+            Media.objects.create(post=post, base64=img_b64)
+
+        # Atualiza número de artes do usuário
+        user = request.user
+        user.arts = Post.objects.filter(user=user).count()
+        user.save()
+
+        nick = user.nick
+        return core_pg(request, nick)
+
+    else:
+        return HttpResponse('erro: algo deu errado na hora de criar seu post')
         
 
         
