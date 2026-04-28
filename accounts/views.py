@@ -73,7 +73,12 @@ def login_auth(request): #login usuario
 
 
 
-
+def follow_list_pg(request, nick):
+    user = get_object_or_404(User, nick=nick)
+    seguindo = Followers.objects.filter(follower_id = user.user_id)
+    seguindo_lista = list(seguindo.values_list('user_id', flat=True))
+    return render (request,  'users/core/follow-list.html', {
+    "followings": seguindo_lista})
 
 
 def make_logout(request):

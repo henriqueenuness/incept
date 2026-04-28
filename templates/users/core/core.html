@@ -391,10 +391,12 @@
                                 <strong>{{ perfil_user.followers|default_if_none:"0" }}</strong>
                                 <span class="muted">seguidores</span>
                             </div>
+                            <a href="{% url 'follow_list_pg' user.nick %}">
                             <div class="profile-highlight">
                                 <strong>{{ perfil_user.following|default_if_none:"0" }}</strong>
                                 <span class="muted">seguindo</span>
                             </div>
+                            </a>
                             <div class="profile-highlight">
                                 <strong>{% if perfil_user.cargo == "artista" %}{{ perfil_user.arts|default_if_none:"0" }}{% else %}-{% endif %}</strong>
                                 <span class="muted">posts</span>

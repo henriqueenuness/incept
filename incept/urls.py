@@ -28,6 +28,7 @@ urlpatterns = [
     path('logout/',accounts_views.make_logout, name='logout'),
 
     path('core/new-post/<str:nick>/', accounts_views.new_post_pg, name='new_post_pg'),
+    path('core/follow-list/<str:nick>/', accounts_views.follow_list_pg, name='follow_list_pg'),
 
     path('core/new-post/post', accounts_views.new_post, name='new_post'),
     path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
