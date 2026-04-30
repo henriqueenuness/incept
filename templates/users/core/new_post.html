@@ -278,8 +278,8 @@
         <section class="composer-page">
                 <article class="composer-panel">
                     <div class="composer-hero">
-                        <div class="composer-preview-box">
-                            <img src="" alt="Preview do post" data-post-preview>
+                        <div class="composer-preview-box" data-post-preview>
+                            
                         </div>
                     </div>
                     <div class="composer-head">
@@ -293,10 +293,11 @@
                         <div class="composer-upload-row">
                             <label class="composer-field composer-file-wrap" data-file-wrap>
                                 <span>Arquivo</span>
-                                <input class="field composer-file-input" type="file" name="post_image" accept="image/*" data-post-image>
+                                <input class="field composer-file-input" type="file" name="post_image" accept="image/*" multiple data-post-image >
                             </label>
 
                             <div class="composer-upload-controls" data-upload-controls>
+                                <button type="button" onclick="addInput()">Adicionar outra imagem</button>
                                 <input type="checkbox" name="like_number" value="True" checked>
                                 <label for="like_number">número de likes</label>
                                 <span for="like_number">ao desativar, o número de likes não será exibido</span>
@@ -351,7 +352,30 @@
     const changeImageButton = document.querySelector('[data-change-image]');
     const removeImageButton = document.querySelector('[data-remove-image]');
     const submitPostButton = document.querySelector('[data-submit-post]');
+    const input = document.querySelector('[data-post-image]');
+    const previewBox = document.querySelector('[data-post-preview]');
 
+    input.addEventListener('change', () => {
+    previewBox.innerHTML = ''; // limpa pré-visualizações anteriores
+
+    for (const file of input.files) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = "Preview do post";
+      img.style.width = '150px';
+      img.style.margin = '5px';
+      img.dataset.postPreview = true; // mantém o atributo para referência
+      previewBox.appendChild(img);
+    }
+    });
+    function addInput() {
+        const container = document.getElementById('upload-container');
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = 'post_image';
+        input.accept = 'image/*';
+        container.appendChild(input);
+    }
     if (postImageInput && postPreviewWrap && postPreviewImage && composerHead && postFileWrap && postUploadControls && changeImageButton && removeImageButton && submitPostButton) {
         const syncComposerState = (hasImage) => {
             postPreviewWrap.classList.toggle('is-visible', hasImage);
