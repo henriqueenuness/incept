@@ -1069,7 +1069,9 @@
                                         <button class="post-comments-close" type="button" data-comment-close aria-label="Fechar comentários">
                                             <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
                                         </button>
-                                        <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description|default_if_none:post.user.nick }}">
+                                        {% for media in post.media.all %}
+                                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </section>
