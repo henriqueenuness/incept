@@ -1015,6 +1015,7 @@
                             </a>
                             <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
                         </div>
+                        <a href="">Reportar Post</a>
                         {% for media in post.media.all %}
                         <button class="feed-media feed-media-button" type="button" data-open-lightbox data-image-src="data:image/png;base64,{{ media.image }}" data-image-alt="{{ media.description|default_if_none:post.user.nick }}">
                             <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
