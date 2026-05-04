@@ -183,10 +183,16 @@ def new_post(request): #postar post
         like_number = request.POST.get('like_number')
         comment = request.POST.get('comment')
         share = request.POST.get('share')
+        roxotag = request.POST.get('roxotag')
 
         post_data = {'user_id': u_id}
         if description:
             post_data['description'] = description
+
+        if roxotag:
+            #roxotags = roxotag.split("#")
+            roxotags = roxotag.replace(" ", "").replace("\t", "").replace("\n", "")
+            post_data['roxotags'] = roxotags
 
         if like_number:
             post_data['like_number'] = like_number

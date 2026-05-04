@@ -328,6 +328,14 @@
                             <input class="textarea-field" name="collab" placeholder="Coloque aqui o nick de quem fez a arte com você (sem @)" maxlength="25" data-description-input></input>
                         </label>
 
+                        <label class="composer-field">
+                            <div class="composer-field-header">
+                                <span>Roxotags</span>
+                                <span class="composer-char-counter" data-char-counter>0/25</span>
+                            </div>
+                            <input class="textarea-field" name="roxotag" placeholder="digite as roxotags que tem haver com sua arte" data-description-input></input>
+                        </label>
+
                         <div class="composer-actions">
                             <button class="button" type="submit" data-submit-post disabled>Publicar</button>
                             <a class="ghost-button" href="{% url 'core_pg' user.nick %}">Cancelar</a>

@@ -27,6 +27,7 @@ class Post(models.Model):
     comment = models.BooleanField(default=False, null=False)
     like_number = models.BooleanField(default=False, null=False)
     share = models.BooleanField(default=False, null=False)
+    roxotags =models.TextField(null=True)
 
 
 class Hashtags(models.Model):
