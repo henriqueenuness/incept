@@ -440,25 +440,7 @@
         font-size: 0.74rem;
         text-transform: lowercase;
     }
-    .post-comments-comment-actions {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex-wrap: wrap;
-    }
-    .post-comments-comment-action {
-        padding: 0;
-        border: 0;
-        background: transparent;
-        color: rgba(255, 255, 255, 0.52);
-        font-size: 0.74rem;
-        font-weight: 600;
-        text-transform: none;
-    }
-    .post-comments-comment-action:hover,
-    .post-comments-comment-action.is-active {
-        color: rgba(255, 255, 255, 0.88);
-    }
+
     .post-comments-pinned-badge {
         display: none;
         padding: 2px 8px;
@@ -766,13 +748,7 @@
     [data-theme="light"] .post-comments-comment-meta {
         color: var(--muted);
     }
-    [data-theme="light"] .post-comments-comment-action {
-        color: var(--muted);
-    }
-    [data-theme="light"] .post-comments-comment-action:hover,
-    [data-theme="light"] .post-comments-comment-action.is-active {
-        color: var(--text);
-    }
+
     [data-theme="light"] .post-comments-pinned-badge {
         background: rgba(108, 43, 217, 0.12);
         color: #6c2bd9;
@@ -1333,10 +1309,6 @@
                                 <p><strong>@${escapeHtml(comment.user.nick)}</strong> ${escapeHtml(comment.content)}</p>
                                 <div class="post-comments-comment-meta">
                                     <span>${escapeHtml(comment.created_relative)}</span>
-                                    <div class="post-comments-comment-actions">
-                                        <button class="post-comments-comment-action" type="button" data-comment-like>Curtir</button>
-                                        <button class="post-comments-comment-action" type="button" data-comment-reply data-comment-author="@${escapeHtml(comment.user.nick)}">Responder</button>
-                                    </div>
                                     <span class="post-comments-pinned-badge">Fixado</span>
                                 </div>
                             </div>
@@ -1365,33 +1337,6 @@
                     container.prepend(entry);
                 }
             });
-        });
-        entries.forEach((entry) => {
-            const likeButton = entry.querySelector('[data-comment-like]');
-            const replyButton = entry.querySelector('[data-comment-reply]');
-            if (likeButton && likeButton.dataset.bound !== 'true') {
-                likeButton.dataset.bound = 'true';
-                likeButton.addEventListener('click', () => {
-                    const isActive = likeButton.classList.toggle('is-active');
-                    likeButton.textContent = isActive ? 'Curtido' : 'Curtir';
-                });
-            }
-            if (replyButton && replyButton.dataset.bound !== 'true') {
-                replyButton.dataset.bound = 'true';
-                replyButton.addEventListener('click', () => {
-                    const input = modal.querySelector('[data-comment-input]');
-                    if (!input) {
-                        return;
-                    }
-                    const prefix = `${replyButton.dataset.commentAuthor || ''} `;
-                    const currentValue = input.value.trim();
-                    input.value = currentValue.startsWith(prefix.trim()) ? input.value : `${prefix}${input.value}`.trim();
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                    input.focus();
-                    const length = input.value.length;
-                    input.setSelectionRange(length, length);
-                });
-            }
         });
     };
     const renderComments = (modal, comments) => {

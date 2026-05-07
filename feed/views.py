@@ -147,7 +147,7 @@ def comment(request, id):
         return JsonResponse({
             "ok": bool(comment),
             "comment": serialize_comment(comment) if comment else None,
-            "count": Post.comments_set.count(),
+            "count": postid.comments_set.count(),
         })
 
     return redirect(request.META.get('HTTP_REFERER', 'explore_pg'))
