@@ -148,6 +148,49 @@
         padding-top: 8px;
         padding-bottom: 8px;
     }
+    /* ── Dropzone ── */
+    .composer-dropzone {
+        position: relative;
+        border: 2px dashed var(--line-strong);
+        border-radius: 20px;
+        padding: 40px 24px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 200ms ease, background 200ms ease;
+        background: var(--panel);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .composer-dropzone.is-dragover {
+        border-color: var(--accent);
+        background: rgba(155, 89, 255, 0.08);
+    }
+    .composer-dropzone-icon {
+        width: 40px; height: 40px;
+        stroke: var(--accent); fill: none;
+        stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .composer-dropzone-label {
+        color: var(--text); font-size: 0.98rem; margin: 0;
+    }
+    .composer-dropzone-label span {
+        color: var(--accent); text-decoration: underline; text-transform: none; letter-spacing: 0;
+    }
+    .composer-dropzone-sub { color: var(--muted); font-size: 0.82rem; margin: 0; }
+    /* ── Toggle group ── */
+    .composer-toggle-group { display: grid; gap: 10px; }
+    .composer-toggle-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 14px; border-radius: 14px;
+        border: 1px solid var(--line); cursor: pointer;
+        transition: background 180ms ease;
+    }
+    .composer-toggle-item:hover { background: rgba(155, 89, 255, 0.06); }
+    .composer-toggle-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
+    .composer-toggle-item .composer-toggle-label { font-size: 0.92rem; font-weight: 500; color: var(--text); }
+    .composer-toggle-item small { color: var(--muted); font-size: 0.78rem; margin-left: auto; }
     .composer-upload-row {
         display: grid;
         gap: 12px;
@@ -291,22 +334,31 @@
                     <form class="composer-form" action="{% url 'new_post' %}" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="composer-upload-row">
-                            <label class="composer-field composer-file-wrap" data-file-wrap>
-                                <span>Arquivo</span>
-                                <input class="field composer-file-input" type="file" name="post_image" accept="image/*" multiple data-post-image >
-                            </label>
+                            <div class="composer-dropzone" data-dropzone>
+                                <input class="field composer-file-input" type="file" name="post_image" id="composer-file-input" accept="image/*" multiple data-post-image style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+                                <svg viewBox="0 0 24 24" class="composer-dropzone-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                <p class="composer-dropzone-label">Arraste aqui ou <span>clique para selecionar</span></p>
+                                <p class="composer-dropzone-sub">PNG, JPG, WEBP — múltiplas imagens permitidas</p>
+                            </div>
 
                             <div class="composer-upload-controls" data-upload-controls>
-                                <button type="button" onclick="addInput()">Adicionar outra imagem</button>
-                                <input type="checkbox" name="like_number" value="True" checked>
-                                <label for="like_number">número de likes</label>
-                                <span for="like_number">ao desativar, o número de likes não será exibido</span>
-                                <input type="checkbox" name="comment" value="True" checked>
-                                <label for="comment">comentários</label>
-                                <span for="comment">ao desativar, não será possível fazer comentários na arte</span>
-                                <input type="checkbox" name="share" value="True" checked>
-                                <label for="share">compartilhar</label>
-                                <span for="share">ao desativar, não será possível compartilhar a arte</span>
+                                <div class="composer-toggle-group">
+                                    <label class="composer-toggle-item">
+                                        <input type="checkbox" name="like_number" value="True" checked>
+                                        <span class="composer-toggle-label">Número de likes</span>
+                                        <small>Ao desativar, o contador não aparece</small>
+                                    </label>
+                                    <label class="composer-toggle-item">
+                                        <input type="checkbox" name="comment" value="True" checked>
+                                        <span class="composer-toggle-label">Comentários</span>
+                                        <small>Ao desativar, comentários são bloqueados</small>
+                                    </label>
+                                    <label class="composer-toggle-item">
+                                        <input type="checkbox" name="share" value="True" checked>
+                                        <span class="composer-toggle-label">Compartilhamento</span>
+                                        <small>Ao desativar, o botão de compartilhar some</small>
+                                    </label>
+                                </div>
                                 <button class="ghost-button" type="button" data-change-image>Trocar imagem</button>
                                 <button class="ghost-button" type="button" data-remove-image>Remover imagem</button>
                             </div>
@@ -352,80 +404,68 @@
 {% block scripts %}
 <script>
     const postImageInput = document.querySelector('[data-post-image]');
-    const postPreviewWrap = document.querySelector('.composer-hero');
-    const postPreviewImage = document.querySelector('[data-post-preview]');
+    const previewBox = document.querySelector('[data-post-preview]');
     const composerHead = document.querySelector('.composer-head');
-    const postFileWrap = document.querySelector('[data-file-wrap]');
     const postUploadControls = document.querySelector('[data-upload-controls]');
     const changeImageButton = document.querySelector('[data-change-image]');
     const removeImageButton = document.querySelector('[data-remove-image]');
     const submitPostButton = document.querySelector('[data-submit-post]');
-    const input = document.querySelector('[data-post-image]');
-    const previewBox = document.querySelector('[data-post-preview]');
+    const dropzone = document.querySelector('[data-dropzone]');
 
-    input.addEventListener('change', () => {
-    previewBox.innerHTML = ''; // limpa pré-visualizações anteriores
+    const showPreviews = (files) => {
+        if (!previewBox) return;
+        previewBox.innerHTML = '';
+        for (const file of files) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.alt = 'Preview';
+            img.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:12px;margin:4px;';
+            previewBox.appendChild(img);
+        }
+        const hasFiles = files.length > 0;
+        if (submitPostButton) submitPostButton.disabled = !hasFiles;
+        if (postUploadControls) { postUploadControls.style.display = hasFiles ? 'flex' : 'none'; }
+    };
 
-    for (const file of input.files) {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      img.alt = "Preview do post";
-      img.style.width = '150px';
-      img.style.margin = '5px';
-      img.dataset.postPreview = true; // mantém o atributo para referência
-      previewBox.appendChild(img);
-    }
-    });
-    function addInput() {
-        const container = document.getElementById('upload-container');
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.name = 'post_image';
-        input.accept = 'image/*';
-        container.appendChild(input);
-    }
-    if (postImageInput && postPreviewWrap && postPreviewImage && composerHead && postFileWrap && postUploadControls && changeImageButton && removeImageButton && submitPostButton) {
-        const syncComposerState = (hasImage) => {
-            postPreviewWrap.classList.toggle('is-visible', hasImage);
-            composerHead.classList.toggle('is-hidden', hasImage);
-            postUploadControls.classList.toggle('is-visible', hasImage);
-            postFileWrap.classList.toggle('is-hidden', hasImage);
-            submitPostButton.disabled = !hasImage;
-        };
-
-        const clearComposerImage = () => {
-            postImageInput.value = '';
-            postPreviewImage.src = '';
-            syncComposerState(false);
-        };
-
+    if (postImageInput) {
         postImageInput.addEventListener('change', () => {
-            const [file] = postImageInput.files || [];
-
-            if (!file) {
-                clearComposerImage();
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                postPreviewImage.src = event.target?.result || '';
-                syncComposerState(true);
-            };
-            reader.readAsDataURL(file);
+            showPreviews(Array.from(postImageInput.files || []));
         });
-
-        changeImageButton.addEventListener('click', () => {
-            postFileWrap.classList.remove('is-hidden');
-            postImageInput.click();
-        });
-
-        removeImageButton.addEventListener('click', () => {
-            clearComposerImage();
-        });
-
-        syncComposerState(false);
     }
+
+    if (dropzone) {
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('is-dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('is-dragover');
+            const dt = e.dataTransfer;
+            if (dt && dt.files.length && postImageInput) {
+                const transfer = new DataTransfer();
+                Array.from(dt.files).forEach(f => transfer.items.add(f));
+                postImageInput.files = transfer.files;
+                showPreviews(Array.from(dt.files));
+            }
+        });
+    }
+
+    if (changeImageButton && postImageInput) {
+        changeImageButton.addEventListener('click', () => postImageInput.click());
+    }
+    if (removeImageButton && postImageInput && previewBox) {
+        removeImageButton.addEventListener('click', () => {
+            postImageInput.value = '';
+            previewBox.innerHTML = '';
+            if (submitPostButton) submitPostButton.disabled = true;
+            if (postUploadControls) postUploadControls.style.display = 'none';
+        });
+    }
+
+    if (submitPostButton) submitPostButton.disabled = true;
+    if (postUploadControls) postUploadControls.style.display = 'none';
 
     const descriptionInput = document.querySelector('[data-description-input]');
     const charCounter = document.querySelector('[data-char-counter]');

@@ -701,7 +701,7 @@
         <div class="social-more-menu">
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configurações em breve" data-placeholder-copy="Salvar preferências do usuário ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibição em breve" data-placeholder-copy="A preferência de exibição ainda não é armazenada por usuário."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="social-more-item" type="button" data-display-settings-toggle style="border:0;background:transparent;color:var(--text);width:100%;padding:12px 18px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;flex-shrink:0;"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></button>
             <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
             <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
         </div>
@@ -737,8 +737,9 @@
                             <span class="feed-time">{{ post.date|date:"d/m/Y H:i" }}</span>
                         </div>
 
-                        <button class="feed-media feed-media-button" type="button" data-open-lightbox data-image-src="data:image/png;base64,{{ post.image }}" data-image-alt="{{ post.description|default_if_none:post.user.nick }}">
+                        <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" style="position:relative;overflow:hidden;" aria-label="Ver comentários">
                             <img src="data:image/png;base64,{{ post.image }}" alt="{{ post.description }}">
+                            <span class="dblclick-heart" aria-hidden="true" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);font-size:4rem;color:var(--accent);pointer-events:none;opacity:0;">&#10084;</span>
                         </button>
 
                         <div class="feed-toolbar">
@@ -759,13 +760,13 @@
                         {% if post.comments_set.count > 0 %}
                         <div class="feed-comments-preview">
                             {% for comment in comments %}
-                                {% if comment.post_id == post.id and forloop.counter <= 2 %}
+                                {% if comment.post_id == post.id and forloop.counter <= 1 %}
                                 <div class="feed-comment-preview-item">
                                     <p><strong>@{{ comment.user.nick }}</strong> {{ comment.content }}</p>
                                 </div>
                                 {% endif %}
                             {% endfor %}
-                            {% if post.comments_set.count > 2 %}
+                            {% if post.comments_set.count > 1 %}
                             <button class="feed-comment-view-all" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}">
                                 Ver todos os {{ post.comments_set.count }} comentários
                             </button>
@@ -802,9 +803,11 @@
                                         <div class="post-comments-options-menu" data-options-menu>
                                             <button class="post-comments-option is-danger" type="button">Denunciar</button>
                                             <button class="post-comments-option" type="button" data-follow-menu data-url="{% url 'follow' post.user.user_id %}">Deixar de seguir</button>
-                                            <button class="post-comments-option" type="button">Adicionar aos Favoritos</button>
                                             <button class="post-comments-option" type="button" data-share-url="#post-{{ post.id }}">Compartilhar</button>
                                             <button class="post-comments-option" type="button" data-copy-link="#post-{{ post.id }}">Copiar link</button>
+                                            {% if user.is_authenticated and user.user_id == post.user.user_id %}
+                                            <button class="post-comments-option is-danger" type="button" data-delete-post data-url="{% url 'delete_post' post.id %}" data-post-id="{{ post.id }}">Apagar post</button>
+                                            {% endif %}
                                             <button class="post-comments-option" type="button" data-options-close>Cancelar</button>
                                         </div>
                                     </div>
@@ -922,6 +925,76 @@
         });
     };
     bindLikeButtons();
+
+    /* Duplo clique na imagem = curtir */
+    const triggerLike = async (postId, likeUrl) => {
+        try {
+            const response = await fetch(likeUrl, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrftoken }
+            });
+            if (!response.ok) return;
+            const data = await response.json();
+            document.querySelectorAll(`.like-btn[data-like-post-id="${postId}"]`).forEach((btn) => {
+                btn.classList.toggle('liked', Boolean(data.liked));
+                btn.classList.remove('is-animating');
+                if (data.liked) {
+                    void btn.offsetWidth;
+                    btn.classList.add('is-animating');
+                    window.setTimeout(() => btn.classList.remove('is-animating'), 560);
+                }
+                const likeCount = btn.querySelector('[data-like-count]');
+                if (likeCount) likeCount.textContent = data.likes;
+            });
+        } catch (err) { console.error(err); }
+    };
+    document.querySelectorAll('[data-dblclick-like]').forEach((btn) => {
+        btn.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const postId = btn.dataset.postId;
+            const likeUrl = btn.dataset.likeUrl;
+            if (!postId || !likeUrl) return;
+            const heart = btn.querySelector('.dblclick-heart');
+            if (heart) {
+                heart.classList.remove('is-animating');
+                void heart.offsetWidth;
+                heart.classList.add('is-animating');
+                window.setTimeout(() => heart.classList.remove('is-animating'), 700);
+            }
+            triggerLike(postId, likeUrl);
+        });
+    });
+
+    /* Animação visual no botão de comentar */
+    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
+        btn.addEventListener('mousedown', () => {
+            btn.classList.remove('is-clicking');
+            void btn.offsetWidth;
+            btn.classList.add('is-clicking');
+            window.setTimeout(() => btn.classList.remove('is-clicking'), 300);
+        });
+    });
+
+    /* Deletar post */
+    document.querySelectorAll('[data-delete-post]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Apagar este post definitivamente?')) return;
+            try {
+                const response = await fetch(btn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken }
+                });
+                if (response.ok) {
+                    const postId = btn.dataset.postId;
+                    const card = document.getElementById('post-' + postId);
+                    const modal = document.getElementById('comments-panel-' + postId);
+                    if (card) card.remove();
+                    if (modal) modal.remove();
+                }
+            } catch (err) { console.error(err); }
+        });
+    });
 
     const commentModals = Array.from(document.querySelectorAll('.post-comments-modal'));
     const commentPollingTimers = new Map();

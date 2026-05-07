@@ -170,6 +170,7 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
     }
+    .profile-tab-tile:hover .tile-delete-btn { opacity: 1 !important; }
     .profile-tab-tile-empty {
         display: grid;
         place-items: center;
@@ -452,10 +453,15 @@
                                 {% if imagens %}
                                 <div class="profile-tab-grid">
                                     {% for img in imagens %}
-                                    <article class="profile-tab-tile">
+                                    <article class="profile-tab-tile" id="post-tile-{{ img.id }}" style="position:relative;">
                                         <button class="feed-media profile-tab-tile-button" type="button" style="margin-top:0; border:0; border-radius:0; height:100%;" data-open-lightbox data-image-src="data:image/png;base64,{{ img.image }}" data-image-alt="{{ img.description }}">
                                             <img src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
                                         </button>
+                                        {% if user.nick == perfil_user.nick %}
+                                        <button class="tile-delete-btn" type="button" title="Apagar post" data-delete-post data-url="{% url 'delete_post' img.id %}" data-post-id="{{ img.id }}" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,0.62);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity 180ms ease;">
+                                            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
+                                        </button>
+                                        {% endif %}
                                     </article>
                                     {% endfor %}
                                 </div>
@@ -577,6 +583,24 @@
             const target = button.dataset.profileTab;
             profileTabButtons.forEach((item) => item.classList.toggle('is-active', item === button));
             profileTabPanels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.profilePanel === target));
+        });
+    });
+
+    const csrftoken = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+    document.querySelectorAll('[data-delete-post]').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            if (!confirm('Apagar este post definitivamente?')) return;
+            try {
+                const response = await fetch(btn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken }
+                });
+                if (response.ok) {
+                    const tile = document.getElementById('post-tile-' + btn.dataset.postId);
+                    if (tile) tile.remove();
+                }
+            } catch (err) { console.error(err); }
         });
     });
 </script>
