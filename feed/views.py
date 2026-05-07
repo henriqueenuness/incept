@@ -34,10 +34,8 @@ def cycle_pg(request):
     comments = Comments.objects.all()
     #return HttpResponse(", ".join(str(x) for x in followings_ids))
     return render(request, 'feed/cycle.html',
-                    {'user' : user,
-                    'posts' : post,
+                    {'posts' : post,
                     'comments': comments,
-                    #'following': list(followings_ids)
                     })
 
 def search_user(request):

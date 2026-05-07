@@ -1299,7 +1299,8 @@
             .app-shell,
             .social-layout,
             .profile-columns { grid-template-columns: 1fr; }
-            .app-shell { padding-left: 0; }
+            .app-shell { padding-left: 0; overflow-x: hidden; }
+            .app-main { overflow-x: hidden; }
             .social-rail {
                 position: static;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1348,6 +1349,8 @@
             .social-stat-grid,
             .profile-gallery,
             .profile-hero-grid { grid-template-columns: 1fr; }
+            .social-layout { grid-template-columns: 1fr; }
+            .social-layout > .social-rail { display: none; }
             .feed-comment-form { grid-template-columns: 1fr; }
             .profile-heading,
             .feed-card-header,
@@ -1371,6 +1374,46 @@
             .social-brand-fixed {
                 justify-content: flex-start;
                 width: auto;
+            }
+            .feed-action-icon svg { width: 22px; height: 22px; }
+            .feed-card-actions { gap: 6px; }
+            input.field, textarea.field, select.field { font-size: 16px; }
+        }
+        @media (max-width: 480px) {
+            .shell { width: 100%; margin: 0; padding-top: 8px; }
+            .social-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0;
+                padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+                background: var(--panel);
+                border-top: 1px solid rgba(155, 89, 255, 0.12);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                z-index: 50;
+            }
+            .social-nav-link {
+                min-height: 52px;
+                min-width: 44px;
+                justify-content: center;
+                padding: 0;
+            }
+            .social-nav-label { display: none; }
+            .app-shell { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+            .social-brand-fixed { display: none; }
+            .social-more, .messages-fab { display: none; }
+            .social-card { padding: 14px; }
+            .feed-stack { gap: 12px; }
+            .post-comments-dialog {
+                height: 100dvh;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .post-comments-form {
+                padding-bottom: env(safe-area-inset-bottom);
             }
         }
     </style>
