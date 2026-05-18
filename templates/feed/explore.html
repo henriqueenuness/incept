@@ -892,7 +892,7 @@
                         </div>
                         {% for media in post.media.all %}
                         <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
-                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
+                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}" class="lazy">
                             <span class="dblclick-heart" aria-hidden="true">&#10084;</span>
                         </button>
                         {% endfor %}
@@ -1086,6 +1086,21 @@
     const storyNextBtn = document.querySelector('[data-story-next]');
     let storyScrollPosition = 0;
 
+    document.addEventListener("DOMContentLoaded", function () {
+    const LazyImages = document.querySelectorAll(".lazy");
+    const lazyLoad = function () {
+      lazyImages.forEach(function (img) {
+        if (img.getBoundingClientRect().top <= window.innerHeight && img.getBoundingClientRect().bottom >= 0 && getComputedStyle(img).display !== "none") {
+            img.src = img.dataset.src;
+            img.classList.remove("lazy");
+        }
+      });
+    };
+    lazyLoad();
+    document.addEventListener("scroll", lazyLoad);
+    window.addEventListener("resize", lazyLoad);
+    window.addEventListener("orientationchange", lazyLoad);
+    });
     const updateStoryNavButtons = () => {
         if (!storyStrip || !storyPrevBtn || !storyNextBtn) return;
 
