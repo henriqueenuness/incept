@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Followers, Interests
+from .models import User, Followers, Interests, Links
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -110,12 +110,24 @@ def edit_core_pg(request):
 
 def edit_core(request): #edit core
     if request.method == "POST":
+        website = request.POST.get('website_link')
+        link = request.POST.get('link')
+        link_name = request.POST.get('link_name')
         real_name = request.POST.get('real_name')
         bio = request.POST.get('bio')
         art_style = request.POST.get('art_style')
         nick = request.POST.get('nick')
         core_picture = request.FILES.get('core_picture')
         user = request.user
+        if website:
+            if Links.objects.filter(user_id = user.user_id).exists():
+                Links.objects.filter(user_id = user.user_id).delete()
+                Links.objects.create(user_id = user.user_id, url = website, name = "user_website") 
+            
+
+
+
+
         if core_picture:
             if core_picture.content_type.startswith('image/'):
                 core_p = base64.b64encode(core_picture.read()).decode('utf-8')
