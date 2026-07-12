@@ -888,6 +888,9 @@
                                     <small>{{ post.user.art_style|default_if_none:"artista" }}</small>
                                 </span>
                             </a>
+                            <a href="{% url 'report' post.id %}">
+                                <button>Reportar</button>
+                            </a>
                             <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
                         </div>
                         {% for media in post.media.all %}
@@ -911,6 +914,7 @@
                                 <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
                                 {% endif %}
                                 <button class="feed-action-icon save-btn" data-url="{% url 'save' post.id %}" data-save-post-id="{{ post.id }}" type="button"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+                                
                             </div>
                             <div class="feed-toolbar-meta"></div>
                         </div>

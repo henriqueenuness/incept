@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from accounts.models import User, Followers
-from .models import Post, Likes, Comments, Saved
+from .models import Reports, Post, Likes, Comments, Saved
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -107,6 +107,25 @@ def save(request, id):
         saved = True
     return JsonResponse({"saved" : saved,
                          "post_id" : post.id })
+def explore(request):
+    posts = Post.objects.all()
+    return render(request, "feed/explore.html", {"posts": posts})
+def report_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        reason = request.POST.get("reason")
+        if reason == "Outro":
+            reason = request.POST.get("other_reason")
+
+        Reports.objects.create(
+            user=request.user,
+            post=post,
+            reason=reason
+        )
+        return redirect("explore")  # redireciona de volta para feed/explore
+
+    return render(request, "feed/report.html", {"post": post})  
 
 def serialize_comment(comment):
     return {

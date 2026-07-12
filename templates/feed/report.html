@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Reportar Post</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label>
+        <input type="radio" name="reason" value="Conteúdo explícito"> Conteúdo explícito
+    </label><br>
+    <label>
+        <input type="radio" name="reason" value="IA"> IA
+    </label><br>
+    <label>
+        <input type="radio" name="reason" value="Ofensivo"> Ofensivo
+    </label><br>
+    <label>
+        <input type="radio" name="reason" value="Outro"> Outro:
+        <input type="text" name="other_reason">
+    </label><br>
+    <button type="submit">Enviar denúncia</button>
+</form>
+{% endblock %}
