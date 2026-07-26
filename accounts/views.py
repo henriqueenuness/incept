@@ -4,7 +4,7 @@ from .models import User, Followers, Interests
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
-from feed.models import Post, Comments, Saved ,Media
+from feed.models import Post, Comments, Saved ,Media , Notification
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
 
@@ -258,7 +258,11 @@ def follow(request, id):
         User.objects.filter(user_id=follower_id).update(following=F('following')+1)
         User.objects.filter(user_id=followed_id).update(followers=F('followers')+1)
         is_following = True
-
+    Notification.objects.create(
+        user= id,
+        actor=request.user.user_id,
+        type='follow'
+    )
     return JsonResponse({
         'is_following' : is_following,
     })
@@ -307,3 +311,19 @@ def interests(request):
                 for interesse in interesses
             ])
         return redirect('explore_pg')
+    
+def get_notifications(request):
+    notifications = request.user.notifications.filter(read=False).order_by('-created_at')
+    data = [
+        {
+            "message": n.get_message(),
+            "created_at": n.created_at.strftime("%d/%m/%Y %H:%M"),
+            "read": n.read
+        }
+        for n in notifications
+    ]
+    return JsonResponse({"notifications": data})
+
+def notifications_page(request):
+    notifications = request.user.notifications.order_by('-created_at')
+    return render(request, 'feed/notifications.html', {'notifications': notifications})

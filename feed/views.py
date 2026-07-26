@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from accounts.models import User, Followers
-from .models import Reports, Post, Likes, Comments, Saved
+from .models import Reports, Post, Likes, Comments, Saved , Notification
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
@@ -93,6 +93,12 @@ def like(request, id):
     else:
         Likes.objects.create(post=post, user_id = user) #primeiro o db, dps a variavel python
         liked = True
+    Notification.objects.create(
+        user=post.user_id,
+        actor=request.user.user_id,
+        type='like',
+        post=post.id
+    )
     return JsonResponse({"likes": post.likes_set.count(),
                          "liked" : liked }) #
 

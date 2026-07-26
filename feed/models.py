@@ -95,3 +95,26 @@ class Reports(models.Model):
         null = True
     )
     reason = models.TextField(null=False)
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('follow', 'Follow'),
+        ('like', 'Like'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")  # quem vai receber a notificação
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="actor_notifications")  # quem deu like ou seguiu
+    type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True)  # post que deu like
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.get_message()
+
+    def get_message(self):
+        if self.type == 'follow':
+            return f"{self.actor.username} começou a seguir você."
+        elif self.type == 'like' and self.post:
+            return f"{self.actor.username} deu like no seu post '{self.post.title}'."
+        return "Nova notificação."

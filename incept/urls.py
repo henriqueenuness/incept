@@ -38,6 +38,7 @@ urlpatterns = [
     path('explore/save-post/<id>/', feed_views.save, name='save'),
     path('', feed_views.explore, name='explore'),
     path('explore/report/<int:post_id>/', feed_views.report_post, name='report'),
+    path('notifications/', accounts_views.notifications_page, name='notifications'),
     path('search/', feed_views.search_pg, name='search_pg'),
     path('search/user', feed_views.search_user, name='search_user'),
     path('cycle/', feed_views.cycle_pg, name='cycle_pg'),
