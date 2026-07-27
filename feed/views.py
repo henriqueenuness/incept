@@ -11,8 +11,8 @@ def search_pg(request):
     return render(request, 'feed/search.html')
 
 def explore_pg(request):
-    post = Post.objects.all()
-    comments = Comments.objects.all()
+    post = Post.objects.select_related('user', 'collaborator').prefetch_related('media', 'likes_set', 'comments_set').order_by('-date')
+    comments = Comments.objects.select_related('user').all()
     suggested_users = User.objects.exclude(user_id=request.user.user_id).order_by('nick') if request.user.is_authenticated else User.objects.all().order_by('nick')
     users_with_posts = list(Post.objects.values_list('user_id', flat=True).distinct())
     following_ids = list(
@@ -30,8 +30,8 @@ def cycle_pg(request):
     user = request.user.user_id
     f = Followers.objects.filter(follower_id = user).values_list('user_id', flat=True)
     followings_ids = list(f)
-    post = Post.objects.filter(user_id__in = followings_ids)
-    comments = Comments.objects.all()
+    post = Post.objects.filter(user_id__in=followings_ids).select_related('user', 'collaborator').prefetch_related('media', 'likes_set', 'comments_set').order_by('-date')
+    comments = Comments.objects.select_related('user').all()
     #return HttpResponse(", ".join(str(x) for x in followings_ids))
     return render(request, 'feed/cycle.html',
                     {'posts' : post,
