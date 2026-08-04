@@ -250,8 +250,12 @@
             min-height: 0;
         }
 
+        /* com `100vh` + centralização, o campo focado não podia ser rolado
+           para a vista com o teclado aberto */
         .auth-panel {
-            min-height: 100vh;
+            min-height: auto;
+            padding-top: 56px;
+            place-items: start center;
         }
     }
 
