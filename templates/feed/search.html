@@ -6,11 +6,14 @@
 
 {% block extra_head %}
 <style>
-    .shell {
-        width: calc(100% - 24px);
-        max-width: none;
-        margin: 0 12px;
-        padding-top: 12px;
+    /* `.shell` no mobile é governado pelo base.html */
+    @media (min-width: 981px) {
+        .shell {
+            width: calc(100% - 24px);
+            max-width: none;
+            margin: 0 12px;
+            padding-top: 12px;
+        }
     }
     .search-hero {
         display: grid;

@@ -6,11 +6,14 @@
 
 {% block extra_head %}
 <style>
-    .shell {
-        width: calc(100% - 24px);
-        max-width: none;
-        margin: 0 12px;
-        padding-top: 12px;
+    /* `.shell` no mobile é governado pelo base.html */
+    @media (min-width: 981px) {
+        .shell {
+            width: calc(100% - 24px);
+            max-width: none;
+            margin: 0 12px;
+            padding-top: 12px;
+        }
     }
     .post-comments-modal {
         position: fixed;
@@ -28,7 +31,7 @@
     }
     .post-comments-dialog {
         width: min(1320px, 100%);
-        height: min(94vh, 1020px);
+        height: min(94dvh, 1020px);
         display: grid;
         grid-template-columns: minmax(0, 1fr) 456px;
         overflow: hidden;
@@ -49,9 +52,9 @@
         height: 100%;
     }
     .post-comments-close {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
         padding: 0;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -128,9 +131,9 @@
         gap: 10px;
     }
     .post-comments-options-toggle {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
         padding: 0;
         border: 0;
         border-radius: 999px;
@@ -206,15 +209,15 @@
         border: 0;
     }
     .post-comments-form {
-        padding: 0;
+        /* o shorthand `padding: 0` apagava o padding-bottom de safe-area
+           que o base define em <=480px */
+        padding-block: 0 env(safe-area-inset-bottom);
+        padding-inline: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         display: grid;
         gap: 0;
         background: #1a1d22;
-        position: sticky;
-        bottom: 0;
         z-index: 2;
-        flex-shrink: 0;
     }
     .post-comments-form-row {
         display: grid;
@@ -241,6 +244,11 @@
         gap: 14px;
     }
     .post-comments-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
         padding: 0;
         border: 0;
         background: transparent;
@@ -368,8 +376,8 @@
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
-        color: rgba(255, 255, 255, 0.44);
-        font-size: 0.74rem;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.78rem;
         text-transform: lowercase;
     }
 
@@ -386,12 +394,21 @@
         display: inline-flex;
     }
     .post-comments-pin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
         border: 0;
         background: transparent;
         color: rgba(255, 255, 255, 0.52);
         padding: 4px;
         opacity: 0;
         transition: opacity 160ms ease, color 160ms ease;
+    }
+    /* sem :hover em touch o botão de fixar era invisível e inutilizável */
+    @media (hover: none) {
+        .post-comments-pin { opacity: 1; }
     }
     .post-comments-comment:hover .post-comments-pin,
     .post-comments-comment.is-pinned .post-comments-pin {
@@ -412,7 +429,9 @@
         border-radius: 0;
         background: transparent;
         border: 0;
-        font-size: 0.92rem;
+        /* abaixo de 16px o iOS dá zoom ao focar — e este campo recebe focus()
+           automático quando o modal abre */
+        font-size: 16px;
         line-height: 1.35;
         transition: color 140ms ease, box-shadow 140ms ease;
     }
@@ -469,6 +488,9 @@
         color: var(--text);
     }
     .feed-comment-view-all {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
         padding: 0;
         border: 0;
         background: transparent;
@@ -602,16 +624,37 @@
     }
     /* ── FIM MODO CLARO ─────────────────────────────────── */
 
-    @media (max-width: 720px) {
-        .cycle-hero-meta {
+    /* faltava aqui a regra que o explore tem: sem ela um nick longo
+       estoura o card */
+    .feed-card-author-copy strong {
+        word-break: break-word;
+        white-space: normal;
+        line-height: 1.2;
+    }
+    /* esta página não renderiza `.social-rail` */
+    .social-layout {
+        grid-template-columns: minmax(0, 640px);
+        max-width: 640px;
+    }
+    .feed-card-header {
+        flex-wrap: wrap;
+    }
+
+    /* a sidebar de 456px espremia a imagem do post para 276px em 768px */
+    @media (max-width: 980px) {
+        .post-comments-dialog {
             grid-template-columns: 1fr;
+            grid-template-rows: auto minmax(0, 1fr);
         }
+    }
+    @media (max-width: 720px) {
         .post-comments-modal {
             padding: 0;
         }
         .post-comments-dialog {
             width: 100%;
-            height: 100vh;
+            /* `100vh` anulava o `100dvh` do base */
+            height: 100dvh;
             max-height: none;
             border-radius: 0;
             grid-template-columns: 1fr;
