@@ -6,8 +6,10 @@
 {% block extra_head %}
 <style>
     body {
+        /* `fixed` não é honrado no iOS Safari e força repaint no Android */
         background:
-            url("{% static 'img-login-logon.jpg' %}") center center / cover no-repeat fixed;
+            url("{% static 'img-login-logon.jpg' %}") center center / cover no-repeat;
+        background-attachment: scroll;
     }
 
     .shell {
@@ -22,8 +24,15 @@
         user-select: none;
     }
 
+    /* sem isto o iOS some com as alças de seleção dentro dos campos */
+    .auth-page input,
+    .auth-page textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
     .auth-page {
-        min-height: 100vh;
+        min-height: 100dvh;
         display: grid;
         grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
         background:
@@ -91,8 +100,11 @@
     }
 
     .auth-form-shell {
+        /* faltava: o ::before usa `position:absolute; inset:1px` e sem isto era
+           pintado sobre a coluna inteira, não sobre o card */
+        position: relative;
         width: min(100%, 560px);
-        padding: clamp(22px, 3.2vw, 34px);
+        padding: clamp(18px, 3.2vw, 34px);
         border-radius: 34px;
         border: 1px solid rgba(255, 255, 255, 0.16);
         background: linear-gradient(180deg, rgba(10, 14, 22, 0.42), rgba(9, 12, 18, 0.24));
@@ -439,6 +451,9 @@
     }
 
     .auth-links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
         color: #fff;
     }
 
@@ -521,15 +536,19 @@
     @media (max-width: 980px) {
         .auth-page {
             grid-template-columns: 1fr;
-            min-height: 100vh;
+            min-height: 100dvh;
         }
 
         .auth-empty {
             min-height: 0;
         }
 
+        /* entre 721 e 980px a marca `absolute` caía sobre o topo do card,
+           porque `.auth-empty` fica com altura zero */
         .auth-panel {
             min-height: auto;
+            padding-top: 56px;
+            place-items: start center;
         }
     }
 
@@ -540,7 +559,7 @@
         }
 
         .auth-panel {
-            padding: 72px 14px 18px;
+            padding: 56px 14px 18px;
         }
 
         .auth-form-shell {
@@ -564,6 +583,21 @@
         .auth-step-dots {
             justify-content: flex-start;
         }
+    }
+
+    @media (max-width: 480px) {
+        .auth-panel { padding: 48px 12px 16px; }
+        .auth-form-shell { padding: 18px 16px; border-radius: 24px; }
+        .auth-links {
+            gap: 0 16px;
+            justify-content: flex-start;
+        }
+        .auth-step-copy { min-height: 0; }
+    }
+
+    @media (max-width: 400px) {
+        .auth-panel { padding: 44px 10px 12px; }
+        .auth-form-shell { padding: 16px 14px; }
     }
 </style>
 {% if user.is_authenticated %}

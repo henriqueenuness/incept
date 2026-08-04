@@ -5,16 +5,12 @@
 
 {% block topbar %}{% endblock %}
 
+{% block extra_head %}
+{# estava fora de qualquer bloco: o Django descartava e o redirect nunca rodava #}
 {% if user.interests_set.exists %}
 <script>window.location.replace("{% url 'explore_pg' %}");</script>
 {% endif %}
-
-{% block extra_head %}
 <style>
-    body {
-        background: #07111f;
-    }
-
     .shell {
         width: 100%;
         max-width: none;
@@ -22,12 +18,16 @@
     }
 
     .interests-page {
-        min-height: 100vh;
+        min-height: 100dvh;
         display: grid;
-        place-items: center;
+        /* `place-items:center` + `overflow:hidden` cortava o topo do painel
+           quando ele passava de 568px, sem scroll possível */
+        place-items: start center;
+        align-content: center;
         padding: 32px 20px;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
+        background: #07111f;
     }
 
     .interests-page::before,
@@ -190,6 +190,8 @@
     .interest-icon {
         width: 44px;
         height: 44px;
+        max-width: 100%;
+        flex-shrink: 0;
         border-radius: 50%;
         display: grid;
         place-items: center;
@@ -231,7 +233,8 @@
 
     .interests-actions {
         display: grid;
-        gap: 10px;
+        /* "Pular por agora" ficava a 10px do CTA primário */
+        gap: 16px;
     }
 
     .interests-actions .button {
@@ -252,8 +255,22 @@
     }
 
     @media (max-width: 480px) {
-        .interests-panel { padding: 32px 22px 28px; }
-        .interests-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .interests-page { padding: 24px 14px; }
+        .interests-panel { padding: 24px 16px 22px; }
+        .interests-grid { gap: 8px; }
+        .interests-kicker { letter-spacing: 0.1em; font-size: 0.8rem; }
+        .interests-kicker::before { width: 20px; }
+        /* orbs de 420px e 340px animando sobre um viewport de 320px */
+        .interests-page::before,
+        .interests-page::after { display: none; }
+    }
+
+    @media (max-width: 400px) {
+        /* em 320px a coluna dava 73px e o rótulo "Visuais" (~53px) estourava
+           um content-box de 47px, com o ícone fixo de 44px sem folga */
+        .interests-grid { grid-template-columns: repeat(2, 1fr); }
+        .interests-panel { padding: 20px 14px 18px; }
+        .interest-card label { padding: 14px 8px; }
     }
 </style>
 {% endblock %}

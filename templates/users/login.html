@@ -6,8 +6,10 @@
 {% block extra_head %}
 <style>
     body {
+        /* `fixed` não é honrado no iOS Safari e força repaint no Android */
         background:
-            url("{% static 'img-login-logon.jpg' %}") center center / cover no-repeat fixed;
+            url("{% static 'img-login-logon.jpg' %}") center center / cover no-repeat;
+        background-attachment: scroll;
     }
 
     .shell {
@@ -22,8 +24,16 @@
         user-select: none;
     }
 
+    /* sem isto o iOS some com as alças de seleção dentro dos campos:
+       colar e corrigir um e-mail digitado errado fica muito mais difícil */
+    .auth-page input,
+    .auth-page textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+
     .auth-page {
-        min-height: 100vh;
+        min-height: 100dvh;
         display: grid;
         grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
         background:
@@ -91,8 +101,11 @@
     }
 
     .auth-form-shell {
+        /* faltava: o ::before abaixo usa `position:absolute; inset:1px` e sem
+           isto era pintado sobre a coluna inteira, não sobre o card */
+        position: relative;
         width: min(100%, 520px);
-        padding: clamp(26px, 4vw, 40px);
+        padding: clamp(20px, 4vw, 40px);
         border-radius: 34px;
         border: 1px solid rgba(255, 255, 255, 0.16);
         background: linear-gradient(180deg, rgba(10, 14, 22, 0.42), rgba(9, 12, 18, 0.24));
@@ -198,6 +211,9 @@
     }
 
     .auth-links a {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
         color: #fff;
     }
 
@@ -245,14 +261,31 @@
             top: 18px;
         }
 
+        /* eram 72px reservados para uma marca `absolute` numa linha de grade
+           já colapsada: 72px de vazio empurrando o CTA para fora da tela */
         .auth-panel {
-            padding: 72px 14px 18px;
+            padding: 56px 14px 18px;
+            place-items: start center;
         }
 
         .auth-form-shell {
             width: 100%;
             border-radius: 28px;
         }
+    }
+
+    @media (max-width: 480px) {
+        .auth-panel { padding: 48px 12px 16px; }
+        .auth-form-shell { padding: 20px 16px; border-radius: 24px; }
+        .auth-links {
+            gap: 0 16px;
+            justify-content: flex-start;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .auth-panel { padding: 44px 10px 12px; }
+        .auth-form-shell { padding: 18px 14px; }
     }
 </style>
 {% if user.is_authenticated %}
