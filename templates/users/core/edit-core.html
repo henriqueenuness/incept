@@ -22,7 +22,7 @@
     }
     .editor-page {
         width: min(100%, 980px);
-        min-height: calc(100vh - 32px);
+        min-height: calc(100svh - 32px);
         padding: 16px 24px 40px;
         display: grid;
         gap: 28px;
@@ -96,8 +96,8 @@
         background: rgba(7, 13, 24, 0.8);
         border: 1px solid rgba(255, 255, 255, 0.12);
         color: rgba(243, 247, 251, 0.9);
-        font-size: 0.7rem;
-        letter-spacing: 0.08em;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         opacity: 0;
         transform: translateY(6px);
@@ -115,6 +115,13 @@
     .editor-avatar-trigger:focus-visible::after {
         opacity: 1;
         transform: translateY(0);
+    }
+    /* em touch não há :hover: sem isto nada indica que o avatar é o upload */
+    @media (hover: none) {
+        .editor-avatar-trigger::after {
+            opacity: 1;
+            transform: none;
+        }
     }
     .editor-avatar-trigger:focus-visible {
         outline: 2px solid rgba(183, 229, 255, 0.55);
@@ -165,8 +172,8 @@
         color: var(--muted);
     }
     .editor-char-counter {
-        font-size: 0.78rem;
-        color: rgba(243, 247, 251, 0.5);
+        font-size: 0.8rem;
+        color: rgba(243, 247, 251, 0.62);
         transition: color 180ms ease;
     }
     .editor-char-counter.near-limit {
@@ -330,17 +337,21 @@
     .photo-modal {
         position: fixed;
         inset: 0;
-        z-index: 40;
+        /* era 40, abaixo do z-index 50 da nav inferior: a barra pintava por
+           cima do modal e cobria o Cancelar em <=480px */
+        z-index: 210;
         display: grid;
         place-items: center;
         padding: 24px;
+        overflow-y: auto;
         background: rgba(2, 5, 12, 0.72);
         backdrop-filter: blur(10px);
     }
     .photo-modal-dialog {
         width: min(100%, 560px);
+        max-height: calc(100dvh - 48px);
+        overflow-y: auto;
         border-radius: 28px;
-        overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: linear-gradient(180deg, rgba(28, 31, 38, 0.98), rgba(17, 18, 24, 0.98));
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
@@ -485,20 +496,24 @@
     /* ── FIM MODO CLARO ─────────────────────────────────── */
 
     @media (max-width: 980px) {
-        .app-shell {
-            padding-left: 0;
-        }
         .editor-page {
             padding-left: 0;
             padding-right: 0;
         }
+        /* Nick|Nome e Email|Site ficavam lado a lado até 720px */
+        .editor-grid {
+            grid-template-columns: 1fr;
+        }
+        .editor-panel {
+            padding: 24px;
+        }
     }
     @media (max-width: 720px) {
         .editor-panel {
-            padding: 24px 18px;
+            padding: 20px 16px;
         }
-        .editor-grid {
-            grid-template-columns: 1fr;
+        .editor-section {
+            padding: 16px;
         }
         .editor-danger {
             align-items: stretch;
@@ -506,12 +521,43 @@
         .delete-account-wrap {
             justify-items: start;
         }
-        .editor-actions .button {
+        /* a regra original mirava só `.button`, e o "Fazer Logout" é
+           `.ghost-button`: ficava sozinho encolhido na linha */
+        .editor-actions .button,
+        .editor-actions .ghost-button,
+        .editor-danger .ghost-button {
+            width: 100%;
+        }
+        .delete-account-confirm {
             width: 100%;
         }
         .photo-modal {
             padding: 12px;
         }
+    }
+    @media (max-width: 480px) {
+        .editor-panel { padding: 16px 14px; border-radius: 22px; }
+        .editor-section { padding: 14px; }
+        .editor-avatar-trigger,
+        .editor-hero .avatar-lg { width: 96px; height: 96px; }
+        .editor-hero-top { gap: 14px; }
+        /* o Salvar ficava no fim de um formulário de ~2200px, e ainda caía na
+           faixa coberta pela nav inferior */
+        .editor-actions {
+            position: sticky;
+            bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+            z-index: 5;
+            margin: 0 -14px -16px;
+            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+            background: var(--panel-strong);
+            border-top: 1px solid var(--line);
+        }
+        .editor-actions .button { min-height: 48px; }
+    }
+    @media (max-width: 400px) {
+        .editor-avatar-trigger,
+        .editor-hero .avatar-lg { width: 84px; height: 84px; }
+        .editor-avatar-trigger::after { font-size: 0.68rem; inset: auto 6px 6px; }
     }
 </style>
 {% endblock %}
@@ -769,13 +815,16 @@
     const deleteLink = document.querySelector('[data-delete-link]');
 
     if (photoModal && photoModalOpen && photoModalClose && photoUpload && corePictureInput) {
+        /* diferente dos modais do base, este não travava o scroll de fundo */
         const closePhotoModal = () => {
             photoModal.hidden = true;
+            document.body.style.overflow = '';
         };
 
         photoModalOpen.addEventListener('click', () => {
             if (currentCorePicture && !isDefaultCorePicture) {
                 photoModal.hidden = false;
+                document.body.style.overflow = 'hidden';
                 return;
             }
 

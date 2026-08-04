@@ -24,9 +24,8 @@
     .profile-page {
         width: min(100%, 1520px);
         margin: 0 auto;
-        padding-left: clamp(8px, 1.2vw, 18px);
-        padding-right: clamp(18px, 2.2vw, 36px);
-        min-height: calc(100vh - 32px);
+        padding-inline: clamp(12px, 1.6vw, 24px);
+        min-height: calc(100svh - 32px);
         padding-bottom: 24px;
         border-radius: 0;
         border: 0;
@@ -172,6 +171,35 @@
         background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
     }
     .profile-tab-tile:hover .tile-delete-btn { opacity: 1 !important; }
+    /* sem :hover em touch, excluir post era inalcançável */
+    @media (hover: none) {
+        .profile-tab-tile .tile-delete-btn { opacity: 1 !important; }
+    }
+    .tile-delete-btn {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--tap);
+        height: var(--tap);
+        border: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.62);
+        color: #fff;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 180ms ease;
+    }
+    .tile-delete-btn svg {
+        width: 17px;
+        height: 17px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
     .profile-tab-tile-empty {
         display: grid;
         place-items: center;
@@ -226,8 +254,8 @@
         background: rgba(255, 255, 255, 0.02);
     }
     .profile-link-item span {
-        font-size: 0.76rem;
-        letter-spacing: 0.12em;
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         color: var(--muted);
     }
@@ -281,9 +309,8 @@
         .profile-columns {
             grid-template-columns: 1fr;
         }
-        .profile-tab-bar {
-            grid-template-columns: 1fr;
-        }
+        /* as 3 abas empilhavam verticalmente já em 768px e a descrição da aba
+           ativa empurrava a galeria ~250px para baixo */
         .profile-tab-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -292,9 +319,18 @@
         }
     }
     @media (max-width: 720px) {
-        .profile-tab-grid {
-            grid-template-columns: 1fr;
-        }
+        .profile-tab-bar { gap: 8px; }
+    }
+    @media (max-width: 480px) {
+        .profile-page { padding-inline: 0; }
+        .profile-tab-bar { gap: 4px; }
+        .profile-tab-bar::before { display: none; }
+        .profile-tab-grid { gap: 10px; }
+        .profile-hero { border-radius: 0; border-inline: 0; }
+    }
+    @media (max-width: 400px) {
+        .profile-tab-grid { gap: 8px; }
+        .profile-link-item { padding: 12px 14px; }
     }
 </style>
 {% endblock %}
@@ -459,21 +495,16 @@
                                             <img src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
                                         </button>
                                         {% if user.nick == perfil_user.nick %}
-                                        <button class="tile-delete-btn" type="button" title="Apagar post" data-delete-post data-url="{% url 'delete_post' img.id %}" data-post-id="{{ img.id }}" style="position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,0.62);color:#fff;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity 180ms ease;">
-                                            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
+                                        <button class="tile-delete-btn" type="button" title="Apagar post" data-delete-post data-url="{% url 'delete_post' img.id %}" data-post-id="{{ img.id }}">
+                                            <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
                                         </button>
                                         {% endif %}
                                     </article>
                                     {% endfor %}
                                 </div>
                                 {% else %}
-                                <div class="profile-tab-grid">
-                                    {% for item in "1234"|make_list %}
-                                    <article class="profile-tab-tile profile-tab-tile-empty">
-                                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="m20 15-4-4L6 20"></path></svg>
-                                    </article>
-                                    {% endfor %}
-                                </div>
+                                {# o CTA vinha depois de 4 placeholders de 4/5, ~1610px
+                                   de quadrados vazios antes da ação primária em 375px #}
                                 <div class="profile-empty">
                                     <div>
                                         <h3>Seu portfólio ainda está em branco.</h3>
@@ -484,6 +515,13 @@
                                         </div>
                                         {% endif %}
                                     </div>
+                                </div>
+                                <div class="profile-tab-grid">
+                                    {% for item in "12"|make_list %}
+                                    <article class="profile-tab-tile profile-tab-tile-empty">
+                                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><path d="m20 15-4-4L6 20"></path></svg>
+                                    </article>
+                                    {% endfor %}
                                 </div>
                                 {% endif %}
                             </section>
