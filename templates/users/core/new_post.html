@@ -6,15 +6,8 @@
 
 {% block extra_head %}
 <style>
-    .shell {
-        width: calc(100% - 12px);
-        max-width: none;
-        margin: 0 6px 0 0;
-        padding-top: 12px;
-    }
-    .app-shell {
-        padding-left: 228px;
-    }
+    /* `.shell` e `.app-shell` são governados pelo base.html: overrides aqui
+       vazam para dentro das media queries dele e anulam o layout mobile */
     .app-main {
         width: 100%;
         display: grid;
@@ -22,9 +15,9 @@
     }
     .composer-page {
         width: min(100%, 980px);
-        min-height: calc(100vh - 32px);
         padding: 8px 24px 32px;
         display: grid;
+        align-content: start;
     }
     .composer-panel {
         border-radius: 30px;
@@ -60,36 +53,42 @@
         height: 1px;
         background: linear-gradient(90deg, var(--accent), transparent);
     }
+    /* grade fluida: com `aspect-ratio` fixo + `overflow:hidden`, a partir da
+       5ª imagem os previews eram cortados sem scroll */
     .composer-preview-box {
-        aspect-ratio: 3 / 4;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+        gap: 8px;
         max-width: 400px;
+        padding: 8px;
         border-radius: 24px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: rgba(255, 255, 255, 0.03);
-        overflow: hidden;
     }
-    .composer-preview-box img {
+    .composer-preview-box:empty { display: none; }
+    .composer-preview-thumb {
         width: 100%;
-        height: 100%;
+        aspect-ratio: 1 / 1;
         object-fit: cover;
+        border-radius: 12px;
     }
     .composer-panel h2 {
         font-family: "Montserrat", sans-serif;
-        font-size: clamp(2rem, 4vw, 3rem);
-        line-height: 0.96;
-        letter-spacing: -0.05em;
+        font-size: clamp(1.5rem, 4vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
     }
     .composer-panel {
         display: grid;
         gap: 10px;
     }
+    /* `max-height:220px` cortava a última linha do texto em 320px (o conteúdo
+       real mede ~250px lá) */
     .composer-head {
         display: grid;
         gap: 2px;
         max-width: 60ch;
         transition: opacity 160ms ease, max-height 160ms ease, margin 160ms ease;
-        max-height: 220px;
-        overflow: hidden;
     }
     .composer-head.is-hidden {
         opacity: 0;
@@ -133,18 +132,18 @@
         gap: 12px;
         align-items: center;
     }
+    /* eram 34px fixos — os dois botões mais importantes da página */
     .composer-actions .button,
     .composer-actions .ghost-button,
     .composer-actions button,
     .composer-actions a {
-        min-height: 34px;
-        height: 34px;
-        padding: 0 14px;
-        font-size: 0.92rem;
+        min-height: var(--tap);
+        padding: 0 18px;
+        font-size: 0.94rem;
         line-height: 1;
     }
     .composer-file-input {
-        min-height: 36px;
+        min-height: var(--tap);
         padding-top: 8px;
         padding-bottom: 8px;
     }
@@ -182,15 +181,17 @@
     /* ── Toggle group ── */
     .composer-toggle-group { display: grid; gap: 10px; }
     .composer-toggle-item {
-        display: flex; align-items: center; gap: 12px;
+        display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px;
+        min-height: var(--tap);
         padding: 12px 14px; border-radius: 14px;
         border: 1px solid var(--line); cursor: pointer;
         transition: background 180ms ease;
     }
     .composer-toggle-item:hover { background: rgba(155, 89, 255, 0.06); }
-    .composer-toggle-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); flex-shrink: 0; }
+    .composer-toggle-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); flex-shrink: 0; }
     .composer-toggle-item .composer-toggle-label { font-size: 0.92rem; font-weight: 500; color: var(--text); }
-    .composer-toggle-item small { color: var(--muted); font-size: 0.78rem; margin-left: auto; }
+    /* sem `flex-wrap` os dois textos se espremiam em ~200px a 320px */
+    .composer-toggle-item small { color: var(--muted); font-size: 0.8rem; margin-left: auto; }
     .composer-upload-row {
         display: grid;
         gap: 12px;
@@ -204,7 +205,7 @@
         display: flex;
     }
     .composer-upload-controls .ghost-button {
-        min-height: 36px;
+        min-height: var(--tap);
         background: rgba(255, 255, 255, 0.08);
         border-color: rgba(183, 229, 255, 0.14);
         color: var(--text);
@@ -250,13 +251,36 @@
     /* ── FIM MODO CLARO ─────────────────────────────────── */
 
     @media (max-width: 980px) {
-        .app-shell {
-            padding-left: 0;
-        }
         .composer-page {
             padding-left: 0;
             padding-right: 0;
         }
+    }
+    @media (max-width: 720px) {
+        .composer-panel { padding: 18px; border-radius: 24px; }
+        .composer-dropzone { padding: 26px 16px; }
+        .composer-dropzone-icon { width: 32px; height: 32px; }
+    }
+    @media (max-width: 480px) {
+        .composer-page { padding: 4px 0 24px; }
+        .composer-panel { padding: 14px; border-radius: 20px; }
+        .composer-actions { flex-direction: column-reverse; align-items: stretch; }
+        .composer-actions .button,
+        .composer-actions .ghost-button,
+        .composer-actions a { width: 100%; min-height: 48px; }
+        .composer-toggle-item small { margin-left: 0; flex-basis: 100%; }
+        /* arrastar não existe em touch: o dropzone vira só um botão */
+        .composer-dropzone { padding: 20px 14px; }
+        .composer-dropzone-label { font-size: 0.94rem; }
+        .composer-dropzone-sub { font-size: 0.78rem; }
+    }
+    @media (max-width: 400px) {
+        .composer-panel { padding: 12px; }
+        .composer-preview-box { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    }
+    @media (hover: none) {
+        .composer-dropzone-label { font-size: 0; }
+        .composer-dropzone-label span { font-size: 0.96rem; }
     }
 </style>
 {% endblock %}
@@ -379,7 +403,7 @@
                                 <span>Collab</span>
                                 <span class="composer-char-counter" data-char-counter>0/25</span>
                             </div>
-                            <input class="textarea-field" name="collab" placeholder="Coloque aqui o nick de quem fez a arte com você (sem @)" maxlength="25" data-description-input></input>
+                            <input class="field" name="collab" placeholder="Nick de quem fez a arte com você (sem @)" maxlength="25" data-description-input>
                         </label>
 
                         <label class="composer-field">
@@ -387,7 +411,7 @@
                                 <span>Roxotags</span>
                                 <span class="composer-char-counter" data-char-counter>0/25</span>
                             </div>
-                            <input class="textarea-field" name="roxotag" placeholder="digite as roxotags que tem haver com sua arte" data-description-input></input>
+                            <input class="field" name="roxotag" placeholder="Roxotags da sua arte" maxlength="25" data-description-input>
                         </label>
 
                         <div class="composer-actions">
@@ -407,7 +431,7 @@
 <script>
     const postImageInput = document.querySelector('[data-post-image]');
     const previewBox = document.querySelector('[data-post-preview]');
-    const composerHead = document.querySelector('.composer-head');
+    const composerHero = document.querySelector('.composer-hero');
     const postUploadControls = document.querySelector('[data-upload-controls]');
     const changeImageButton = document.querySelector('[data-change-image]');
     const removeImageButton = document.querySelector('[data-remove-image]');
@@ -421,12 +445,15 @@
             const img = document.createElement('img');
             img.src = URL.createObjectURL(file);
             img.alt = 'Preview';
-            img.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:12px;margin:4px;';
+            img.className = 'composer-preview-thumb';
             previewBox.appendChild(img);
         }
         const hasFiles = files.length > 0;
         if (submitPostButton) submitPostButton.disabled = !hasFiles;
         if (postUploadControls) { postUploadControls.style.display = hasFiles ? 'flex' : 'none'; }
+        /* sem isto o `.composer-hero { display:none }` permanecia e o preview
+           montado acima nunca era exibido */
+        if (composerHero) composerHero.classList.toggle('is-visible', hasFiles);
     };
 
     if (postImageInput) {
@@ -463,27 +490,30 @@
             previewBox.innerHTML = '';
             if (submitPostButton) submitPostButton.disabled = true;
             if (postUploadControls) postUploadControls.style.display = 'none';
+            if (composerHero) composerHero.classList.remove('is-visible');
         });
     }
 
     if (submitPostButton) submitPostButton.disabled = true;
     if (postUploadControls) postUploadControls.style.display = 'none';
 
-    const descriptionInput = document.querySelector('[data-description-input]');
-    const charCounter = document.querySelector('[data-char-counter]');
+    /* eram três campos com contador, mas `querySelector` pegava só o primeiro
+       e o limite estava fixo em 500 mesmo onde o campo diz 25 */
+    document.querySelectorAll('[data-description-input]').forEach((input) => {
+        const charCounter = input.closest('.composer-field')?.querySelector('[data-char-counter]');
+        if (!charCounter) return;
 
-    if (descriptionInput && charCounter) {
+        const maxLength = Number(input.getAttribute('maxlength')) || 500;
+
         const updateCounter = () => {
-            const length = descriptionInput.value.length;
-            const maxLength = 500;
+            const length = input.value.length;
             charCounter.textContent = `${length}/${maxLength}`;
-
-            charCounter.classList.toggle('near-limit', length >= 450 && length < maxLength);
+            charCounter.classList.toggle('near-limit', length >= maxLength * 0.9 && length < maxLength);
             charCounter.classList.toggle('at-limit', length >= maxLength);
         };
 
-        descriptionInput.addEventListener('input', updateCounter);
+        input.addEventListener('input', updateCounter);
         updateCounter();
-    }
+    });
 </script>
 {% endblock %}

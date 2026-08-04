@@ -586,7 +586,6 @@
         });
     });
 
-    const csrftoken = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
     document.querySelectorAll('[data-delete-post]').forEach((btn) => {
         btn.addEventListener('click', async (e) => {
             e.stopPropagation();
