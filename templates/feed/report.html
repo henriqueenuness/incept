@@ -1,23 +1,129 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h2>Reportar Post</h2>
+{% block title %}Reportar post | Incept{% endblock %}
 
-<form method="post">
-    {% csrf_token %}
-    <label>
-        <input type="radio" name="reason" value="Conteúdo explícito"> Conteúdo explícito
-    </label><br>
-    <label>
-        <input type="radio" name="reason" value="IA"> IA
-    </label><br>
-    <label>
-        <input type="radio" name="reason" value="Ofensivo"> Ofensivo
-    </label><br>
-    <label>
-        <input type="radio" name="reason" value="Outro"> Outro:
-        <input type="text" name="other_reason">
-    </label><br>
-    <button type="submit">Enviar denúncia</button>
-</form>
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .report-page {
+        width: min(100%, 560px);
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+        padding: 8px 0 32px;
+    }
+    .report-panel {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border-radius: 28px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+    }
+    .report-panel h2 {
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.4rem, 4vw, 2.2rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+    }
+    .report-options {
+        display: grid;
+        gap: 10px;
+    }
+    /* os radios nativos tinham 13px num label de 19px, separados por <br> */
+    .report-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: var(--tap);
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        cursor: pointer;
+        transition: border-color 180ms ease, background 180ms ease;
+    }
+    .report-option:hover { border-color: var(--line-strong); }
+    .report-option input[type="radio"] {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        accent-color: var(--accent);
+    }
+    .report-option:has(input:checked) {
+        border-color: var(--line-strong);
+        background: rgba(155, 89, 255, 0.10);
+    }
+    .report-other {
+        display: grid;
+        gap: 8px;
+    }
+    .report-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .report-actions .button { flex: 1 1 180px; }
+    .report-actions .ghost-button { flex: 0 1 auto; }
+
+    [data-theme="light"] .report-option {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(100, 40, 200, 0.10);
+    }
+
+    @media (max-width: 480px) {
+        .report-page { padding-inline: 12px; }
+        .report-panel { padding: 18px; border-radius: 22px; }
+        .report-actions { flex-direction: column-reverse; }
+        .report-actions .button,
+        .report-actions .ghost-button { width: 100%; min-height: 48px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    {% include "partials/app_nav.html" %}
+
+    <div class="app-main">
+        <section class="report-page">
+            <form class="report-panel" method="post">
+                {% csrf_token %}
+                <h2>Reportar post</h2>
+
+                <div class="report-options">
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Conteúdo explícito">
+                        <span>Conteúdo explícito</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="IA">
+                        <span>IA</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Ofensivo">
+                        <span>Ofensivo</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Outro">
+                        <span>Outro</span>
+                    </label>
+                </div>
+
+                <label class="report-other">
+                    <span class="muted">Descreva o motivo (opcional)</span>
+                    <input class="field" type="text" name="other_reason" placeholder="Conte o que aconteceu">
+                </label>
+
+                <div class="report-actions">
+                    <button class="button" type="submit">Enviar denúncia</button>
+                    <a class="ghost-button" href="{% url 'explore_pg' %}">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </div>
+</section>
 {% endblock %}

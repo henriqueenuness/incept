@@ -29,12 +29,26 @@
         gap: 10px;
     }
     .search-filter-chip {
-        min-height: 36px;
-        padding: 0 14px;
+        min-height: var(--tap);
+        padding: 0 16px;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: rgba(255, 255, 255, 0.05);
         color: var(--text);
+    }
+    .search-avatar {
+        width: 64px;
+        height: 64px;
+        flex-shrink: 0;
+    }
+    /* nick, bio e o termo buscado são strings do usuário sem ponto de quebra */
+    .search-card-head strong,
+    .search-card-copy .feed-card-copy,
+    .search-empty-title {
+        overflow-wrap: anywhere;
+    }
+    .search-card-head .feed-card-author-copy {
+        min-width: 0;
     }
     .search-card-head {
         display: flex;
@@ -81,6 +95,30 @@
         box-shadow: 0 0 0 6px rgba(224, 92, 26, 0.12);
     }
     /* ── FIM MODO CLARO ─────────────────────────────────── */
+
+    /* esta página não renderiza `.social-rail` no fluxo principal */
+    @media (max-width: 980px) {
+        .search-hero { gap: 14px; }
+    }
+    @media (max-width: 720px) {
+        .search-filter-row { gap: 8px; }
+    }
+    @media (max-width: 480px) {
+        /* o h2 a 32px ocupava ~5 linhas e empurrava o campo de busca
+           para fora da tela em 320x568 */
+        .search-hero .feed-hero-copy h2 { font-size: 1.5rem; line-height: 1.15; }
+        .search-hero .lead { font-size: 0.94rem; }
+        .search-hero { gap: 12px; }
+        .search-avatar { width: 52px; height: 52px; }
+        .search-card-head { gap: 10px; }
+        .search-filter-row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+        .search-filter-row::-webkit-scrollbar { display: none; }
+        .search-filter-chip { flex: 0 0 auto; }
+    }
+    @media (max-width: 400px) {
+        .search-hero .feed-hero-copy h2 { font-size: 1.35rem; }
+        .search-avatar { width: 46px; height: 46px; }
+    }
 </style>
 {% endblock %}
 
@@ -166,27 +204,28 @@
                 </article>
 
                 {% if users %}
-                    {% for user in users %}
+                    {# `user` como variável de loop sombreava o usuário logado #}
+                    {% for perfil in users %}
                     <article class="feed-card">
                         <div class="search-card-head">
-                            <a class="feed-card-author" href="{% url 'core_pg' user.nick %}">
-                                <span class="avatar-lg" style="width:64px; height:64px;"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+                            <a class="feed-card-author" href="{% url 'core_pg' perfil.nick %}">
+                                <span class="avatar-lg search-avatar"><img src="data:image/png;base64,{{ perfil.core_picture }}" alt="{{ perfil.nick }}"></span>
                                 <span class="feed-card-author-copy">
-                                    <strong>@{{ user.nick }}</strong>
-                                    <small>{{ user.real_name|default_if_none:"Sem nome publico" }}</small>
-                                    {% if request.user.is_authenticated and user.user_id != request.user.user_id %}
-                                    <small class="feed-card-copy">{% if user.user_id in following %}Seguindo{% endif %}</small>
+                                    <strong>@{{ perfil.nick }}</strong>
+                                    <small>{{ perfil.real_name|default_if_none:"Sem nome publico" }}</small>
+                                    {% if request.user.is_authenticated and perfil.user_id != request.user.user_id %}
+                                    <small class="feed-card-copy">{% if perfil.user_id in following %}Seguindo{% endif %}</small>
                                     {% endif %}
                                 </span>
                             </a>
-                            <span class="tag search-role {% if user.cargo == 'cliente' %}is-client{% endif %}">{{ user.cargo }}</span>
+                            <span class="tag search-role {% if perfil.cargo == 'cliente' %}is-client{% endif %}">{{ perfil.cargo }}</span>
                         </div>
                         <div class="search-card-copy">
-                            <p class="feed-card-copy">{{ user.bio|default_if_none:"Este perfil ainda não escreveu uma bio." }}</p>
+                            <p class="feed-card-copy">{{ perfil.bio|default_if_none:"Este perfil ainda não escreveu uma bio." }}</p>
                             <div class="feed-toolbar" style="margin-top:0;">
                                 <div class="feed-toolbar-meta">
-                                    {% if user.art_style %}
-                                    <span class="tag">{{ user.art_style }}</span>
+                                    {% if perfil.art_style %}
+                                    <span class="tag">{{ perfil.art_style }}</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -195,7 +234,7 @@
                     {% endfor %}
                 {% elif search %}
                 <article class="social-card profile-empty">
-                    <h3>Nada apareceu para "{{ search }}".</h3>
+                    <h3 class="search-empty-title">Nada apareceu para "{{ search }}".</h3>
                     <p>Tente um apelido diferente, um estilo ou parte do nome.</p>
                 </article>
                 {% else %}

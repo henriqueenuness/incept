@@ -1,23 +1,92 @@
 {% extends "base.html" %}
 
+{% block title %}Notificações | Incept{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .notif-page {
+        width: min(100%, 640px);
+        margin: 0 auto;
+        display: grid;
+        gap: 16px;
+        padding: 8px 0 32px;
+    }
+    .notif-page h2 {
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.4rem, 4vw, 2.2rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+    }
+    .notif-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 10px;
+    }
+    .notif-item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 4px 14px;
+        min-height: var(--tap);
+        padding: 14px 16px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+    }
+    .notif-item.is-unread {
+        border-color: var(--line-strong);
+        background: rgba(155, 89, 255, 0.08);
+    }
+    .notif-message {
+        min-width: 0;
+        flex: 1 1 200px;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+    .notif-item.is-unread .notif-message { font-weight: 600; }
+    .notif-date {
+        flex-shrink: 0;
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+    [data-theme="light"] .notif-item {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(100, 40, 200, 0.10);
+    }
+
+    @media (max-width: 480px) {
+        .notif-page { padding-inline: 12px; }
+        .notif-item { padding: 12px 14px; border-radius: 16px; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
- <div class="container mt-5">
-        <h2 class="mb-4">Suas Notificações</h2>
-        
-        <ul class="list-group">
-            {% for notification in notifications %}
-                <li class="list-group-item d-flex justify-content-between align-items-center 
-                    {% if not notification.read %}fw-bold{% endif %}">
-                    
-                    {{ notification.get_message }}
-                    
-                    <small class="text-muted">
-                        {{ notification.created_at|date:"d/m/Y H:i" }}
-                    </small>
+<section class="app-shell">
+    {% include "partials/app_nav.html" %}
+
+    <div class="app-main">
+        <section class="notif-page">
+            <h2>Suas notificações</h2>
+
+            <ul class="notif-list">
+                {% for notification in notifications %}
+                <li class="notif-item {% if not notification.read %}is-unread{% endif %}">
+                    <span class="notif-message">{{ notification.get_message }}</span>
+                    <span class="notif-date">{{ notification.created_at|date:"d/m/Y H:i" }}</span>
                 </li>
-            {% empty %}
-                <li class="list-group-item">Nenhuma notificação encontrada.</li>
-            {% endfor %}
-        </ul>
+                {% empty %}
+                <li class="notif-item">
+                    <span class="notif-message muted">Nenhuma notificação encontrada.</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
     </div>
+</section>
 {% endblock %}
