@@ -935,8 +935,7 @@
                         </div>
                         {% for media in post.media.all %}
                         <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
-                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
-                            <span class="dblclick-heart" aria-hidden="true">&#10084;</span>
+                            <img src="{{ media.image_url }}" alt="{{ post.description }}">
                         </button>
                         {% endfor %}
 
@@ -990,7 +989,7 @@
                                             <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
                                         </button>
                                         {% for media in post.media.all %}
-                                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
+                                        <img src="{{ media.image_url }}" alt="{{ post.description }}">
                                         {% endfor %}
                                     </div>
                                 </div>

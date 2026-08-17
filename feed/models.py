@@ -65,12 +65,8 @@ class Comments(models.Model):
     content = models.CharField(max_length=255)
 
 class Media(models.Model):
-    post = models.ForeignKey(
-        Post,
-        related_name= "media",
-        on_delete=models.CASCADE,
-    )
-    base64 = models.TextField(null=True)
+    post = models.ForeignKey(Post, related_name="media", on_delete=models.CASCADE)
+    image_url = models.URLField(null=True, blank=True)
 
 
 class Saved(models.Model):

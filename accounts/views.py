@@ -7,7 +7,9 @@ from datetime import datetime, timedelta
 from feed.models import Post, Comments, Saved ,Media , Notification
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
-
+from supabase import create_client
+import os
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 
 # Create your views here.
 def home(request):
@@ -87,17 +89,20 @@ def interests_pg(request):
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
     logged_user = request.user
-    imagens = Post.objects.filter(user=user)
+    imagens = Post.objects.filter(user=user).prefetch_related('media')
     salvos = Saved.objects.filter(user=user)
     salvos_id = list(salvos.values_list('post_id', flat=True))
-    posts_salvos = Post.objects.filter(id__in=salvos_id) #pega os objetos de cada id listado acima
-    is_following = Followers.objects.filter( follower_id=logged_user.user_id, user_id=user.user_id ).exists() if logged_user.is_authenticated else False
+    posts_salvos = Post.objects.filter(id__in=salvos_id).prefetch_related('media')
+    is_following = Followers.objects.filter(
+        follower_id=logged_user.user_id, user_id=user.user_id
+    ).exists() if logged_user.is_authenticated else False
     return render(request, "users/core/core.html", {
-        "perfil_user" : user, #perfil do cabra que foi pesquisado. Isso garante que na hora de colocar dados na pagina, possa ser diferenciado user.nick de perfil_user.nick
-         "imagens": imagens,
-         "salvos": salvos,
-         "posts_salvos" : posts_salvos,
-          "is_following": is_following })
+        "perfil_user": user,
+        "imagens": imagens,
+        "salvos": salvos,
+        "posts_salvos": posts_salvos,
+        "is_following": is_following
+    })
 
 
 '''def core_posts(request, nick):
@@ -173,8 +178,28 @@ def new_artist(request):
             user.cargo = 'artista'
             user.save()
             return redirect('explore_pg')
+        
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase = create_client(url, key)
 
-def new_post(request): #postar post
+def upload_image(file, filename):
+    data = file.read()
+    content_type = getattr(file, "content_type", None) or "application/octet-stream"
+    supabase.storage.from_("posts").upload(
+        filename, data, file_options={"content-type": content_type}
+    )
+    result = supabase.storage.from_("posts").get_public_url(filename)
+
+    # normaliza: pode vir como string ou como dict dependendo da versão da lib
+    if isinstance(result, dict):
+        public_url = result.get("publicUrl") or result.get("publicURL") or result.get("public_url")
+    else:
+        public_url = result
+
+    return public_url
+
+def new_post(request):
     if request.method == 'POST':
         description = request.POST.get('post_description')
         images = request.FILES.getlist('post_image')
@@ -188,48 +213,34 @@ def new_post(request): #postar post
         post_data = {'user_id': u_id}
         if description:
             post_data['description'] = description
-
         if roxotag:
-            #roxotags = roxotag.split("#")
-            roxotags = roxotag.replace(" ", "").replace("\t", "").replace("\n", "")
-            post_data['roxotags'] = roxotags
-
+            post_data['roxotags'] = roxotag.replace(" ", "").replace("\t", "").replace("\n", "")
         if like_number:
             post_data['like_number'] = like_number
-
         if comment:
             post_data['comment'] = comment
-
         if share:
             post_data['share'] = share
-
         if collab:
             collaborator = User.objects.filter(nick=collab).first()
             if collaborator:
-                collaborator_id = collaborator.user_id
-                post_data['collaborator_id'] = collaborator_id
+                post_data['collaborator_id'] = collaborator.user_id
 
         post_instance = Post.objects.create(**post_data)
+
         for img in images:
-            if not img.content_type.startswith('image/'):
-                img_compativel = False
-                return HttpResponse("erro: formato de arquivo inválido")
-            else:
-                img_compativel = True
-                img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
-            if img_compativel:
-                Media.objects.create(post=post_instance, base64=img_b64)     
-        #parte que adiciona 1 ao numero de postagens do usuario
+            filename = f"{u_id}/{post_instance.id}/{img.name}"
+            public_url = upload_image(img, filename)
+            Media.objects.create(post=post_instance, image_url=public_url)
+
+        # Atualiza contador de artes
         user = request.user
         user.arts = Post.objects.filter(user=user).count()
-        user.save() #salva a quantidade de artes do user
-        nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
-        return core_pg(request, nick)
-        
-    else:
-        return HttpResponse('erro: algo deu errado na hora de criar seu post')
-        
+        user.save()
+        return core_pg(request, user.nick)
 
+    return HttpResponse('erro: algo deu errado na hora de criar seu post')
+        
         
 def delete_post(request, id):
     user = request.user

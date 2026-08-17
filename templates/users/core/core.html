@@ -488,20 +488,22 @@
                         <div class="profile-tab-panels">
                             <section class="profile-tab-panel is-active" data-profile-panel="posts">
                                 {% if imagens %}
-                                <div class="profile-tab-grid">
-                                    {% for img in imagens %}
-                                    <article class="profile-tab-tile" id="post-tile-{{ img.id }}" style="position:relative;">
-                                        <button class="feed-media profile-tab-tile-button" type="button" style="margin-top:0; border:0; border-radius:0; height:100%;" data-open-lightbox data-image-src="data:image/png;base64,{{ img.image }}" data-image-alt="{{ img.description }}">
-                                            <img src="data:image/png;base64,{{ img.image }}" alt="{{ img.description }}">
-                                        </button>
-                                        {% if user.nick == perfil_user.nick %}
-                                        <button class="tile-delete-btn" type="button" title="Apagar post" data-delete-post data-url="{% url 'delete_post' img.id %}" data-post-id="{{ img.id }}">
-                                            <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
-                                        </button>
-                                        {% endif %}
-                                    </article>
-                                    {% endfor %}
-                                </div>
+                                    <div class="profile-tab-grid">
+                                        {% for img in imagens %}
+                                        {% with capa=img.media.first %}
+                                        <article class="profile-tab-tile" id="post-tile-{{ img.id }}" style="position:relative;">
+                                            <button class="feed-media profile-tab-tile-button" type="button" style="margin-top:0; border:0; border-radius:0; height:100%;" data-open-lightbox data-image-src="{{ capa.image_url }}" data-image-alt="{{ img.description }}">
+                                                <img src="{{ capa.image_url }}" alt="{{ img.description }}" loading="lazy">
+                                            </button>
+                                            {% if user.nick == perfil_user.nick %}
+                                            <button class="tile-delete-btn" type="button" title="Apagar post" data-delete-post data-url="{% url 'delete_post' img.id %}" data-post-id="{{ img.id }}">
+                                                <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
+                                            </button>
+                                            {% endif %}
+                                        </article>
+                                        {% endwith %}
+                                        {% endfor %}
+                                    </div>
                                 {% else %}
                                 {# o CTA vinha depois de 4 placeholders de 4/5, ~1610px
                                    de quadrados vazios antes da ação primária em 375px #}
