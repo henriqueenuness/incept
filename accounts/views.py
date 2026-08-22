@@ -338,3 +338,27 @@ def get_notifications(request):
 def notifications_page(request):
     notifications = request.user.notifications.order_by('-created_at')
     return render(request, 'feed/notifications.html', {'notifications': notifications})
+
+
+def followers(request, nick):
+    perfil_user = get_object_or_404(User, nick=nick)
+    relacoes = Followers.objects.filter(user=perfil_user).select_related('follower')
+    seguidores = [r.follower for r in relacoes]
+
+    return render(request, 'users/core/follower.html', {
+        'perfil_user': perfil_user,
+        'usuarios': seguidores,
+        'titulo': 'Seguidores',
+    })
+
+
+def following(request, nick):
+    perfil_user = get_object_or_404(User, nick=nick)
+    relacoes = Followers.objects.filter(follower=perfil_user).select_related('user')
+    seguindo = [r.user for r in relacoes]
+
+    return render(request, 'users/core/follower.html', {
+        'perfil_user': perfil_user,
+        'usuarios': seguindo,
+        'titulo': 'Seguindo',
+    })

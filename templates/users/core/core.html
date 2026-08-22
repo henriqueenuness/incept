@@ -332,6 +332,12 @@
         .profile-tab-grid { gap: 8px; }
         .profile-link-item { padding: 12px 14px; }
     }
+    .profile-highlight-link {
+    text-decoration: none;
+    color: inherit;
+    }
+
+
 </style>
 {% endblock %}
 
@@ -424,21 +430,27 @@
                             </div>
                         </div>
 
-                        <div class="profile-highlights">
+                       <div class="profile-highlights">
+                        <a href="{% url 'followers' perfil_user.nick %}" class="profile-highlight-link">
                             <div class="profile-highlight">
                                 <strong>{{ perfil_user.followers|default_if_none:"0" }}</strong>
                                 <span class="muted">seguidores</span>
                             </div>
+                        </a>
+
+                        <a href="{% url 'following' perfil_user.nick %}" class="profile-highlight-link">
                             <div class="profile-highlight">
                                 <strong>{{ perfil_user.following|default_if_none:"0" }}</strong>
                                 <span class="muted">seguindo</span>
                             </div>
-                            <div class="profile-highlight">
-                                <strong>{% if perfil_user.cargo == "artista" %}{{ perfil_user.arts|default_if_none:"0" }}{% else %}-{% endif %}</strong>
-                                <span class="muted">posts</span>
-                            </div>
-                        </div>
+                        </a>
 
+                        <div class="profile-highlight">
+                            <strong>{% if perfil_user.cargo == "artista" %}{{ perfil_user.arts|default_if_none:"0" }}{% else %}-{% endif %}</strong>
+                            <span class="muted">posts</span>
+                        </div>
+                    </div>
+                
                         <p class="profile-bio">{{ perfil_user.bio|default_if_none:"Sem bio por enquanto." }}</p>
 
                         <section class="profile-link-card" data-profile-links hidden>

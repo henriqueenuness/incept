@@ -19,6 +19,7 @@ from django.urls import path
 from accounts import views as accounts_views
 from feed import views as feed_views
 
+
 urlpatterns = [
     path('', accounts_views.home, name='home'),
     path('signup/',accounts_views.signup_pg, name='signup_pg'),
@@ -31,7 +32,14 @@ urlpatterns = [
 
     path('core/new-post/post', accounts_views.new_post, name='new_post'),
     path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
-    
+    path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
+    path('core/follow/<id>/', accounts_views.follow, name='follow'),
+
+
+    path('core/<str:nick>/seguidores/', accounts_views.followers, name='followers'),
+    path('core/<str:nick>/seguindo/', accounts_views.following, name='following'),
+
+
     path('explore/', feed_views.explore_pg, name='explore_pg'),
     path('explore/like-post/<id>/', feed_views.like, name='like'),
     path('explore/comment/<id>', feed_views.comment, name = 'comment'),
