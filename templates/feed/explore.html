@@ -331,6 +331,7 @@
     }
     /* Coração de duplo clique */
     .feed-media { position: relative; overflow: hidden; }
+
     .dblclick-heart {
         position: absolute;
         top: 50%; left: 50%;
@@ -935,9 +936,11 @@
                         </div>
                         {% for media in post.media.all %}
                         <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
-                            <img src="{{ media.image_url }}" alt="{{ post.description }}">
+                            <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
                         </button>
                         {% endfor %}
+
+
 
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
@@ -989,7 +992,9 @@
                                             <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
                                         </button>
                                         {% for media in post.media.all %}
-                                        <img src="{{ media.image_url }}" alt="{{ post.description }}">
+                                        <div class = "post-img-wrapper">
+                                        <img class = "post-real-img" loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                                        </div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -1648,3 +1653,11 @@
 
 </script>
 {% endblock %}
+
+
+
+
+
+
+
+
