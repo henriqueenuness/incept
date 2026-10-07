@@ -651,7 +651,18 @@
             grid-template-columns: 1fr;
         }
     }
+    .feed-audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    }
 
+    .feed-audio audio {
+        width: 100%;
+    }
     /* ── MODO CLARO — Explore ───────────────────────────── */
     /* Cards de sugestão */
     [data-theme="light"] .explore-suggestion-card {
@@ -935,13 +946,18 @@
                             <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
                         </div>
                         {% for media in post.media.all %}
-                        <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
-                            <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
-                        </button>
+                            {% if media.is_audio %}
+                                <div class="feed-media feed-audio">
+                                    <audio controls preload="none" src="{{ media.image_url }}">
+                                        Seu navegador não suporta áudio.
+                                    </audio>
+                                </div>
+                            {% else %}
+                                <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
+                                    <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                                </button>
+                            {% endif %}
                         {% endfor %}
-
-
-
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
                                 <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg>

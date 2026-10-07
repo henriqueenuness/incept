@@ -67,7 +67,13 @@ class Comments(models.Model):
 class Media(models.Model):
     post = models.ForeignKey(Post, related_name="media", on_delete=models.CASCADE)
     image_url = models.URLField(null=True, blank=True)
-    
+    @property
+    def is_audio(self):
+        if not self.image_url:
+            return False
+        # remove query string (urls assinadas, por exemplo) antes de checar
+        path = self.image_url.split('?')[0].lower()
+        return path.endswith('.mp3')
 
 class Saved(models.Model):
      user = models.ForeignKey(

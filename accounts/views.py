@@ -10,6 +10,15 @@ from django.db.models import F
 from supabase import create_client
 import os
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+import mimetypes
+from django.contrib import messages
+import uuid
+
+from django.utils.text import get_valid_filename
+
+ALLOWED_IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+ALLOWED_AUDIO_EXTS = {'.mp3'}
+MAX_AUDIO_SIZE = 20 * 1024 * 1024
 
 # Create your views here.
 def home(request):
@@ -183,9 +192,36 @@ url = os.getenv("SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase = create_client(url, key)
 
+def is_valid_media(f):
+    """Retorna True se o arquivo é imagem ou mp3 permitido."""
+    ext = os.path.splitext(f.name)[1].lower()
+    content_type = (f.content_type or '').lower()
+
+    if ext in ALLOWED_IMAGE_EXTS and content_type.startswith('image/'):
+        return True
+    if ext in ALLOWED_AUDIO_EXTS and content_type in ('audio/mpeg', 'audio/mp3'):
+        return f.size <= MAX_AUDIO_SIZE
+    return False
+
+
+def make_storage_name(original_name):
+    """Gera um nome seguro e único: só letras/números + extensão."""
+    ext = os.path.splitext(original_name)[1].lower()
+    return f"{uuid.uuid4().hex}{ext}"
+
 def upload_image(file, filename):
+    file.seek(0)
     data = file.read()
-    content_type = getattr(file, "content_type", None) or "application/octet-stream"
+
+    content_type = (
+        getattr(file, "content_type", None)
+        or mimetypes.guess_type(filename)[0]
+        or "application/octet-stream"
+    )
+    # normaliza variações não padrão de mp3
+    if content_type in ("audio/mp3", "audio/x-mpeg-3"):
+        content_type = "audio/mpeg"
+
     supabase.storage.from_("posts").upload(
         filename, data, file_options={"content-type": content_type}
     )
@@ -193,16 +229,21 @@ def upload_image(file, filename):
 
     # normaliza: pode vir como string ou como dict dependendo da versão da lib
     if isinstance(result, dict):
-        public_url = result.get("publicUrl") or result.get("publicURL") or result.get("public_url")
+        public_url = (
+            result.get("publicUrl")
+            or result.get("publicURL")
+            or result.get("public_url")
+        )
     else:
         public_url = result
 
-    return public_url
+    # algumas versões retornam a URL com "?" no final
+    return public_url.rstrip("?") if public_url else public_url
 
 def new_post(request):
     if request.method == 'POST':
         description = request.POST.get('post_description')
-        images = request.FILES.getlist('post_image')
+        files = request.FILES.getlist('post_image')  # imagens e mp3 no mesmo input
         u_id = request.user.user_id
         collab = request.POST.get('collab')
         like_number = request.POST.get('like_number')
@@ -228,10 +269,22 @@ def new_post(request):
 
         post_instance = Post.objects.create(**post_data)
 
-        for img in images:
-            filename = f"{u_id}/{post_instance.id}/{img.name}"
-            public_url = upload_image(img, filename)
+        rejected = []
+        for f in files:
+            if not is_valid_media(f):
+                rejected.append(f.name)
+                continue
+
+            filename = f"{u_id}/{post_instance.id}/{make_storage_name(f.name)}"
+            public_url = upload_image(f, filename)
             Media.objects.create(post=post_instance, image_url=public_url)
+
+        if rejected:
+            messages.warning(
+                request,
+                "Alguns arquivos não foram enviados (formato inválido ou muito grande): "
+                + ", ".join(rejected)
+            )
 
         # Atualiza contador de artes
         user = request.user
