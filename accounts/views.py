@@ -351,7 +351,7 @@ def follow(request, id):
         is_following = True
     Notification.objects.create(
         user= id,
-        actor=request.user.user_id,
+        actor=request.user.user,
         type='follow'
     )
     return JsonResponse({

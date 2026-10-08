@@ -78,23 +78,28 @@ def search_user(request):
     return render(request, 'users/core/core.html', {'user': user})'''
 
 def like(request, id):
-    user = request.user.user_id
-    #likes.objects.get(post_id_id=id)
     post = get_object_or_404(Post, id=id)
-    if Likes.objects.filter(user=user, post=post).exists():
-        Likes.objects.filter(user=user, post=post).delete()
+    like_qs = Likes.objects.filter(user=request.user, post=post)
+
+    if like_qs.exists():
+        like_qs.delete()
         liked = False
     else:
-        Likes.objects.create(post=post, user_id = user) #primeiro o db, dps a variavel python
+        Likes.objects.create(post=post, user=request.user)
         liked = True
-    Notification.objects.create(
-        user=post.user_id,
-        actor=request.user.user_id,
-        type='like',
-        post=post.id
-    )
-    return JsonResponse({"likes": post.likes_set.count(),
-                         "liked" : liked }) #
+
+        if post.user != request.user:
+            Notification.objects.create(
+                user=post.user,
+                actor=request.user,
+                type='like',
+                post=post,
+            )
+
+    return JsonResponse({
+        "likes": post.likes_set.count(),
+        "liked": liked,
+    })
 
 def save(request, id):
     user = request.user.user_id
