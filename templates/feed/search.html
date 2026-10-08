@@ -203,7 +203,40 @@
                     </form>
                 </article>
 
-                {% if users %}
+                {% if posts %}
+                    {% for post in posts %}
+                    <article class="feed-card">
+                        <div class="search-card-head">
+                            <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                                <span class="feed-card-author-copy">
+                                    <strong>@{{ post.user.nick }}</strong>
+                                </span>
+                            </a>
+                        </div>
+                        <p class="feed-card-copy">{{ post.description }}</p>
+
+                        {% for media in post.media.all %}
+                            {% if media.is_audio %}
+                                <div class="feed-media feed-audio">
+                                    <audio controls preload="none" src="{{ media.image_url }}">
+                                        Seu navegador não suporta áudio.
+                                    </audio>
+                                </div>
+                            {% else %}
+                                <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
+                                    <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="feed-toolbar-meta">
+                            {% for tag in post.roxotags %}
+                            <a class="tag" href="{% url 'search_user' %}?search=%23{{ tag }}">#{{ tag }}</a>
+                            {% endfor %}
+                        </div>
+                    </article>
+                    {% endfor %}
+                {% elif users %}
                     {# `user` como variável de loop sombreava o usuário logado #}
                     {% for perfil in users %}
                     <article class="feed-card">

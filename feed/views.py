@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.utils.timesince import timesince
-
+from accounts.views import parse_hashtags
 # Create your views here.
 def search_pg(request):
     return render(request, 'feed/search.html')
@@ -39,45 +39,39 @@ def cycle_pg(request):
                     })
 
 def search_user(request):
-    if request.method=="GET":
-        search = request.GET.get('search')
+    if request.method == "GET":
+        search = (request.GET.get('search') or '').strip()
         new_post_search = request.GET.get('new_post_search')
         users = []
-
+        posts = []
         followings_ids = []
-        if search or new_post_search:
+
+        if search.startswith('#'):
+            tags = parse_hashtags(search)
+            if tags:
+                # posts que possuem TODAS as hashtags digitadas
+                posts = (Post.objects
+                         .filter(roxotags__contains=tags)
+                         .select_related('user')
+                         .order_by('-date'))
+                # use roxotags__overlap=tags se quiser posts com QUALQUER uma delas
+
+        elif search or new_post_search:
             users = User.objects.filter(nick__icontains=search)
             users_ids = list(users.values_list("user_id", flat=True))
-            #se na lista de seguindo(following) do usuário logado tiver o id do usuário pesquisado, ele mostra "seguindo"
-            #else mostra "seguir"
-
-            #1. filtrar o following do usuário logado
-            #2. filtrar se o id do usuário buscado está na lista de seguindo do user logado
             followings_ids = list(
                 Followers.objects.filter(
-                    follower_id = request.user.user_id, 
-                    user_id__in = users_ids)
-                    .values_list('user_id', flat=True)
-                    )
+                    follower_id=request.user.user_id,
+                    user_id__in=users_ids
+                ).values_list('user_id', flat=True)
+            )
 
-        else:
-            users = ""
-        if new_post_search:
-            return HttpResponse("ebaaa")
-            return JsonResponse({
-                'users': list(users.values('nick', 'core_picture')),
-                'search': search,
-            })
-            return render(request, 'feed/search.html',
-                    {'users' : users,
-                    'search' : search,
-                    'following': followings_ids})
-        return render(request, 'feed/search.html',
-                    {'users' : users,
-                    'search' : search,
-                    'following': followings_ids})
-        #return HttpResponse(", ".join(str(x) for x in followings_ids))
-
+        return render(request, 'feed/search.html', {
+            'users': users,
+            'posts': posts,
+            'search': search,
+            'following': followings_ids,
+        })
     
 '''def enter_core(request, nick): 
     user = User.objects.get(nick=nick) # pega direto do path

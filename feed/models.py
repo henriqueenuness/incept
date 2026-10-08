@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from accounts.models import User
-
+from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 
 class Post(models.Model):
@@ -27,7 +27,11 @@ class Post(models.Model):
     comment = models.BooleanField(default=False, null=False)
     like_number = models.BooleanField(default=False, null=False)
     share = models.BooleanField(default=False, null=False)
-    roxotags =models.TextField(null=True)
+    roxotags = ArrayField(
+        models.TextField(),
+        default=list,
+        blank=True,
+    )
 
 
 class Hashtags(models.Model):
@@ -67,6 +71,7 @@ class Comments(models.Model):
 class Media(models.Model):
     post = models.ForeignKey(Post, related_name="media", on_delete=models.CASCADE)
     image_url = models.URLField(null=True, blank=True)
+    base64 = models.TextField(null=True,blank=True)
     @property
     def is_audio(self):
         if not self.image_url:

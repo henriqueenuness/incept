@@ -13,7 +13,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUpload
 import mimetypes
 from django.contrib import messages
 import uuid
-
+import re
 from django.utils.text import get_valid_filename
 
 ALLOWED_IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
@@ -239,7 +239,17 @@ def upload_image(file, filename):
 
     # algumas versões retornam a URL com "?" no final
     return public_url.rstrip("?") if public_url else public_url
-
+def parse_hashtags(raw):
+    """'#arte #Pixel, digital' -> ['arte', 'pixel', 'digital']"""
+    if not raw:
+        return []
+    tags = re.split(r'[\s,#]+', raw)
+    seen = []
+    for t in tags:
+        t = t.strip().lower()
+        if t and t not in seen:
+            seen.append(t)
+    return seen
 def new_post(request):
     if request.method == 'POST':
         description = request.POST.get('post_description')
@@ -255,7 +265,7 @@ def new_post(request):
         if description:
             post_data['description'] = description
         if roxotag:
-            post_data['roxotags'] = roxotag.replace(" ", "").replace("\t", "").replace("\n", "")
+            post_data['roxotags'] = parse_hashtags(roxotag)
         if like_number:
             post_data['like_number'] = like_number
         if comment:
