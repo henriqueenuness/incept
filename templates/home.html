@@ -123,7 +123,17 @@
         text-transform: uppercase;
     }
 
+    .brandline a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
     .footer-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 8px;
         color: rgba(255, 255, 255, 0.78);
         transition: color 180ms ease, transform 180ms ease;
     }
@@ -277,7 +287,6 @@
             saturate(calc(1.04 - (var(--hero-progress) * 0.2)))
             brightness(calc(var(--brightness, 0.92) + (var(--hero-progress) * 0.09)));
         will-change: transform, opacity, filter;
-        animation: hero-card-float var(--float-duration, 14s) ease-in-out infinite alternate;
     }
 
     .hero-card::before {
@@ -488,7 +497,7 @@
     .final-panel {
         text-align: center;
         padding-block: clamp(2rem, 5vw, 4rem);
-        min-height: min(78vh, 760px);
+        min-height: min(78svh, 760px);
         display: grid;
         place-items: center;
     }
@@ -605,11 +614,6 @@
         filter: none;
     }
 
-    @keyframes hero-card-float {
-        0% { --float-shift: -10px; }
-        100% { --float-shift: 10px; }
-    }
-
     @keyframes drift-noise {
         0% { transform: translate3d(0, 0, 0); }
         25% { transform: translate3d(1px, -1px, 0); }
@@ -619,9 +623,11 @@
     }
 
     @media (max-width: 1180px) {
-        .home-header { grid-template-columns: 1fr; }
-        .brandline,
-        .header-actions { justify-content: flex-start; }
+        .home-header { gap: 12px; }
+        .header-actions {
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+        }
         .hero { min-height: 200svh; }
         .hero-center-reserve { inset: 18svh 18vw 18svh 18vw; }
         .hero-copy,
@@ -637,6 +643,14 @@
             padding: 8px 0;
         }
 
+        .brandline { font-size: 0.86rem; letter-spacing: 0.18em; }
+        .premium-btn,
+        .premium-btn-muted {
+            min-height: 46px;
+            padding: 0 18px;
+            font-size: 0.92rem;
+        }
+
         .hero { min-height: 180svh; }
         .hero-content,
         .hero-outro { width: min(100% - 20px, 1240px); }
@@ -648,26 +662,90 @@
     }
 
     @media (max-width: 640px) {
-        .brandline,
-        .header-actions,
+        /* Header em uma única linha: marca à esquerda, ações à direita */
+        .home-header {
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+            gap: 10px;
+        }
+        .brandline {
+            justify-content: flex-start;
+            font-size: 0.76rem;
+            letter-spacing: 0.16em;
+        }
+        .header-actions {
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            gap: 8px;
+        }
+        .header-actions > * {
+            flex: 0 1 auto;
+            min-width: 0;
+            white-space: nowrap;
+        }
+        .premium-btn,
+        .premium-btn-muted {
+            min-height: 44px;
+            padding: 0 14px;
+            font-size: 0.84rem;
+        }
+
+        /* CTAs finais empilhados em largura total — alvo de toque generoso */
         .final-actions { width: 100%; }
-        .brandline { justify-content: center; }
-        .header-actions > *,
         .final-actions > * { flex: 1 1 100%; }
-        .hero { min-height: 160svh; }
+        .hero-cta,
+        .hero-ghost { min-height: 50px; }
+
+        .hero { min-height: 155svh; }
         .hero-center-reserve { inset: 14svh 5vw 18svh 5vw; }
-        .hero-copy { top: 48%; width: min(100%, 92vw); }
-        .hero-next-copy { top: 76%; width: min(100%, 92vw); }
-        .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
+        .hero-copy { top: 50%; width: min(100%, 92vw); }
+        .hero-next-copy { top: 50%; width: min(100%, 92vw); }
+        .hero-title { max-width: 12ch; font-size: clamp(2.05rem, 9.4vw, 4rem); }
+        .hero-next-title { max-width: 13ch; font-size: clamp(2rem, 8.6vw, 3.4rem); }
         .hero-sub,
-        .hero-next-sub { font-size: 0.94rem; max-width: 30ch; }
+        .hero-next-sub { font-size: 0.92rem; max-width: 32ch; }
+        .hero-kicker,
+        .hero-next-kicker,
+        .eyebrow { font-size: 0.72rem; letter-spacing: 0.18em; }
+        .hero-kicker::before,
+        .hero-next-kicker::before,
+        .eyebrow::before { width: 26px; }
+
         .content-section,
         .footer { width: min(100% - 20px, 1280px); }
+        .section-title { font-size: clamp(1.95rem, 8.4vw, 3.4rem); }
         .section-panel { border-radius: 26px; }
+        .final-panel { min-height: min(72svh, 620px); }
         .footer {
             flex-direction: column;
             align-items: flex-start;
             padding-inline: 4px;
+        }
+        .footer-row { gap: 6px; }
+        .footer-row:last-child { margin-left: -8px; }
+    }
+
+    @media (max-width: 380px) {
+        .brandline { font-size: 0.7rem; letter-spacing: 0.12em; }
+        .premium-btn,
+        .premium-btn-muted { padding: 0 12px; font-size: 0.8rem; }
+        .hero-title { font-size: clamp(1.95rem, 10vw, 2.6rem); }
+        .hero-next-title { font-size: clamp(1.85rem, 9vw, 2.4rem); }
+        .content-section { padding: 3rem 0; }
+        .section-panel { padding: 1.3rem; }
+        .feature-item { padding: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-noise { animation: none; }
+        .split-word,
+        .fade-up,
+        .final-brand,
+        .final-content,
+        .footer {
+            transition-duration: 1ms !important;
         }
     }
 
@@ -823,6 +901,9 @@
         const revealTargets = document.querySelectorAll(".fade-up, [data-split]");
         let galleryCardNodes = [];
         let finalSequenceTimer = 0;
+        let renderedMode = "";
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const isCoarsePointer = window.matchMedia("(pointer: coarse)").matches;
         const galleryItems = [
             { src: "{% static 'home/img-01.png' %}", ratio: "1 / 1", size: 12.4, top: 48, left: 2, sizeTablet: 12.8, topTablet: 49, leftTablet: 2, sizeMobile: 0, rotate: -10, parallaxX: 12, parallaxY: 10, driftX: 20, driftY: 34, zoom: 0.14, fadeStart: 0.56, fadeRate: 2.3, float: 13, brightness: 0.94 },
             { src: "{% static 'home/img-02.jpg' %}", ratio: "1.5 / 1", size: 13.8, top: 23, left: 4, sizeTablet: 15.6, topTablet: 24, leftTablet: 6, sizeMobile: 0, rotate: 7, parallaxX: -14, parallaxY: 10, driftX: -28, driftY: 20, zoom: 0.18, fadeStart: 0.54, fadeRate: 2.3, float: 15, brightness: 0.92 },
@@ -903,6 +984,7 @@
                     </figure>
                 `;
             }).join("");
+            renderedMode = mode;
             galleryCardNodes = Array.from(heroGallery.querySelectorAll(".hero-card"));
             heroGallery.querySelectorAll("img").forEach((img) => {
                 img.addEventListener("error", () => {
@@ -1016,16 +1098,14 @@
             pointerY = (((clientY - rect.top) / rect.height) - 0.5) * 2;
         };
 
-        hero.addEventListener("mousemove", (event) => setPointer(event.clientX, event.clientY));
-        hero.addEventListener("touchmove", (event) => {
-            const touch = event.touches[0];
-            if (touch) setPointer(touch.clientX, touch.clientY);
-        }, { passive: true });
-
-        hero.addEventListener("mouseleave", () => {
-            pointerX = 0;
-            pointerY = 0;
-        });
+        /* Parallax por ponteiro só faz sentido com mouse: no toque ele treme durante o scroll */
+        if (!isCoarsePointer && !prefersReducedMotion) {
+            hero.addEventListener("mousemove", (event) => setPointer(event.clientX, event.clientY));
+            hero.addEventListener("mouseleave", () => {
+                pointerX = 0;
+                pointerY = 0;
+            });
+        }
 
         window.addEventListener("scroll", () => {
             targetScroll = window.scrollY;
@@ -1034,10 +1114,28 @@
         let resizeTimer = 0;
         window.addEventListener("resize", () => {
             window.clearTimeout(resizeTimer);
-            resizeTimer = window.setTimeout(renderGallery, 120);
+            resizeTimer = window.setTimeout(() => {
+                /* No mobile a barra de URL colapsando dispara resize: só refaz a galeria
+                   quando o breakpoint realmente muda, evitando recarregar as imagens. */
+                if (getViewportMode() === renderedMode) return;
+                renderGallery();
+            }, 160);
         });
 
+        let heroWasVisible = true;
+
         const loop = () => {
+            const heroRect = hero.getBoundingClientRect();
+            const heroVisible = heroRect.bottom > 0 && heroRect.top < window.innerHeight;
+
+            /* Fora da tela não há o que animar: evita escrever estilos em 23 nós por frame */
+            if (!heroVisible && !heroWasVisible) {
+                currentScroll = targetScroll;
+                requestAnimationFrame(loop);
+                return;
+            }
+            heroWasVisible = heroVisible;
+
             currentX += (pointerX - currentX) * 0.06;
             currentY += (pointerY - currentY) * 0.06;
             currentScroll += (targetScroll - currentScroll) * 0.08;

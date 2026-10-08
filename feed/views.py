@@ -1,18 +1,18 @@
 from django.shortcuts import render, redirect
 from accounts.models import User, Followers
-from .models import Post, Likes, Comments, Saved
+from .models import Reports, Post, Likes, Comments, Saved , Notification
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_GET, require_POST
 from django.utils.timesince import timesince
-
+from accounts.views import parse_hashtags
 # Create your views here.
 def search_pg(request):
     return render(request, 'feed/search.html')
 
 def explore_pg(request):
-    post = Post.objects.all()
-    comments = Comments.objects.all()
+    post = Post.objects.select_related('user', 'collaborator').prefetch_related('media', 'likes_set', 'comments_set').order_by('-date')
+    comments = Comments.objects.select_related('user').all()
     suggested_users = User.objects.exclude(user_id=request.user.user_id).order_by('nick') if request.user.is_authenticated else User.objects.all().order_by('nick')
     users_with_posts = list(Post.objects.values_list('user_id', flat=True).distinct())
     following_ids = list(
@@ -30,8 +30,8 @@ def cycle_pg(request):
     user = request.user.user_id
     f = Followers.objects.filter(follower_id = user).values_list('user_id', flat=True)
     followings_ids = list(f)
-    post = Post.objects.filter(user_id__in = followings_ids)
-    comments = Comments.objects.all()
+    post = Post.objects.filter(user_id__in=followings_ids).select_related('user', 'collaborator').prefetch_related('media', 'likes_set', 'comments_set').order_by('-date')
+    comments = Comments.objects.select_related('user').all()
     #return HttpResponse(", ".join(str(x) for x in followings_ids))
     return render(request, 'feed/cycle.html',
                     {'posts' : post,
@@ -39,45 +39,39 @@ def cycle_pg(request):
                     })
 
 def search_user(request):
-    if request.method=="GET":
-        search = request.GET.get('search')
+    if request.method == "GET":
+        search = (request.GET.get('search') or '').strip()
         new_post_search = request.GET.get('new_post_search')
         users = []
-
+        posts = []
         followings_ids = []
-        if search or new_post_search:
+
+        if search.startswith('#'):
+            tags = parse_hashtags(search)
+            if tags:
+                # posts que possuem TODAS as hashtags digitadas
+                posts = (Post.objects
+                         .filter(roxotags__contains=tags)
+                         .select_related('user')
+                         .order_by('-date'))
+                # use roxotags__overlap=tags se quiser posts com QUALQUER uma delas
+
+        elif search or new_post_search:
             users = User.objects.filter(nick__icontains=search)
             users_ids = list(users.values_list("user_id", flat=True))
-            #se na lista de seguindo(following) do usuário logado tiver o id do usuário pesquisado, ele mostra "seguindo"
-            #else mostra "seguir"
-
-            #1. filtrar o following do usuário logado
-            #2. filtrar se o id do usuário buscado está na lista de seguindo do user logado
             followings_ids = list(
                 Followers.objects.filter(
-                    follower_id = request.user.user_id, 
-                    user_id__in = users_ids)
-                    .values_list('user_id', flat=True)
-                    )
+                    follower_id=request.user.user_id,
+                    user_id__in=users_ids
+                ).values_list('user_id', flat=True)
+            )
 
-        else:
-            users = ""
-        if new_post_search:
-            return HttpResponse("ebaaa")
-            return JsonResponse({
-                'users': list(users.values('nick', 'core_picture')),
-                'search': search,
-            })
-            return render(request, 'feed/search.html',
-                    {'users' : users,
-                    'search' : search,
-                    'following': followings_ids})
-        return render(request, 'feed/search.html',
-                    {'users' : users,
-                    'search' : search,
-                    'following': followings_ids})
-        #return HttpResponse(", ".join(str(x) for x in followings_ids))
-
+        return render(request, 'feed/search.html', {
+            'users': users,
+            'posts': posts,
+            'search': search,
+            'following': followings_ids,
+        })
     
 '''def enter_core(request, nick): 
     user = User.objects.get(nick=nick) # pega direto do path
@@ -93,6 +87,12 @@ def like(request, id):
     else:
         Likes.objects.create(post=post, user_id = user) #primeiro o db, dps a variavel python
         liked = True
+    Notification.objects.create(
+        user=post.user_id,
+        actor=request.user.user_id,
+        type='like',
+        post=post.id
+    )
     return JsonResponse({"likes": post.likes_set.count(),
                          "liked" : liked }) #
 
@@ -107,6 +107,25 @@ def save(request, id):
         saved = True
     return JsonResponse({"saved" : saved,
                          "post_id" : post.id })
+def explore(request):
+    posts = Post.objects.all()
+    return render(request, "feed/explore.html", {"posts": posts})
+def report_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        reason = request.POST.get("reason")
+        if reason == "Outro":
+            reason = request.POST.get("other_reason")
+
+        Reports.objects.create(
+            user=request.user,
+            post=post,
+            reason=reason
+        )
+        return redirect("explore")  # redireciona de volta para feed/explore
+
+    return render(request, "feed/report.html", {"post": post})  
 
 def serialize_comment(comment):
     return {

@@ -14,7 +14,7 @@ import dj_database_url
 from dotenv import load_dotenv
 from decouple import config
 from pathlib import Path
-
+from supabase import create_client
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'default' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4
+    'neon' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4
 
-    'supabase': {                                    #supabase - suporte para ipv6
+    'default': {                                    #supabase - suporte para ipv6
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("dbname"),
         'USER': os.getenv("user"),
@@ -99,8 +99,11 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+load_dotenv()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # Password validation

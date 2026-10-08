@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Reportar post | Incept{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .report-page {
+        width: min(100%, 560px);
+        margin: 0 auto;
+        display: grid;
+        gap: 18px;
+        padding: 8px 0 32px;
+    }
+    .report-panel {
+        display: grid;
+        gap: 18px;
+        padding: 24px;
+        border-radius: 28px;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        box-shadow: var(--shadow);
+    }
+    .report-panel h2 {
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.4rem, 4vw, 2.2rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+    }
+    .report-options {
+        display: grid;
+        gap: 10px;
+    }
+    /* os radios nativos tinham 13px num label de 19px, separados por <br> */
+    .report-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: var(--tap);
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        cursor: pointer;
+        transition: border-color 180ms ease, background 180ms ease;
+    }
+    .report-option:hover { border-color: var(--line-strong); }
+    .report-option input[type="radio"] {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        accent-color: var(--accent);
+    }
+    .report-option:has(input:checked) {
+        border-color: var(--line-strong);
+        background: rgba(155, 89, 255, 0.10);
+    }
+    .report-other {
+        display: grid;
+        gap: 8px;
+    }
+    .report-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .report-actions .button { flex: 1 1 180px; }
+    .report-actions .ghost-button { flex: 0 1 auto; }
+
+    [data-theme="light"] .report-option {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(100, 40, 200, 0.10);
+    }
+
+    @media (max-width: 480px) {
+        .report-page { padding-inline: 12px; }
+        .report-panel { padding: 18px; border-radius: 22px; }
+        .report-actions { flex-direction: column-reverse; }
+        .report-actions .button,
+        .report-actions .ghost-button { width: 100%; min-height: 48px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="app-shell">
+    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
+
+    <aside class="social-nav">
+        <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
+            <span class="social-nav-label">Página Inicial</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'search_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
+            <span class="social-nav-label">Busca</span>
+        </a>
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
+            <span class="social-nav-label">Criar</span>
+        </a>
+        {% endif %}
+        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
+            <span class="social-nav-label">Ciclo</span>
+        </a>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
+            <span class="social-nav-label">Mensagens</span>
+        </a>
+        <a class="social-nav-link" href="{% url 'notifications' %}">
+            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
+            <span class="social-nav-label">Notificações</span>
+        </a>
+        {% if user.is_authenticated %}
+        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
+            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
+            <span class="social-nav-label">Perfil</span>
+        </a>
+        {% endif %}
+    </aside>
+
+    <details class="social-more">
+        <summary>
+            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+            <span class="social-more-label">Mais</span>
+        </summary>
+        <div class="social-more-menu">
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configurações em breve" data-placeholder-copy="Salvar preferências do usuário ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Alternar exibição em breve" data-placeholder-copy="A preferência de exibição ainda não é armazenada por usuário."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></span></button>
+            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
+            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
+        </div>
+    </details>
+
+    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A área está reservada na interface, mas o fluxo real ainda não foi implementado.">
+        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
+        <span>Mensagens</span>
+    </a>
+<section class="app-shell">
+    {% include "partials/app_nav.html" %}
+
+    <div class="app-main">
+        <section class="report-page">
+            <form class="report-panel" method="post">
+                {% csrf_token %}
+                <h2>Reportar post</h2>
+
+                <div class="report-options">
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Conteúdo explícito">
+                        <span>Conteúdo explícito</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="IA">
+                        <span>IA</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Ofensivo">
+                        <span>Ofensivo</span>
+                    </label>
+                    <label class="report-option">
+                        <input type="radio" name="reason" value="Outro">
+                        <span>Outro</span>
+                    </label>
+                </div>
+
+                <label class="report-other">
+                    <span class="muted">Descreva o motivo (opcional)</span>
+                    <input class="field" type="text" name="other_reason" placeholder="Conte o que aconteceu">
+                </label>
+
+                <div class="report-actions">
+                    <button class="button" type="submit">Enviar denúncia</button>
+                    <a class="ghost-button" href="{% url 'explore_pg' %}">Cancelar</a>
+                </div>
+            </form>
+        </section>
+    </div>
+</section>
+{% endblock %}

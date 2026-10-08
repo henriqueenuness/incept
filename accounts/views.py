@@ -4,10 +4,21 @@ from .models import User, Followers, Interests, Links
 import base64
 from django.utils import timezone
 from datetime import datetime, timedelta
-from feed.models import Post, Comments, Saved ,Media
+from feed.models import Post, Comments, Saved ,Media , Notification
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
+from supabase import create_client
+import os
+from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
+import mimetypes
+from django.contrib import messages
+import uuid
+import re
+from django.utils.text import get_valid_filename
 
+ALLOWED_IMAGE_EXTS = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+ALLOWED_AUDIO_EXTS = {'.mp3'}
+MAX_AUDIO_SIZE = 20 * 1024 * 1024
 
 # Create your views here.
 def home(request):
@@ -92,17 +103,20 @@ def interests_pg(request):
 def core_pg(request, nick):
     user = get_object_or_404(User, nick=nick)
     logged_user = request.user
-    imagens = Post.objects.filter(user=user)
+    imagens = Post.objects.filter(user=user).prefetch_related('media')
     salvos = Saved.objects.filter(user=user)
     salvos_id = list(salvos.values_list('post_id', flat=True))
-    posts_salvos = Post.objects.filter(id__in=salvos_id) #pega os objetos de cada id listado acima
-    is_following = Followers.objects.filter( follower_id=logged_user.user_id, user_id=user.user_id ).exists() if logged_user.is_authenticated else False
+    posts_salvos = Post.objects.filter(id__in=salvos_id).prefetch_related('media')
+    is_following = Followers.objects.filter(
+        follower_id=logged_user.user_id, user_id=user.user_id
+    ).exists() if logged_user.is_authenticated else False
     return render(request, "users/core/core.html", {
-        "perfil_user" : user, #perfil do cabra que foi pesquisado. Isso garante que na hora de colocar dados na pagina, possa ser diferenciado user.nick de perfil_user.nick
-         "imagens": imagens,
-         "salvos": salvos,
-         "posts_salvos" : posts_salvos,
-          "is_following": is_following })
+        "perfil_user": user,
+        "imagens": imagens,
+        "salvos": salvos,
+        "posts_salvos": posts_salvos,
+        "is_following": is_following
+    })
 
 
 '''def core_posts(request, nick):
@@ -190,11 +204,73 @@ def new_artist(request):
             user.cargo = 'artista'
             user.save()
             return redirect('explore_pg')
+        
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase = create_client(url, key)
 
-def new_post(request): #postar post
+def is_valid_media(f):
+    """Retorna True se o arquivo é imagem ou mp3 permitido."""
+    ext = os.path.splitext(f.name)[1].lower()
+    content_type = (f.content_type or '').lower()
+
+    if ext in ALLOWED_IMAGE_EXTS and content_type.startswith('image/'):
+        return True
+    if ext in ALLOWED_AUDIO_EXTS and content_type in ('audio/mpeg', 'audio/mp3'):
+        return f.size <= MAX_AUDIO_SIZE
+    return False
+
+
+def make_storage_name(original_name):
+    """Gera um nome seguro e único: só letras/números + extensão."""
+    ext = os.path.splitext(original_name)[1].lower()
+    return f"{uuid.uuid4().hex}{ext}"
+
+def upload_image(file, filename):
+    file.seek(0)
+    data = file.read()
+
+    content_type = (
+        getattr(file, "content_type", None)
+        or mimetypes.guess_type(filename)[0]
+        or "application/octet-stream"
+    )
+    # normaliza variações não padrão de mp3
+    if content_type in ("audio/mp3", "audio/x-mpeg-3"):
+        content_type = "audio/mpeg"
+
+    supabase.storage.from_("posts").upload(
+        filename, data, file_options={"content-type": content_type}
+    )
+    result = supabase.storage.from_("posts").get_public_url(filename)
+
+    # normaliza: pode vir como string ou como dict dependendo da versão da lib
+    if isinstance(result, dict):
+        public_url = (
+            result.get("publicUrl")
+            or result.get("publicURL")
+            or result.get("public_url")
+        )
+    else:
+        public_url = result
+
+    # algumas versões retornam a URL com "?" no final
+    return public_url.rstrip("?") if public_url else public_url
+def parse_hashtags(raw):
+    """'#arte #Pixel, digital' -> ['arte', 'pixel', 'digital']"""
+    if not raw:
+        return []
+    tags = re.split(r'[\s,#]+', raw)
+    seen = []
+    for t in tags:
+        t = t.strip().lower()
+        if t and t not in seen:
+            seen.append(t)
+    return seen
+def new_post(request):
     if request.method == 'POST':
         description = request.POST.get('post_description')
-        images = request.FILES.getlist('post_image')
+        files = request.FILES.getlist('post_image')  # imagens e mp3 no mesmo input
         u_id = request.user.user_id
         collab = request.POST.get('collab')
         like_number = request.POST.get('like_number')
@@ -205,48 +281,46 @@ def new_post(request): #postar post
         post_data = {'user_id': u_id}
         if description:
             post_data['description'] = description
-
         if roxotag:
-            #roxotags = roxotag.split("#")
-            roxotags = roxotag.replace(" ", "").replace("\t", "").replace("\n", "")
-            post_data['roxotags'] = roxotags
-
+            post_data['roxotags'] = parse_hashtags(roxotag)
         if like_number:
             post_data['like_number'] = like_number
-
         if comment:
             post_data['comment'] = comment
-
         if share:
             post_data['share'] = share
-
         if collab:
             collaborator = User.objects.filter(nick=collab).first()
             if collaborator:
-                collaborator_id = collaborator.user_id
-                post_data['collaborator_id'] = collaborator_id
+                post_data['collaborator_id'] = collaborator.user_id
 
         post_instance = Post.objects.create(**post_data)
-        for img in images:
-            if not img.content_type.startswith('image/'):
-                img_compativel = False
-                return HttpResponse("erro: formato de arquivo inválido")
-            else:
-                img_compativel = True
-                img_b64 = base64.b64encode(img.read()).decode('utf-8') #transforma a imagem em b64
-            if img_compativel:
-                Media.objects.create(post=post_instance, base64=img_b64)     
-        #parte que adiciona 1 ao numero de postagens do usuario
+
+        rejected = []
+        for f in files:
+            if not is_valid_media(f):
+                rejected.append(f.name)
+                continue
+
+            filename = f"{u_id}/{post_instance.id}/{make_storage_name(f.name)}"
+            public_url = upload_image(f, filename)
+            Media.objects.create(post=post_instance, image_url=public_url)
+
+        if rejected:
+            messages.warning(
+                request,
+                "Alguns arquivos não foram enviados (formato inválido ou muito grande): "
+                + ", ".join(rejected)
+            )
+
+        # Atualiza contador de artes
         user = request.user
         user.arts = Post.objects.filter(user=user).count()
-        user.save() #salva a quantidade de artes do user
-        nick = user.nick # passa o nick para o core_pg pq ele precisa pra atualizar as postagens no perfil
-        return core_pg(request, nick)
-        
-    else:
-        return HttpResponse('erro: algo deu errado na hora de criar seu post')
-        
+        user.save()
+        return core_pg(request, user.nick)
 
+    return HttpResponse('erro: algo deu errado na hora de criar seu post')
+        
         
 def delete_post(request, id):
     user = request.user
@@ -275,7 +349,11 @@ def follow(request, id):
         User.objects.filter(user_id=follower_id).update(following=F('following')+1)
         User.objects.filter(user_id=followed_id).update(followers=F('followers')+1)
         is_following = True
-
+    Notification.objects.create(
+        user= id,
+        actor=request.user.user_id,
+        type='follow'
+    )
     return JsonResponse({
         'is_following' : is_following,
     })
@@ -324,3 +402,43 @@ def interests(request):
                 for interesse in interesses
             ])
         return redirect('explore_pg')
+    
+def get_notifications(request):
+    notifications = request.user.notifications.filter(read=False).order_by('-created_at')
+    data = [
+        {
+            "message": n.get_message(),
+            "created_at": n.created_at.strftime("%d/%m/%Y %H:%M"),
+            "read": n.read
+        }
+        for n in notifications
+    ]
+    return JsonResponse({"notifications": data})
+
+def notifications_page(request):
+    notifications = request.user.notifications.order_by('-created_at')
+    return render(request, 'feed/notifications.html', {'notifications': notifications})
+
+
+def followers(request, nick):
+    perfil_user = get_object_or_404(User, nick=nick)
+    relacoes = Followers.objects.filter(user=perfil_user).select_related('follower')
+    seguidores = [r.follower for r in relacoes]
+
+    return render(request, 'users/core/follower.html', {
+        'perfil_user': perfil_user,
+        'usuarios': seguidores,
+        'titulo': 'Seguidores',
+    })
+
+
+def following(request, nick):
+    perfil_user = get_object_or_404(User, nick=nick)
+    relacoes = Followers.objects.filter(follower=perfil_user).select_related('user')
+    seguindo = [r.user for r in relacoes]
+
+    return render(request, 'users/core/follower.html', {
+        'perfil_user': perfil_user,
+        'usuarios': seguindo,
+        'titulo': 'Seguindo',
+    })

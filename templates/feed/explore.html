@@ -6,11 +6,15 @@
 
 {% block extra_head %}
 <style>
-    .shell {
-        width: calc(100% - 24px);
-        max-width: none;
-        margin: 0 12px;
-        padding-top: 12px;
+    /* `.shell` no mobile é governado pelo base.html — este bloco é emitido
+       depois do <style> dele e vazava para dentro das media queries de lá */
+    @media (min-width: 981px) {
+        .shell {
+            width: calc(100% - 24px);
+            max-width: none;
+            margin: 0 12px;
+            padding-top: 12px;
+        }
     }
     .explore-fallback-grid {
         display: grid;
@@ -53,10 +57,8 @@
     }
     .post-comments-modal {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
+        /* `100vw` inclui a scrollbar e deslocava o dialog centralizado */
+        inset: 0;
         z-index: 240;
         display: none;
         background: rgba(0, 0, 0, 0.42);
@@ -68,8 +70,8 @@
         justify-content: center;
     }
     .post-comments-dialog {
-        width: min(1320px, calc(100vw - 40px));
-        height: min(88vh, 820px);
+        width: min(1320px, calc(100% - 40px));
+        height: min(88dvh, 820px);
         display: grid;
         grid-template-columns: minmax(0, 1fr) 456px;
         overflow: hidden;
@@ -90,9 +92,9 @@
         height: 100%;
     }
     .post-comments-close {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
         padding: 0;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -169,9 +171,9 @@
         gap: 10px;
     }
     .post-comments-options-toggle {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
         padding: 0;
         border: 0;
         border-radius: 999px;
@@ -247,15 +249,15 @@
         border: 0;
     }
     .post-comments-form {
-        padding: 0;
+        /* o shorthand `padding: 0` apagava o padding-bottom de safe-area
+           que o base define em <=480px */
+        padding-block: 0 env(safe-area-inset-bottom);
+        padding-inline: 0;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
         display: grid;
         gap: 0;
         background: #1a1d22;
-        position: sticky;
-        bottom: 0;
         z-index: 2;
-        flex-shrink: 0;
     }
     .post-comments-form-row {
         display: grid;
@@ -282,6 +284,11 @@
         gap: 14px;
     }
     .post-comments-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
         padding: 0;
         border: 0;
         background: transparent;
@@ -324,6 +331,7 @@
     }
     /* Coração de duplo clique */
     .feed-media { position: relative; overflow: hidden; }
+
     .dblclick-heart {
         position: absolute;
         top: 50%; left: 50%;
@@ -356,6 +364,21 @@
         word-break: break-word;
         white-space: normal;
         line-height: 1.2;
+    }
+    /* esta página não renderiza `.social-rail`, mas o base mantinha a 2ª
+       trilha: o feed ficava descentralizado com ~274px de vão morto */
+    .social-layout {
+        grid-template-columns: minmax(0, 640px);
+        max-width: 640px;
+    }
+    .feed-card-header {
+        flex-wrap: wrap;
+    }
+    .feed-report-link {
+        min-height: var(--tap);
+        padding: 0 14px;
+        font-size: 0.8rem;
+        color: var(--muted);
     }
     .post-comments-feedback {
         padding: 0 16px 14px;
@@ -436,8 +459,8 @@
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
-        color: rgba(255, 255, 255, 0.44);
-        font-size: 0.74rem;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.78rem;
         text-transform: lowercase;
     }
 
@@ -454,12 +477,21 @@
         display: inline-flex;
     }
     .post-comments-pin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
         border: 0;
         background: transparent;
         color: rgba(255, 255, 255, 0.52);
         padding: 4px;
         opacity: 0;
         transition: opacity 160ms ease, color 160ms ease;
+    }
+    /* sem :hover em touch o botão de fixar era invisível e inutilizável */
+    @media (hover: none) {
+        .post-comments-pin { opacity: 1; }
     }
     .post-comments-comment:hover .post-comments-pin,
     .post-comments-comment.is-pinned .post-comments-pin {
@@ -480,7 +512,9 @@
         border-radius: 0;
         background: transparent;
         border: 0;
-        font-size: 0.92rem;
+        /* abaixo de 16px o iOS dá zoom ao focar — e este campo recebe focus()
+           automático quando o modal abre */
+        font-size: 16px;
         line-height: 1.35;
         transition: color 140ms ease, box-shadow 140ms ease;
     }
@@ -537,6 +571,9 @@
         color: var(--text);
     }
     .feed-comment-view-all {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
         padding: 0;
         border: 0;
         background: transparent;
@@ -569,23 +606,29 @@
             transform: translate3d(-100vw, 0, 0);
         }
     }
-    @media (max-width: 720px) {
-        .explore-suggestion-grid {
+    /* a sidebar de 456px espremia a imagem do post para 272px em 768px */
+    @media (max-width: 980px) {
+        .post-comments-dialog {
             grid-template-columns: 1fr;
+            grid-template-rows: auto minmax(0, 1fr);
         }
+    }
+    @media (max-width: 720px) {
         .post-comments-modal {
             padding: 0;
         }
         .post-comments-dialog {
             width: 100%;
-            height: 100vh;
+            /* `100vh` anulava o `100dvh` do base: o campo de comentário ficava
+               sob a barra do navegador, sem scroll possível */
+            height: 100dvh;
             max-height: none;
             border-radius: 0;
             grid-template-columns: 1fr;
         }
         .post-comments-media-frame img {
             max-width: 100%;
-            max-height: 46vh;
+            max-height: 46dvh;
         }
         .post-comments-side {
             min-height: 0;
@@ -608,7 +651,18 @@
             grid-template-columns: 1fr;
         }
     }
+    .feed-audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    }
 
+    .feed-audio audio {
+        width: 100%;
+    }
     /* ── MODO CLARO — Explore ───────────────────────────── */
     /* Cards de sugestão */
     [data-theme="light"] .explore-suggestion-card {
@@ -806,7 +860,7 @@
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
             <span class="social-nav-label">Mensagens</span>
         </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificações em breve" data-placeholder-copy="As notificações ainda precisam de eventos e persistência no backend.">
+        <a class="social-nav-link" href="{% url 'notifications' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
             <span class="social-nav-label">Notificações</span>
         </a>
@@ -888,15 +942,22 @@
                                     <small>{{ post.user.art_style|default_if_none:"artista" }}</small>
                                 </span>
                             </a>
+                            <a class="pill feed-report-link" href="{% url 'report' post.id %}">Reportar</a>
                             <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
                         </div>
                         {% for media in post.media.all %}
-                        <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
-                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}" class="lazy">
-                            <span class="dblclick-heart" aria-hidden="true">&#10084;</span>
-                        </button>
+                            {% if media.is_audio %}
+                                <div class="feed-media feed-audio">
+                                    <audio controls preload="none" src="{{ media.image_url }}">
+                                        Seu navegador não suporta áudio.
+                                    </audio>
+                                </div>
+                            {% else %}
+                                <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
+                                    <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                                </button>
+                            {% endif %}
                         {% endfor %}
-
                         <div class="feed-toolbar">
                             <div class="feed-toolbar-actions">
                                 <button class="feed-action-icon like-btn" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg>
@@ -911,6 +972,7 @@
                                 <button class="feed-action-icon" type="button" data-share-url="#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
                                 {% endif %}
                                 <button class="feed-action-icon save-btn" data-url="{% url 'save' post.id %}" data-save-post-id="{{ post.id }}" type="button"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+                                
                             </div>
                             <div class="feed-toolbar-meta"></div>
                         </div>
@@ -946,7 +1008,9 @@
                                             <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
                                         </button>
                                         {% for media in post.media.all %}
-                                            <img src="data:image/png;base64,{{ media.base64 }}" alt="{{ post.description }}">
+                                        <div class = "post-img-wrapper">
+                                        <img class = "post-real-img" loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                                        </div>
                                         {% endfor %}
                                     </div>
                                 </div>
@@ -1084,7 +1148,10 @@
     const storyStrip = document.querySelector('[data-story-strip]');
     const storyPrevBtn = document.querySelector('[data-story-prev]');
     const storyNextBtn = document.querySelector('[data-story-next]');
-    let storyScrollPosition = 0;
+    /* a tira agora rola nativamente (arrastar com o dedo); os botões apenas
+       empurram o scroll, em vez de aplicar um transform que a posição de
+       scroll do usuário ignoraria */
+    const storyContainer = storyStrip ? storyStrip.parentElement : null;
 
     document.addEventListener("DOMContentLoaded", function () {
     const LazyImages = document.querySelectorAll(".lazy");
@@ -1102,35 +1169,18 @@
     window.addEventListener("orientationchange", lazyLoad);
     });
     const updateStoryNavButtons = () => {
-        if (!storyStrip || !storyPrevBtn || !storyNextBtn) return;
+        if (!storyContainer || !storyPrevBtn || !storyNextBtn) return;
 
-        const container = storyStrip.parentElement;
-        const containerWidth = container.offsetWidth; // 990px
-        const contentWidth = storyStrip.scrollWidth;
-        const maxScroll = Math.max(0, contentWidth - containerWidth);
+        const maxScroll = storyContainer.scrollWidth - storyContainer.clientWidth;
 
-        storyPrevBtn.hidden = storyScrollPosition <= 0;
-        storyNextBtn.hidden = maxScroll <= 0 || storyScrollPosition >= maxScroll;
+        storyPrevBtn.hidden = storyContainer.scrollLeft <= 1;
+        storyNextBtn.hidden = maxScroll <= 1 || storyContainer.scrollLeft >= maxScroll - 1;
     };
 
     const scrollStories = (direction) => {
-        if (!storyStrip) return;
-
-        const container = storyStrip.parentElement;
-        const containerWidth = container.offsetWidth; // 990px
-        const scrollAmount = containerWidth; // Scroll exatamente 9 contas
-
-        if (direction === 'next') {
-            storyScrollPosition += scrollAmount;
-        } else {
-            storyScrollPosition -= scrollAmount;
-        }
-
-        const maxScroll = storyStrip.scrollWidth - containerWidth;
-        storyScrollPosition = Math.max(0, Math.min(storyScrollPosition, maxScroll));
-
-        storyStrip.style.transform = `translateX(-${storyScrollPosition}px)`;
-        updateStoryNavButtons();
+        if (!storyContainer) return;
+        const amount = storyContainer.clientWidth * 0.8;
+        storyContainer.scrollBy({ left: direction === 'next' ? amount : -amount, behavior: 'smooth' });
     };
 
     if (storyPrevBtn) {
@@ -1141,6 +1191,9 @@
         storyNextBtn.addEventListener('click', () => scrollStories('next'));
     }
 
+    if (storyContainer) {
+        storyContainer.addEventListener('scroll', updateStoryNavButtons, { passive: true });
+    }
     window.addEventListener('resize', updateStoryNavButtons);
 
     // Inicializa após o DOM estar totalmente carregado
@@ -1631,3 +1684,11 @@
 
 </script>
 {% endblock %}
+
+
+
+
+
+
+
+

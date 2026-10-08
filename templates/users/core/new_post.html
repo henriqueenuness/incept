@@ -266,7 +266,7 @@
     <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
 
     <aside class="social-nav">
-        <a class="social-nav-link" href="{% url 'explore_pg' %}">
+        <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
             <span class="social-nav-label">Página Inicial</span>
         </a>
@@ -274,19 +274,21 @@
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
             <span class="social-nav-label">Busca</span>
         </a>
-        <a class="social-nav-link is-active" href="{% url 'new_post_pg' user.nick %}">
+        {% if user.is_authenticated and request.user.cargo != "cliente" %}
+        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
             <span class="social-nav-label">Criar</span>
         </a>
+        {% endif %}
         <a class="social-nav-link" href="{% url 'cycle_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
             <span class="social-nav-label">Ciclo</span>
         </a>
-        <a class="social-nav-link" href="#" hidden>
+        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
             <span class="social-nav-label">Mensagens</span>
         </a>
-        <a class="social-nav-link" href="#" hidden>
+        <a class="social-nav-link" href="{% url 'notifications' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
             <span class="social-nav-label">Notificações</span>
         </a>
@@ -334,12 +336,19 @@
                     <form class="composer-form" action="{% url 'new_post' %}" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="composer-upload-row">
-                            <div class="composer-dropzone" data-dropzone>
-                                <input class="field composer-file-input" type="file" name="post_image" id="composer-file-input" accept="image/*" multiple data-post-image style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
-                                <svg viewBox="0 0 24 24" class="composer-dropzone-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <p class="composer-dropzone-label">Arraste aqui ou <span>clique para selecionar</span></p>
-                                <p class="composer-dropzone-sub">PNG, JPG, WEBP — múltiplas imagens permitidas</p>
-                            </div>
+                        <div class="composer-dropzone" data-dropzone>
+                            <input class="field composer-file-input" type="file" name="post_image" id="composer-file-input"
+                                accept="image/*,audio/mpeg,.mp3" multiple data-post-image
+                                style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
+                            <svg viewBox="0 0 24 24" class="composer-dropzone-icon">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <p class="composer-dropzone-label">Arraste aqui ou <span>clique para selecionar</span></p>
+                            <p class="composer-dropzone-sub">PNG, JPG, WEBP ou MP3 (até 20 MB) — múltiplos arquivos permitidos</p>
+                        </div>
+                        </div>
 
                             <div class="composer-upload-controls" data-upload-controls>
                                 <div class="composer-toggle-group">
@@ -411,6 +420,17 @@
     const removeImageButton = document.querySelector('[data-remove-image]');
     const submitPostButton = document.querySelector('[data-submit-post]');
     const dropzone = document.querySelector('[data-dropzone]');
+    const fileInput = document.getElementById('composer-file-input');
+    const MAX_SIZE = 15 * 1024 * 1024; // 15 MB em bytes
+    fileInput.addEventListener('change', function () {
+        for (const file of this.files) {
+            if (file.size > MAX_SIZE) {
+            alert(`O arquivo "${file.name}" excede o limite de 10 MB.`);
+            this.value = ""; // limpa o input para evitar envio
+        break;
+        }
+        }
+    });
 
     const showPreviews = (files) => {
         if (!previewBox) return;

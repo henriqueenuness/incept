@@ -19,6 +19,7 @@ from django.urls import path
 from accounts import views as accounts_views
 from feed import views as feed_views
 
+
 urlpatterns = [
     path('', accounts_views.home, name='home'),
     path('signup/',accounts_views.signup_pg, name='signup_pg'),
@@ -32,11 +33,20 @@ urlpatterns = [
 
     path('core/new-post/post', accounts_views.new_post, name='new_post'),
     path('core/post/delete/<str:id>', accounts_views.delete_post, name='delete_post'),
-    
+    path('core/follow/<id>/', accounts_views.follow, name='follow'),
+
+
+    path('core/<str:nick>/seguidores/', accounts_views.followers, name='followers'),
+    path('core/<str:nick>/seguindo/', accounts_views.following, name='following'),
+
+
     path('explore/', feed_views.explore_pg, name='explore_pg'),
     path('explore/like-post/<id>/', feed_views.like, name='like'),
     path('explore/comment/<id>', feed_views.comment, name = 'comment'),
     path('explore/save-post/<id>/', feed_views.save, name='save'),
+    path('', feed_views.explore, name='explore'),
+    path('explore/report/<int:post_id>/', feed_views.report_post, name='report'),
+    path('notifications/', accounts_views.notifications_page, name='notifications'),
     path('search/', feed_views.search_pg, name='search_pg'),
     path('search/user', feed_views.search_user, name='search_user'),
     path('cycle/', feed_views.cycle_pg, name='cycle_pg'),

@@ -18,12 +18,15 @@
     }
 
     .artist-page {
-        min-height: 100vh;
+        min-height: 100dvh;
         display: grid;
-        place-items: center;
+        /* `place-items:center` + `overflow:hidden` deixava o segundo card
+           abaixo da dobra e cortava o topo, sem scroll */
+        place-items: start center;
+        align-content: center;
         padding: 32px 20px;
         position: relative;
-        overflow: hidden;
+        overflow-x: clip;
     }
 
     .artist-page::before,
@@ -139,7 +142,11 @@
         justify-content: flex-end;
         min-height: 280px;
         transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
-        cursor: pointer;
+    }
+    /* o card anunciava `cursor:pointer` mas só o botão era clicável; em touch
+       não há hover para desambiguar e tocar o card não fazia nada */
+    @media (hover: none) {
+        .artist-card:focus-within .artist-card-bg { opacity: 0.44; }
     }
 
     .artist-card:hover {
@@ -237,7 +244,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 40px;
+        min-height: var(--tap);
         padding: 0 18px;
         border-radius: 999px;
         font: inherit;
@@ -272,9 +279,29 @@
         background: rgba(255, 255, 255, 0.09);
     }
 
-    @media (max-width: 540px) {
+    /* 540px era um breakpoint órfão, sem correspondência no base.html */
+    @media (max-width: 720px) {
         .artist-cards { grid-template-columns: 1fr; }
         .artist-card { min-height: 220px; }
+    }
+
+    @media (max-width: 480px) {
+        .artist-page { padding: 24px 14px; }
+        .artist-card { min-height: 190px; }
+        .artist-card-body { padding: 16px; }
+        /* o texto caía sobre a faixa transparente do gradiente */
+        .artist-card-overlay {
+            background: linear-gradient(180deg, transparent 8%, rgba(5, 10, 20, 0.92));
+        }
+        /* orbs de 500px e 400px animando sobre um viewport de 320px */
+        .artist-page::before,
+        .artist-page::after { display: none; }
+    }
+
+    @media (max-width: 400px) {
+        .artist-page { padding: 20px 12px; }
+        .artist-card { min-height: 170px; }
+        .artist-card-body { padding: 14px; gap: 10px; }
     }
 
     /* ── MODO CLARO ─────────────────────────────────────── */
