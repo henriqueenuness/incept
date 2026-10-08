@@ -34,10 +34,8 @@ def cycle_pg(request):
     comments = Comments.objects.all()
     #return HttpResponse(", ".join(str(x) for x in followings_ids))
     return render(request, 'feed/cycle.html',
-                    {'user' : user,
-                    'posts' : post,
+                    {'posts' : post,
                     'comments': comments,
-                    #'following': list(followings_ids)
                     })
 
 def search_user(request):
@@ -149,7 +147,7 @@ def comment(request, id):
         return JsonResponse({
             "ok": bool(comment),
             "comment": serialize_comment(comment) if comment else None,
-            "count": Post.comments_set.count(),
+            "count": postid.comments_set.count(),
         })
 
     return redirect(request.META.get('HTTP_REFERER', 'explore_pg'))

@@ -27,6 +27,7 @@ class Post(models.Model):
     comment = models.BooleanField(default=False, null=False)
     like_number = models.BooleanField(default=False, null=False)
     share = models.BooleanField(default=False, null=False)
+    roxotags =models.TextField(null=True)
 
 
 class Hashtags(models.Model):
@@ -82,3 +83,15 @@ class Saved(models.Model):
         on_delete=models.CASCADE,
         null = True
     )
+
+class Reports(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        null = True
+    )
+    reason = models.TextField(null=False)
