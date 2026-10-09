@@ -294,7 +294,7 @@
     <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
 
     <aside class="social-nav">
-        <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
             <span class="social-nav-label">Página Inicial</span>
         </a>
@@ -303,7 +303,7 @@
             <span class="social-nav-label">Busca</span>
         </a>
         {% if user.is_authenticated and request.user.cargo != "cliente" %}
-        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
+        <a class="social-nav-link is-active" href="{% url 'new_post_pg' user.nick %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
             <span class="social-nav-label">Criar</span>
         </a>
