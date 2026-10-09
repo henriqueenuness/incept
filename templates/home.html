@@ -733,6 +733,8 @@
         .premium-btn-muted { padding: 0 12px; font-size: 0.8rem; }
         .hero-title { font-size: clamp(1.95rem, 10vw, 2.6rem); }
         .hero-next-title { font-size: clamp(1.85rem, 9vw, 2.4rem); }
+        /* com o piso de 110px os cards da colagem cobriam o parágrafo do hero */
+        .hero-card { width: clamp(88px, calc(var(--size) * 1vw), 290px); }
         .content-section { padding: 3rem 0; }
         .section-panel { padding: 1.3rem; }
         .feature-item { padding: 16px; }
@@ -908,7 +910,7 @@
             { src: "{% static 'home/img-01.png' %}", ratio: "1 / 1", size: 12.4, top: 48, left: 2, sizeTablet: 12.8, topTablet: 49, leftTablet: 2, sizeMobile: 0, rotate: -10, parallaxX: 12, parallaxY: 10, driftX: 20, driftY: 34, zoom: 0.14, fadeStart: 0.56, fadeRate: 2.3, float: 13, brightness: 0.94 },
             { src: "{% static 'home/img-02.jpg' %}", ratio: "1.5 / 1", size: 13.8, top: 23, left: 4, sizeTablet: 15.6, topTablet: 24, leftTablet: 6, sizeMobile: 0, rotate: 7, parallaxX: -14, parallaxY: 10, driftX: -28, driftY: 20, zoom: 0.18, fadeStart: 0.54, fadeRate: 2.3, float: 15, brightness: 0.92 },
             { src: "{% static 'home/img-03.jpg' %}", ratio: "0.72 / 1", size: 10.8, top: 34, left: 12, sizeTablet: 12.4, topTablet: 34, leftTablet: 13, sizeMobile: 0, rotate: -6, parallaxX: 10, parallaxY: 15, driftX: 22, driftY: -12, zoom: 0.16, fadeStart: 0.58, fadeRate: 2.5, float: 14, brightness: 0.9 },
-            { src: "{% static 'home/img-04.jpg' %}", ratio: "1 / 1", size: 8.8, top: 58, left: 12, sizeTablet: 9.8, topTablet: 59, leftTablet: 13, sizeMobile: 8.6, topMobile: 67, leftMobile: 15, rotate: 11, parallaxX: -10, parallaxY: 12, driftX: -10, driftY: -26, zoom: 0.16, fadeStart: 0.6, fadeRate: 2.4, float: 16, brightness: 0.92 },
+            { src: "{% static 'home/img-04.jpg' %}", ratio: "1 / 1", size: 8.8, top: 58, left: 12, sizeTablet: 9.8, topTablet: 59, leftTablet: 13, sizeMobile: 8.6, topMobile: 72, leftMobile: 15, rotate: 11, parallaxX: -10, parallaxY: 12, driftX: -10, driftY: -26, zoom: 0.16, fadeStart: 0.6, fadeRate: 2.4, float: 16, brightness: 0.92 },
             { src: "{% static 'home/img-05.jpg' %}", ratio: "1.58 / 1", size: 15.2, top: 72, left: 20, sizeTablet: 16.4, topTablet: 73, leftTablet: 21, sizeMobile: 0, rotate: -8, parallaxX: 15, parallaxY: 10, driftX: 34, driftY: -18, zoom: 0.2, fadeStart: 0.53, fadeRate: 2.6, float: 14, brightness: 0.95 },
             { src: "{% static 'home/img-06.avif' %}", ratio: "0.74 / 1", size: 11.4, top: 80, left: 10, sizeTablet: 11.8, topTablet: 80, leftTablet: 11, sizeMobile: 0, rotate: 8, parallaxX: -10, parallaxY: 14, driftX: -12, driftY: -34, zoom: 0.14, fadeStart: 0.6, fadeRate: 2.1, float: 17, brightness: 0.88 },
             { src: "{% static 'home/img-07.avif' %}", ratio: "0.82 / 1", size: 16.8, top: 12, left: 79, sizeTablet: 17.2, topTablet: 13, leftTablet: 78, sizeMobile: 0, rotate: 7, parallaxX: -12, parallaxY: 14, driftX: -24, driftY: 34, zoom: 0.18, fadeStart: 0.54, fadeRate: 2.4, float: 15, brightness: 0.92 },

@@ -6,14 +6,17 @@
 
 {% block extra_head %}
 <style>
-    .shell {
-        width: calc(100% - 12px);
-        max-width: none;
-        margin: 0 6px 0 0;
-        padding-top: 12px;
-    }
-    .app-shell {
-        padding-left: 228px;
+    /* `.shell` e `.app-shell` abaixo de 981px são governados pelo base.html */
+    @media (min-width: 981px) {
+        .shell {
+            width: calc(100% - 12px);
+            max-width: none;
+            margin: 0 6px 0 0;
+            padding-top: 12px;
+        }
+        .app-shell {
+            padding-left: 228px;
+        }
     }
     .app-main {
         width: 100%;
@@ -22,7 +25,7 @@
     }
     .composer-page {
         width: min(100%, 980px);
-        min-height: calc(100vh - 32px);
+        min-height: calc(100vh / var(--zoom, 1) - 32px);
         padding: 8px 24px 32px;
         display: grid;
     }
@@ -250,13 +253,38 @@
     /* ── FIM MODO CLARO ─────────────────────────────────── */
 
     @media (max-width: 980px) {
-        .app-shell {
-            padding-left: 0;
-        }
+        /* o recuo de `.app-shell` vem do base: 88px com o rail (768–980), 0 abaixo */
         .composer-page {
             padding-left: 0;
             padding-right: 0;
         }
+    }
+    @media (max-width: 720px) {
+        .composer-panel { padding: 18px; border-radius: 24px; }
+        .composer-dropzone { padding: 26px 16px; }
+        .composer-dropzone-icon { width: 32px; height: 32px; }
+    }
+    @media (max-width: 480px) {
+        /* `.shell` é edge-to-edge aqui: o painel arredondado encostava na borda */
+        .composer-page { padding: 4px 10px 24px; }
+        .composer-panel { padding: 14px; border-radius: 20px; }
+        .composer-actions { flex-direction: column-reverse; align-items: stretch; }
+        .composer-actions .button,
+        .composer-actions .ghost-button,
+        .composer-actions a { width: 100%; min-height: 48px; }
+        .composer-toggle-item small { margin-left: 0; flex-basis: 100%; }
+        /* arrastar não existe em touch: o dropzone vira só um botão */
+        .composer-dropzone { padding: 20px 14px; }
+        .composer-dropzone-label { font-size: 0.94rem; }
+        .composer-dropzone-sub { font-size: 0.78rem; }
+    }
+    @media (max-width: 400px) {
+        .composer-panel { padding: 12px; }
+        .composer-preview-box { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    }
+    @media (hover: none) {
+        .composer-dropzone-label { font-size: 0; }
+        .composer-dropzone-label span { font-size: 0.96rem; }
     }
 </style>
 {% endblock %}
@@ -347,7 +375,6 @@
                             </svg>
                             <p class="composer-dropzone-label">Arraste aqui ou <span>clique para selecionar</span></p>
                             <p class="composer-dropzone-sub">PNG, JPG, WEBP ou MP3 (até 20 MB) — múltiplos arquivos permitidos</p>
-                        </div>
                         </div>
 
                             <div class="composer-upload-controls" data-upload-controls>

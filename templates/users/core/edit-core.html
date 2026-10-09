@@ -22,7 +22,7 @@
     }
     .editor-page {
         width: min(100%, 980px);
-        min-height: calc(100svh - 32px);
+        min-height: calc(100svh / var(--zoom, 1) - 32px);
         padding: 16px 24px 40px;
         display: grid;
         gap: 28px;
@@ -349,7 +349,7 @@
     }
     .photo-modal-dialog {
         width: min(100%, 560px);
-        max-height: calc(100dvh - 48px);
+        max-height: calc(100dvh / var(--zoom, 1) - 48px);
         overflow-y: auto;
         border-radius: 28px;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -536,6 +536,8 @@
         }
     }
     @media (max-width: 480px) {
+        /* `.shell` é edge-to-edge aqui: o painel arredondado encostava na borda */
+        .editor-page { padding-inline: 10px; }
         .editor-panel { padding: 16px 14px; border-radius: 22px; }
         .editor-section { padding: 14px; }
         .editor-avatar-trigger,

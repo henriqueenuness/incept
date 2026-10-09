@@ -25,7 +25,7 @@
         width: min(100%, 1520px);
         margin: 0 auto;
         padding-inline: clamp(12px, 1.6vw, 24px);
-        min-height: calc(100svh - 32px);
+        min-height: calc(100svh / var(--zoom, 1) - 32px);
         padding-bottom: 24px;
         border-radius: 0;
         border: 0;
@@ -299,9 +299,7 @@
     /* ── FIM MODO CLARO ─────────────────────────────────── */
 
     @media (max-width: 980px) {
-        .app-shell {
-            padding-left: 0;
-        }
+        /* o recuo de `.app-shell` vem do base: 88px com o rail (768–980), 0 abaixo */
         .profile-page {
             padding-left: 0;
             padding-right: 0;
