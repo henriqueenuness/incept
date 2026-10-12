@@ -1,54 +1,79 @@
-
-<style>
-.avatar-sm {
-    display: inline-block;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.avatar-sm img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.lista-usuarios {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.item-usuario {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    color: inherit;
-    padding: 8px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.item-usuario:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.item-usuario-info {
-    display: flex;
-    flex-direction: column;
-}
-</style>
 {% extends "base.html" %}
+
+{% block title %}{{ titulo }} de @{{ perfil_user.nick }} | Incept{% endblock %}
+
+{% block topbar %}{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* o <style> ficava antes da tag extends e o Django o descartava:
+       a página renderizava sem nenhum estilo próprio */
+    .follow-page {
+        width: min(100%, 640px);
+        margin: 0 auto;
+        display: grid;
+        gap: 16px;
+        padding: 8px 0 32px;
+    }
+    .follow-page h2 {
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.4rem, 4vw, 2.2rem);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        overflow-wrap: anywhere;
+    }
+    .lista-usuarios {
+        display: grid;
+        gap: 10px;
+    }
+    .item-usuario {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: var(--tap);
+        padding: 10px 14px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        transition: border-color 180ms ease, background 180ms ease;
+    }
+    .item-usuario:hover {
+        border-color: var(--line-strong);
+        background: rgba(155, 89, 255, 0.08);
+    }
+    .item-usuario-info {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+    }
+    /* nick e nome são strings do usuário sem ponto de quebra garantido */
+    .item-usuario-info strong,
+    .item-usuario-info span {
+        overflow-wrap: anywhere;
+    }
+    .follow-empty {
+        padding: 28px 16px;
+        text-align: center;
+    }
+    [data-theme="light"] .item-usuario {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(100, 40, 200, 0.10);
+    }
+
+    @media (max-width: 480px) {
+        .follow-page { padding-inline: 12px; }
+        .item-usuario { padding: 10px 12px; border-radius: 16px; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>{{ titulo }} de {{ perfil_user.nick }}</h2>
-    <section class="app-shell">
+<section class="app-shell">
     <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
 
     <aside class="social-nav">
-        <a class="social-nav-link is-active" href="{% url 'explore_pg' %}">
+        <a class="social-nav-link" href="{% url 'explore_pg' %}">
             <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
             <span class="social-nav-label">Página Inicial</span>
         </a>
@@ -101,29 +126,25 @@
         <span>Mensagens</span>
     </a>
 
-<div class="lista-usuarios">
-    {% for usuario in usuarios %}
-        <a href="{% url 'core_pg' usuario.nick %}" class="item-usuario">
-            <span class="avatar-sm">
-                <img src="data:image/png;base64,{{ usuario.core_picture }}" alt="{{ usuario.nick }}">
-            </span>
-            <div class="item-usuario-info">
-                <strong>{{ usuario.nick }}</strong>
-                {% if usuario.real_name %}
-                    <span class="muted">{{ usuario.real_name }}</span>
-                {% endif %}
+    <div class="app-main">
+        <section class="follow-page">
+            <h2>{{ titulo }} de @{{ perfil_user.nick }}</h2>
+            <div class="lista-usuarios">
+                {% for usuario in usuarios %}
+                <a href="{% url 'core_pg' usuario.nick %}" class="item-usuario">
+                    <span class="avatar"><img src="data:image/png;base64,{{ usuario.core_picture }}" alt="{{ usuario.nick }}"></span>
+                    <span class="item-usuario-info">
+                        <strong>@{{ usuario.nick }}</strong>
+                        {% if usuario.real_name %}
+                        <span class="muted">{{ usuario.real_name }}</span>
+                        {% endif %}
+                    </span>
+                </a>
+                {% empty %}
+                <p class="social-card follow-empty">Nenhum usuário encontrado.</p>
+                {% endfor %}
             </div>
-        </a>
-    {% empty %}
-        <p>Nenhum usuário encontrado.</p>
-    {% endfor %}
-</div>
+        </section>
+    </div>
+</section>
 {% endblock %}
-
-
-
-
-
-
-
-

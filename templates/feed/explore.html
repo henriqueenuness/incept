@@ -71,7 +71,7 @@
     }
     .post-comments-dialog {
         width: min(1320px, calc(100% - 40px));
-        height: min(88dvh, 820px);
+        height: min(calc(88dvh / var(--zoom, 1)), 820px);
         display: grid;
         grid-template-columns: minmax(0, 1fr) 456px;
         overflow: hidden;
@@ -369,6 +369,11 @@
        trilha: o feed ficava descentralizado com ~274px de vão morto */
     .social-layout {
         grid-template-columns: minmax(0, 640px);
+        max-width: 640px;
+    }
+    /* a tira ocupava a largura toda do `.app-main` e ficava encostada à
+       esquerda, desalinhada da coluna central do feed */
+    .story-strip-wrapper {
         max-width: 640px;
     }
     .feed-card-header {

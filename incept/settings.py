@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 from decouple import config
 from pathlib import Path
 from supabase import create_client
-
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,10 +25,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s)a@ly@c2x#7i$6z%pxq*#4bzaa8n93ccuqg332luwjod1eh)1'
+SECRET_KEY = os.getenv("DJANGO-PASSWORD")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'incept-p7gi.onrender.com', '.onrender.com']
 
@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-load_dotenv()
+
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
     'neon' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4

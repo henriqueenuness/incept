@@ -31,7 +31,7 @@
     }
     .post-comments-dialog {
         width: min(1320px, 100%);
-        height: min(94dvh, 1020px);
+        height: min(calc(94dvh / var(--zoom, 1)), 1020px);
         display: grid;
         grid-template-columns: minmax(0, 1fr) 456px;
         overflow: hidden;
