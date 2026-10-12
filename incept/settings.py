@@ -30,10 +30,7 @@ SECRET_KEY = os.getenv("DJANGO_PASSWORD")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 3600
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'incept-p7gi.onrender.com', '.onrender.com']
 
