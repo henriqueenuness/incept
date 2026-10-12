@@ -1158,6 +1158,21 @@
        scroll do usuário ignoraria */
     const storyContainer = storyStrip ? storyStrip.parentElement : null;
 
+    document.addEventListener("DOMContentLoaded", function () {
+    const LazyImages = document.querySelectorAll(".lazy");
+    const lazyLoad = function () {
+      lazyImages.forEach(function (img) {
+        if (img.getBoundingClientRect().top <= window.innerHeight && img.getBoundingClientRect().bottom >= 0 && getComputedStyle(img).display !== "none") {
+            img.src = img.dataset.src;
+            img.classList.remove("lazy");
+        }
+      });
+    };
+    lazyLoad();
+    document.addEventListener("scroll", lazyLoad);
+    window.addEventListener("resize", lazyLoad);
+    window.addEventListener("orientationchange", lazyLoad);
+    });
     const updateStoryNavButtons = () => {
         if (!storyContainer || !storyPrevBtn || !storyNextBtn) return;
 

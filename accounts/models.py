@@ -22,7 +22,16 @@ class UserManager(BaseUserManager): #fazer cadastro
         user.set_password(password)
         user.save(using='default')
         return user
-    
+
+class Links(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="links",
+    )
+    name = models.CharField(max_length=50)
+    url = models.TextField()
+ 
 class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
@@ -71,10 +80,12 @@ class User(AbstractBaseUser):
         default="",
     )
     last_nick_change = models.DateTimeField(null=True, blank=True)
+    # website field removed
 
     objects = UserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ['nick']
+
 
 
 class Followers(models.Model):
@@ -97,4 +108,5 @@ class Interests(models.Model):
         on_delete=models.CASCADE,
     )
         interest = models.CharField(max_length=50, null=True)
+
 
