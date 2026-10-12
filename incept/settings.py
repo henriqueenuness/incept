@@ -32,7 +32,7 @@ DEBUG = os.getenv("DEBUG")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'incept-p7gi.onrender.com', '.onrender.com']
+ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 
 
 # Application definition
