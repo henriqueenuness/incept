@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'neon' : dj_database_url.parse(DATABASE_URL), #neon - suporte para ipv6 e ipv4
+    'neon': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True), #neon - suporte para ipv6 e ipv4
 
     'default': {                                    #supabase - suporte para ipv6
         'ENGINE': 'django.db.backends.postgresql',
@@ -94,6 +94,8 @@ DATABASES = {
         'PASSWORD': os.getenv("password"),
         'HOST': os.getenv("host"),
         'PORT': os.getenv("port"),
+        'CONN_MAX_AGE': 600,
+        'OPTIONS': {'sslmode': 'require'},
         },
 
     'local': {
