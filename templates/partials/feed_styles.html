@@ -1,0 +1,832 @@
+{# Estilos do feed (cards, modal de comentários). Usado no explore e no ciclo. #}
+<style>
+    /* `.shell` no mobile é governado pelo base.html — este bloco é emitido
+       depois do <style> dele e vazava para dentro das media queries de lá */
+    @media (min-width: 981px) {
+        .shell {
+            width: calc(100% - 24px);
+            max-width: none;
+            margin: 0 12px;
+            padding-top: 12px;
+        }
+    }
+    .explore-fallback-grid {
+        display: grid;
+        gap: 14px;
+    }
+    .explore-fallback-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 220px;
+        padding: 22px;
+        border-radius: 30px;
+        border: 1px solid rgba(183, 229, 255, 0.12);
+        background:
+            linear-gradient(180deg, rgba(10, 20, 36, 0.86), rgba(7, 13, 24, 0.9)),
+            radial-gradient(circle at top right, rgba(155, 89, 255, 0.14), transparent 34%);
+        display: grid;
+        align-content: end;
+    }
+    .explore-fallback-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 38%),
+            var(--fallback-bg, linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0)));
+        opacity: 0.9;
+        pointer-events: none;
+    }
+    .explore-fallback-card > * {
+        position: relative;
+        z-index: 1;
+    }
+    .explore-fallback-card h3 {
+        font-family: "Montserrat", sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        letter-spacing: -0.04em;
+    }
+    .explore-fallback-card p {
+        max-width: 34ch;
+    }
+    .post-comments-modal {
+        position: fixed;
+        /* `100vw` inclui a scrollbar e deslocava o dialog centralizado */
+        inset: 0;
+        z-index: 240;
+        display: none;
+        background: rgba(0, 0, 0, 0.42);
+        backdrop-filter: blur(3px);
+    }
+    .post-comments-modal.is-visible {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .post-comments-dialog {
+        width: min(1320px, calc(100% - 40px));
+        height: min(calc(88dvh / var(--zoom, 1)), 820px);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 456px;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: #111318;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
+    }
+    .post-comments-media {
+        min-width: 0;
+        background: #000;
+        display: grid;
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-media-inner {
+        min-height: 0;
+        height: 100%;
+    }
+    .post-comments-close {
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
+        padding: 0;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(15, 17, 22, 0.68);
+        color: rgba(255, 255, 255, 0.82);
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        z-index: 3;
+    }
+    .post-comments-close:hover {
+        background: rgba(15, 17, 22, 0.86);
+        color: #fff;
+    }
+    .post-comments-close svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-media-frame {
+        min-height: 0;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        position: relative;
+        align-items: center;
+        justify-items: center;
+        overflow: hidden;
+    }
+    .post-comments-media-frame img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        object-position: center center;
+        display: block;
+        margin: auto;
+        border-radius: 0;
+        background: #000;
+    }
+    .post-comments-side {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        background: #1a1d22;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+    .post-comments-side-head {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-side-head .feed-card-author-copy strong {
+        font-size: 0.94rem;
+    }
+    .post-comments-side-head .avatar {
+        width: 34px;
+        height: 34px;
+    }
+    .post-comments-side-head-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .post-comments-options-toggle {
+        width: var(--tap);
+        height: var(--tap);
+        min-width: var(--tap);
+        padding: 0;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.82);
+    }
+    .post-comments-options-toggle:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-options-toggle svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+    }
+    .post-comments-options-menu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, calc(100vw - 32px));
+        display: none;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #262a31;
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.38);
+        z-index: 260;
+    }
+    .post-comments-options-menu.is-visible {
+        display: grid;
+    }
+    .post-comments-option {
+        width: 100%;
+        padding: 13px 16px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: #f4f7fb;
+        text-align: center;
+        font-size: 0.93rem;
+        font-weight: 500;
+    }
+    .post-comments-option:last-child {
+        border-bottom: 0;
+    }
+    .post-comments-option:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-option.is-danger {
+        color: #ff8e8e;
+    }
+    .post-comments-side-body {
+        min-height: 0;
+        max-height: 100%;
+        overflow-y: auto;
+        padding: 16px 18px 22px;
+        display: grid;
+        align-content: start;
+        gap: 14px;
+    }
+    .post-comments-side-body::-webkit-scrollbar {
+        width: 8px;
+    }
+    .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+    }
+    .post-comments-empty {
+        padding: 18px 0;
+        color: rgba(255, 255, 255, 0.58);
+        background: transparent;
+        text-align: center;
+        border: 0;
+    }
+    .post-comments-form {
+        /* o shorthand `padding: 0` apagava o padding-bottom de safe-area
+           que o base define em <=480px */
+        padding-block: 0 env(safe-area-inset-bottom);
+        padding-inline: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 0;
+        background: #1a1d22;
+        z-index: 2;
+    }
+    .post-comments-form-row {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 16px 12px;
+        transition: padding 140ms ease;
+    }
+    .post-comments-form-row.is-overflowing {
+        align-items: end;
+    }
+    .post-comments-actions {
+        padding: 12px 16px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+    }
+    .post-comments-actions-left,
+    .post-comments-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .post-comments-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #f7f8fa;
+    }
+    .post-comments-icon svg {
+        width: 29px;
+        height: 29px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.9;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-icon.like-btn svg {
+        width: 31px;
+        height: 31px;
+    }
+    .like-btn svg {
+        transition: fill 320ms cubic-bezier(0.22, 1, 0.36, 1), stroke 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        transform-origin: center;
+    }
+    .like-btn.liked svg {
+        fill: #ff304f;
+        stroke: #ff304f;
+        transform: scale(1.12);
+    }
+    .like-btn.liked:hover svg,
+    .like-btn:hover svg {
+        transform: scale(1.04);
+    }
+    .like-btn.is-animating svg {
+        animation: like-pop 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+    }
+    @keyframes like-pop {
+        0% { transform: scale(0.92); }
+        35% { transform: scale(1.18); }
+        65% { transform: scale(1.04); }
+        100% { transform: scale(1.12); }
+    }
+    /* Coração de duplo clique */
+    .feed-media { position: relative; overflow: hidden; }
+
+    .dblclick-heart {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 4rem;
+        color: var(--accent);
+        pointer-events: none;
+        opacity: 0;
+        text-shadow: 0 0 24px rgba(155,89,255,0.6);
+    }
+    .dblclick-heart.is-animating {
+        animation: heart-burst 700ms cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes heart-burst {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+        50% { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+    /* Animação do botão comentar */
+    [data-comment-toggle].is-clicking {
+        animation: comment-pulse 300ms ease;
+    }
+    @keyframes comment-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.22); }
+        100% { transform: scale(1); }
+    }
+    /* Nick com collab */
+    .feed-card-author-copy strong {
+        word-break: break-word;
+        white-space: normal;
+        line-height: 1.2;
+    }
+    /* esta página não renderiza `.social-rail`, mas o base mantinha a 2ª
+       trilha: o feed ficava descentralizado com ~274px de vão morto */
+    .social-layout {
+        grid-template-columns: minmax(0, 640px);
+        max-width: 640px;
+    }
+    /* a tira ocupava a largura toda do `.app-main` e ficava encostada à
+       esquerda, desalinhada da coluna central do feed */
+    .story-strip-wrapper {
+        max-width: 640px;
+    }
+    .feed-card-header {
+        flex-wrap: wrap;
+    }
+    .feed-report-link {
+        min-height: var(--tap);
+        padding: 0 14px;
+        font-size: 0.8rem;
+        color: var(--muted);
+    }
+    .post-comments-feedback {
+        padding: 0 16px 14px;
+        display: grid;
+        gap: 4px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-feedback strong {
+        color: #f7f8fa;
+    }
+    .post-comments-feedback span {
+        color: rgba(255, 255, 255, 0.46);
+        font-size: 0.84rem;
+    }
+    .post-comments-input-icon {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        color: rgba(255, 255, 255, 0.88);
+    }
+    .post-comments-input-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .post-comments-comment {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .post-comments-comment.is-pinned {
+        order: -1;
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(255, 255, 255, 0.09);
+    }
+    .post-comments-comment-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.08);
+    }
+    .post-comments-comment-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .post-comments-comment-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .post-comments-comment-copy {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+    }
+    .post-comments-comment-copy p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.92);
+        line-height: 1.5;
+        word-break: break-word;
+        font-size: 0.96rem;
+    }
+    .post-comments-comment-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: rgba(255, 255, 255, 0.52);
+        font-size: 0.78rem;
+        text-transform: lowercase;
+    }
+
+    .post-comments-pinned-badge {
+        display: none;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.09);
+        color: rgba(255, 255, 255, 0.84);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+    .post-comments-comment.is-pinned .post-comments-pinned-badge {
+        display: inline-flex;
+    }
+    .post-comments-pin {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--tap);
+        min-height: var(--tap);
+        border: 0;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.52);
+        padding: 4px;
+        opacity: 0;
+        transition: opacity 160ms ease, color 160ms ease;
+    }
+    /* sem :hover em touch o botão de fixar era invisível e inutilizável */
+    @media (hover: none) {
+        .post-comments-pin { opacity: 1; }
+    }
+    .post-comments-comment:hover .post-comments-pin,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        opacity: 1;
+    }
+    .post-comments-pin:hover,
+    .post-comments-comment.is-pinned .post-comments-pin {
+        color: #fff;
+    }
+    .post-comments-pin svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    .post-comments-form .field {
+        min-height: 26px;
+        padding: 6px 2px 6px 0;
+        border-radius: 0;
+        background: transparent;
+        border: 0;
+        /* abaixo de 16px o iOS dá zoom ao focar — e este campo recebe focus()
+           automático quando o modal abre */
+        font-size: 16px;
+        line-height: 1.35;
+        transition: color 140ms ease, box-shadow 140ms ease;
+    }
+    .post-comments-form textarea.field {
+        width: 100%;
+        resize: none;
+        overflow-y: hidden;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 68px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+        overscroll-behavior: contain;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar {
+        width: 6px;
+    }
+    .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.14);
+        border-radius: 999px;
+    }
+    .post-comments-form textarea.field.is-overflowing {
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    .post-comments-form .button {
+        min-height: auto;
+        padding: 0;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
+        color: rgba(243, 247, 251, 0.58);
+        box-shadow: none;
+        transition: color 180ms ease;
+    }
+    .post-comments-form .button.has-content {
+        color: var(--accent);
+    }
+    .feed-comments-preview {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+    }
+    .feed-comment-preview-item {
+        padding: 8px 0;
+    }
+    .feed-comment-preview-item p {
+        margin: 0;
+        color: #edf4fb;
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+    .feed-comment-preview-item strong {
+        color: var(--text);
+    }
+    .feed-comment-view-all {
+        display: inline-flex;
+        align-items: center;
+        min-height: var(--tap);
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font-size: 0.88rem;
+        text-align: left;
+        cursor: pointer;
+        transition: color 180ms ease;
+    }
+    .feed-comment-view-all:hover {
+        color: var(--text);
+    }
+    @keyframes onboarding-stage-enter {
+        0% {
+            opacity: 0;
+            transform: translate3d(0, 0, 0) scale(1.02);
+        }
+        100% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+    }
+    @keyframes onboarding-stage-exit {
+        0% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+        100% {
+            opacity: 0;
+            transform: translate3d(-100vw, 0, 0);
+        }
+    }
+    /* a sidebar de 456px espremia a imagem do post para 272px em 768px */
+    @media (max-width: 980px) {
+        .post-comments-dialog {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto minmax(0, 1fr);
+        }
+    }
+    @media (max-width: 720px) {
+        .post-comments-modal {
+            padding: 0;
+        }
+        .post-comments-dialog {
+            width: 100%;
+            /* `100vh` anulava o `100dvh` do base: o campo de comentário ficava
+               sob a barra do navegador, sem scroll possível */
+            height: 100dvh;
+            max-height: none;
+            border-radius: 0;
+            grid-template-columns: 1fr;
+        }
+        .post-comments-media-frame img {
+            max-width: 100%;
+            max-height: 46dvh;
+        }
+        .post-comments-side {
+            min-height: 0;
+        }
+        .post-comments-form-row {
+            grid-template-columns: 1fr;
+        }
+        .onboarding-stage {
+            grid-template-columns: 1fr;
+        }
+        .onboarding-aside {
+            padding: 22px 18px 12px;
+            gap: 18px;
+        }
+        .onboarding-panel {
+            padding: 18px;
+            align-content: start;
+        }
+        .onboarding-artist-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .feed-audio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    }
+
+    .feed-audio audio {
+        width: 100%;
+    }
+    /* ── MODO CLARO — Explore ───────────────────────────── */
+    /* Cards de sugestão */
+    [data-theme="light"] .explore-suggestion-card {
+        background: rgba(255, 255, 255, 0.72);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    /* Fallback cards */
+    [data-theme="light"] .explore-fallback-card {
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    /* Onboarding aside */
+    [data-theme="light"] .onboarding-aside {
+        background: linear-gradient(180deg, rgba(220,234,248,0.96), rgba(210,228,248,0.92));
+        border-right-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .onboarding-brand {
+        color: var(--text);
+    }
+    [data-theme="light"] .onboarding-progress-dot {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .onboarding-progress-dot.is-active {
+        background: var(--accent);
+        box-shadow: 0 0 0 8px rgba(0, 131, 176, 0.12);
+    }
+    [data-theme="light"] .onboarding-tag {
+        background: rgba(0, 60, 120, 0.06);
+        border-color: rgba(0, 60, 120, 0.14);
+        color: var(--text);
+    }
+    [data-theme="light"] .onboarding-tag.is-selected {
+        background: rgba(0, 131, 176, 0.14);
+        border-color: rgba(0, 131, 176, 0.30);
+    }
+    [data-theme="light"] .onboarding-artist-grid::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .onboarding-artist-card {
+        background: rgba(255, 255, 255, 0.80);
+        border-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .onboarding-follow-btn {
+        background: rgba(0, 60, 120, 0.08);
+        border-color: rgba(0, 131, 176, 0.20);
+        color: var(--text);
+    }
+    /* Modal de comentários (explore também tem) */
+    [data-theme="light"] .post-comments-modal {
+        background: rgba(160, 190, 220, 0.50);
+    }
+    [data-theme="light"] .post-comments-dialog {
+        background: #f5f8fc;
+        border-color: rgba(0, 60, 120, 0.10);
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-media {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-media-frame img {
+        background: #e4edf5;
+    }
+    [data-theme="light"] .post-comments-close {
+        background: rgba(240, 245, 252, 0.92);
+        border-color: rgba(0, 60, 120, 0.16);
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-close:hover {
+        background: rgba(220, 234, 248, 0.98);
+    }
+    [data-theme="light"] .post-comments-side {
+        background: #ffffff;
+        border-left: 1px solid rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-side-head {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-options-toggle {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-options-toggle:hover {
+        background: rgba(0, 0, 0, 0.06);
+    }
+    [data-theme="light"] .post-comments-options-menu {
+        background: #ffffff;
+        border-color: rgba(0, 60, 120, 0.12);
+        box-shadow: 0 24px 46px rgba(0, 0, 0, 0.14);
+    }
+    [data-theme="light"] .post-comments-option {
+        color: var(--text);
+        border-bottom-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-option:hover {
+        background: rgba(0, 0, 0, 0.04);
+    }
+    [data-theme="light"] .post-comments-option.is-danger {
+        color: #c0392b;
+    }
+    [data-theme="light"] .post-comments-side-body::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.18);
+    }
+    [data-theme="light"] .post-comments-empty {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form {
+        background: #ffffff;
+        border-top-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-feedback {
+        border-bottom-color: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-feedback strong {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-feedback span {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-input-icon {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-comment {
+        background: rgba(0, 60, 120, 0.04);
+        border-color: rgba(0, 60, 120, 0.08);
+    }
+    [data-theme="light"] .post-comments-comment.is-pinned {
+        background: rgba(0, 131, 176, 0.07);
+        border-color: rgba(0, 131, 176, 0.18);
+    }
+    [data-theme="light"] .post-comments-comment-avatar {
+        background: rgba(0, 60, 120, 0.10);
+    }
+    [data-theme="light"] .post-comments-comment-copy p {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-comment-meta {
+        color: var(--muted);
+    }
+
+    [data-theme="light"] .post-comments-pinned-badge {
+        background: rgba(108, 43, 217, 0.12);
+        color: #6c2bd9;
+    }
+    [data-theme="light"] .post-comments-pin {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-pin:hover,
+    [data-theme="light"] .post-comments-comment.is-pinned .post-comments-pin {
+        color: var(--text);
+    }
+    [data-theme="light"] .post-comments-form textarea.field {
+        scrollbar-color: rgba(0, 60, 120, 0.18) transparent;
+    }
+    [data-theme="light"] .post-comments-form textarea.field::-webkit-scrollbar-thumb {
+        background: rgba(0, 60, 120, 0.16);
+    }
+    [data-theme="light"] .post-comments-form .button {
+        color: var(--muted);
+    }
+    [data-theme="light"] .post-comments-form .button.has-content {
+        color: var(--accent);
+    }
+    [data-theme="light"] .feed-comment-preview-item p {
+        color: var(--text);
+    }
+    /* ── FIM MODO CLARO ─────────────────────────────────── */
+</style>

@@ -1,0 +1,213 @@
+{# Card de post + modal de comentários. Usado no explore e no ciclo (antes cada página tinha uma cópia, e a do ciclo estava desatualizada). #}
+{# Espera no contexto: post (com like_total, comment_total e comments_list), liked_ids, saved_ids, following_ids #}
+<article class="feed-card" id="post-{{ post.id }}">
+    <div class="feed-card-header">
+        <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+            <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+            <span class="feed-card-author-copy">
+                {% if post.collaborator_id %}
+                    <strong>@{{ post.user.nick }} e @{{ post.collaborator.nick }}</strong>
+                {% else %}
+                    <strong>@{{ post.user.nick }}</strong>
+                {% endif %}
+                <small>{{ post.user.get_art_style_display|default:"artista" }}</small>
+            </span>
+        </a>
+        {% if not user.is_authenticated or user.user_id != post.user.user_id %}
+        <a class="pill feed-report-link" href="{% url 'report' post.id %}">Reportar</a>
+        {% endif %}
+        <span class="feed-time" data-timestamp="{{ post.date.timestamp }}"></span>
+    </div>
+    {% for media in post.media.all %}
+        {% if media.is_audio %}
+            <div class="feed-media feed-audio">
+                <audio controls preload="none" src="{{ media.image_url }}">
+                    Seu navegador não suporta áudio.
+                </audio>
+            </div>
+        {% else %}
+            <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
+                <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                <span class="dblclick-heart" aria-hidden="true">&#9829;</span>
+            </button>
+        {% endif %}
+    {% endfor %}
+    <div class="feed-toolbar">
+        <div class="feed-toolbar-actions">
+            <button class="feed-action-icon like-btn{% if post.id in liked_ids %} liked{% endif %}" type="button" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}" aria-label="Curtir"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg>
+                {% if post.like_number %}
+                <span class="feed-action-count" data-like-count>{{ post.like_total }}</span>
+                {% endif %}
+            </button>
+            {% if post.comment %}
+            <button class="feed-action-icon" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg><span class="feed-action-count" data-comment-count>{{ post.comment_total }}</span></button>
+            {% endif %}
+            {% if post.share %}
+            <button class="feed-action-icon" type="button" data-share-url="{% url 'explore_pg' %}#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+            {% endif %}
+            <button class="feed-action-icon save-btn{% if post.id in saved_ids %} saved{% endif %}" type="button" data-url="{% url 'save' post.id %}" data-save-post-id="{{ post.id }}" aria-label="Salvar"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></button>
+        </div>
+        <div class="feed-toolbar-meta"></div>
+    </div>
+
+    {% if post.description %}
+    <p class="feed-card-copy"><strong>@{{ post.user.nick }}</strong> {{ post.description }}</p>
+    {% endif %}
+
+    {% if post.comment and post.comments_list %}
+    <div class="feed-comments-preview">
+        {% with first_comment=post.comments_list.0 %}
+        <div class="feed-comment-preview-item">
+            <p><strong>@{{ first_comment.user.nick|default:"usuario" }}</strong> {{ first_comment.content }}</p>
+        </div>
+        {% endwith %}
+        {% if post.comment_total > 1 %}
+        <button class="feed-comment-view-all" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}">
+            Ver todos os {{ post.comment_total }} comentários
+        </button>
+        {% endif %}
+    </div>
+    {% endif %}
+</article>
+
+<div class="post-comments-modal" id="comments-panel-{{ post.id }}" hidden aria-hidden="true" data-post-id="{{ post.id }}" data-post-owner-id="{{ post.user.user_id }}" data-comments-enabled="{{ post.comment|yesno:'true,false' }}" data-comments-url="{% url 'comments_api' post.id %}">
+    <div class="post-comments-dialog" role="dialog" aria-modal="true" aria-labelledby="comments-title-{{ post.id }}">
+        <section class="post-comments-media">
+            <div class="post-comments-media-inner">
+                <div class="post-comments-media-frame">
+                    <button class="post-comments-close" type="button" data-comment-close aria-label="Fechar comentários">
+                        <svg viewBox="0 0 24 24"><path d="M6 6l12 12"></path><path d="M18 6 6 18"></path></svg>
+                    </button>
+                    {% for media in post.media.all %}
+                    <div class="post-img-wrapper">
+                        {% if media.is_audio %}
+                        <audio controls preload="none" src="{{ media.image_url }}">Seu navegador não suporta áudio.</audio>
+                        {% else %}
+                        <img class="post-real-img" loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="post-img-wrapper">
+                        <p class="feed-card-copy">{{ post.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <aside class="post-comments-side">
+            <div class="post-comments-side-head">
+                <a class="feed-card-author" href="{% url 'core_pg' post.user.nick %}">
+                    <span class="avatar"><img src="data:image/png;base64,{{ post.user.core_picture }}" alt="{{ post.user.nick }}"></span>
+                    <span class="feed-card-author-copy">
+                        {% if post.collaborator_id %}
+                        <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }} e @{{ post.collaborator.nick }}</strong>
+                        {% else %}
+                        <strong id="comments-title-{{ post.id }}">@{{ post.user.nick }}</strong>
+                        {% endif %}
+                    </span>
+                </a>
+                <div class="post-comments-side-head-actions">
+                    <button class="post-comments-options-toggle" type="button" data-options-toggle aria-label="Mais opções">
+                        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>
+                    </button>
+                    <div class="post-comments-options-menu" data-options-menu>
+                        {% if user.is_authenticated and user.user_id == post.user.user_id %}
+                        <button class="post-comments-option is-danger" type="button" data-delete-post data-url="{% url 'delete_post' post.id %}" data-post-id="{{ post.id }}">Apagar post</button>
+                        {% else %}
+                        <a class="post-comments-option is-danger" href="{% url 'report' post.id %}">Denunciar</a>
+                        {% if user.is_authenticated %}
+                        <button class="post-comments-option" type="button" data-follow-menu data-follow-user-id="{{ post.user.user_id }}" data-url="{% url 'follow' post.user.user_id %}">{% if post.user.user_id in following_ids %}Deixar de seguir{% else %}Seguir{% endif %}</button>
+                        {% else %}
+                        <a class="post-comments-option" href="{% url 'login_pg' %}?next={{ request.get_full_path|urlencode }}">Entrar para seguir</a>
+                        {% endif %}
+                        {% endif %}
+                        {% if post.share %}
+                        <button class="post-comments-option" type="button" data-share-url="{% url 'explore_pg' %}#post-{{ post.id }}">Compartilhar</button>
+                        {% endif %}
+                        <button class="post-comments-option" type="button" data-copy-link="{% url 'explore_pg' %}#post-{{ post.id }}">Copiar link</button>
+                        <button class="post-comments-option" type="button" data-options-close>Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="post-comments-side-body" data-comment-list>
+                {% if not post.comment %}
+                    <div class="post-comments-empty" data-comment-empty>
+                        O artista desativou os comentários.
+                    </div>
+                {% else %}
+                    {% for comment in post.comments_list %}
+                    <article class="post-comments-comment" data-comment-entry data-comment-id="{{ comment.id }}">
+                        <div class="post-comments-comment-avatar">
+                            <img src="data:image/png;base64,{{ comment.user.core_picture }}" alt="{{ comment.user.nick }}">
+                        </div>
+                        <div class="post-comments-comment-head">
+                            <div class="post-comments-comment-copy">
+                                <p><strong>@{{ comment.user.nick|default:"usuario" }}</strong> {{ comment.content }}</p>
+                                <div class="post-comments-comment-meta">
+                                    <span>há {{ comment.date|timesince }}</span>
+                                    <span class="post-comments-pinned-badge">Fixado</span>
+                                </div>
+                            </div>
+                            {% if user.is_authenticated and user.user_id == post.user.user_id %}
+                            <button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">
+                                <svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </article>
+                    {% empty %}
+                    <div class="post-comments-empty" data-comment-empty>
+                        Nenhum comentário ainda. Abra a conversa por aqui.
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% if user.is_authenticated %}
+            <form class="post-comments-form" action="{% url 'comment' post.id %}" method="POST" data-comment-form>
+                {% csrf_token %}
+                <div class="post-comments-actions">
+                    <div class="post-comments-actions-left">
+                        <button class="post-comments-icon like-btn{% if post.id in liked_ids %} liked{% endif %}" type="button" data-url="{% url 'like' post.id %}" data-like-post-id="{{ post.id }}" aria-label="Curtir"><svg viewBox="0 0 24 24"><path d="M12 20.5 5.8 14.3a4.6 4.6 0 0 1 0-6.6 4.5 4.5 0 0 1 6.4 0L12 8l-.2-.3a4.5 4.5 0 0 1 6.4 0 4.6 4.6 0 0 1 0 6.6Z"></path></svg></button>
+                        {% if post.comment %}
+                        <button class="post-comments-icon" type="button" data-focus-comment aria-label="Comentar"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></button>
+                        {% endif %}
+                        {% if post.share %}
+                        <button class="post-comments-icon" type="button" data-share-url="{% url 'explore_pg' %}#post-{{ post.id }}" aria-label="Compartilhar"><svg viewBox="0 0 24 24"><path d="M22 2 11 13"></path><path d="m22 2-7 20-4-9-9-4Z"></path></svg></button>
+                        {% endif %}
+                    </div>
+                    <div class="post-comments-actions-right">
+                        <button class="post-comments-icon save-btn{% if post.id in saved_ids %} saved{% endif %}" type="button" data-url="{% url 'save' post.id %}" data-save-post-id="{{ post.id }}" aria-label="Salvar"><svg viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z"></path></svg></button>
+                    </div>
+                </div>
+                <div class="post-comments-feedback">
+                    {% if post.like_number %}
+                        {% if post.like_total %}
+                        <strong data-like-summary>{{ post.like_total }} curtida{{ post.like_total|pluralize }}</strong>
+                        {% else %}
+                        <strong data-like-summary>Seja a primeira pessoa a curtir isso</strong>
+                        {% endif %}
+                    {% endif %}
+                    <span>há {{ post.date|timesince }}</span>
+                </div>
+                {% if post.comment %}
+                <div class="post-comments-form-row">
+                    <span class="post-comments-input-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 14.5s1.5 2 3.5 2 3.5-2 3.5-2"></path><path d="M9 9.5h.01"></path><path d="M15 9.5h.01"></path></svg>
+                    </span>
+                    <textarea class="field" name="comment-content" rows="1" maxlength="255" placeholder="Escreva um comentário" data-comment-input></textarea>
+                    <button class="button" type="submit">Postar</button>
+                </div>
+                {% endif %}
+            </form>
+            {% else %}
+            <div class="post-comments-form">
+                <div class="post-comments-feedback">
+                    <strong><a href="{% url 'login_pg' %}?next={{ request.get_full_path|urlencode }}">Entre</a> para curtir e comentar</strong>
+                    <span>há {{ post.date|timesince }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+    </div>
+</div>

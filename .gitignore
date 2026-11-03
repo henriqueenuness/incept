@@ -29,6 +29,9 @@ venv/
 Mensagens
 *.png
 *.jpg
+# imagens usadas pelos templates precisam ir pro deploy (new_artist.html usa estas)
+!static/anime-girl-8663780_1280.jpg
+!static/leitoranime.jpg
 cosmos-copy/
 AGENTS.md
 

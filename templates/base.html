@@ -1632,6 +1632,86 @@
             }
         }
     </style>
+    <script>
+        /* Tema por conta: roda no <head>, antes da página aparecer. Antes rodava no fim do <body>
+           e a tela piscava escura antes de virar clara. localStorage pode falhar (aba anônima), por isso o try. */
+        (function () {
+            try {
+                var nick = "{{ user.nick|escapejs|default:'' }}";
+                var stored = localStorage.getItem(nick ? "inceptTheme_" + nick : "inceptTheme");
+                if (stored === "light") {
+                    document.documentElement.setAttribute("data-theme", "light");
+                }
+            } catch (error) {}
+        })();
+        /* Aviso rápido no canto da tela, usado pelas páginas (window.inceptToast("texto", "error")) */
+        window.inceptToast = function (message, kind) {
+            var box = document.querySelector("[data-toasts]");
+            if (!box) {
+                box = document.createElement("div");
+                box.className = "app-toasts";
+                box.setAttribute("data-toasts", "");
+                box.setAttribute("aria-live", "polite");
+                document.body.appendChild(box);
+            }
+            var item = document.createElement("div");
+            item.className = "app-toast" + (kind ? " app-toast-" + kind : "");
+            item.setAttribute("role", kind === "error" ? "alert" : "status");
+            item.textContent = message;
+            box.appendChild(item);
+            window.setTimeout(function () {
+                item.classList.add("is-leaving");
+                window.setTimeout(function () { item.remove(); }, 300);
+            }, 4200);
+        };
+    </script>
+    <style>
+        .app-toasts {
+            position: fixed;
+            left: 50%;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            transform: translateX(-50%);
+            z-index: 400;
+            display: grid;
+            gap: 10px;
+            width: min(440px, calc(100vw - 32px));
+            pointer-events: none;
+        }
+        .app-toast {
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(155, 89, 255, 0.28);
+            background: #1d0d36;
+            color: #f3f7fb;
+            font-size: 0.92rem;
+            line-height: 1.4;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+            pointer-events: auto;
+            animation: app-toast-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: opacity 260ms ease, transform 260ms ease;
+        }
+        .app-toast-error { border-color: rgba(255, 99, 99, 0.5); }
+        .app-toast-success { border-color: rgba(80, 200, 140, 0.5); }
+        .app-toast-warning { border-color: rgba(255, 180, 80, 0.5); }
+        .app-toast.is-leaving { opacity: 0; transform: translateY(6px); }
+        [data-theme="light"] .app-toast {
+            background: #ffffff;
+            color: #1a0d2b;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+        }
+        @keyframes app-toast-in {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* post salvo (antes o botão não mudava de aparência ao salvar) */
+        .save-btn.saved svg {
+            fill: currentColor;
+        }
+        .logout-modal-actions form {
+            flex: 1;
+            display: flex;
+        }
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -1663,6 +1743,11 @@
         {% endblock %}
         {% block content %}{% endblock %}
     </div>
+    <div class="app-toasts" data-toasts aria-live="polite">
+        {% for message in messages %}
+        <div class="app-toast{% if message.tags %} app-toast-{{ message.tags }}{% endif %}" role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}" data-toast>{{ message }}</div>
+        {% endfor %}
+    </div>
     <div class="logout-modal" data-logout-modal hidden>
         <div class="logout-modal-dialog" role="dialog" aria-modal="true" aria-label="Confirmar saída">
             <div class="logout-modal-icon">
@@ -1672,7 +1757,10 @@
             <p>Você precisará entrar novamente para acessar seu perfil.</p>
             <div class="logout-modal-actions">
                 <button class="ghost-button" type="button" data-logout-cancel>Cancelar</button>
-                <a class="logout-confirm-btn" href="{% url 'logout' %}" data-logout-confirm>Sair</a>
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="logout-confirm-btn" type="submit" data-logout-confirm>Sair</button>
+                </form>
             </div>
         </div>
     </div>
@@ -1786,7 +1874,6 @@
             border: 1px solid rgba(155, 89, 255, 0.18);
             background: #16082a;
             box-shadow: 0 30px 70px rgba(0, 0, 0, 0.48);
-            overflow: hidden;
         }
         .display-settings-header {
             padding: 18px 20px;
@@ -1873,15 +1960,6 @@
     </div>
     {% block scripts %}{% endblock %}
     <script>
-        /* Inicialização do tema por conta — roda antes de qualquer paint */
-        (function() {
-            var nick = "{{ user.nick|escapejs|default:'' }}";
-            if (!nick) return;
-            var stored = localStorage.getItem("inceptTheme_" + nick);
-            if (stored === "light") {
-                document.documentElement.setAttribute("data-theme", "light");
-            }
-        })();
         (() => {
             const defaultAvatar = "data:image/svg+xml;utf8," + encodeURIComponent(`
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
@@ -2023,9 +2101,26 @@
                 });
             }
 
+            document.querySelectorAll('[data-placeholder-action]').forEach((trigger) => {
+                trigger.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const title = trigger.dataset.placeholderTitle || 'Em breve';
+                    const copy = trigger.dataset.placeholderCopy || '';
+                    const menu = trigger.closest('details');
+                    if (menu) menu.open = false;
+                    window.inceptToast(copy ? `${title}. ${copy}` : title);
+                });
+            });
+            document.querySelectorAll('[data-toast]').forEach((item) => {
+                window.setTimeout(() => {
+                    item.classList.add('is-leaving');
+                    window.setTimeout(() => item.remove(), 300);
+                }, 5200);
+            });
+
             /* ── Display Settings + Tema (global) ── */
             const displaySettingsModal = document.querySelector('[data-display-settings-modal]');
-            const displaySettingsToggle = document.querySelector('[data-display-settings-toggle]');
+            const displaySettingsToggles = document.querySelectorAll('[data-display-settings-toggle]');
             const displaySettingsClose = document.querySelector('[data-display-settings-close]');
             const darkModeToggle = document.querySelector('[data-dark-mode-toggle]');
 
@@ -2042,9 +2137,13 @@
                 document.body.style.overflow = '';
             };
 
-            if (displaySettingsToggle) {
-                displaySettingsToggle.addEventListener('click', openDisplaySettings);
-            }
+            displaySettingsToggles.forEach((toggle) => {
+                toggle.addEventListener('click', () => {
+                    const menu = toggle.closest('details');
+                    if (menu) menu.open = false;
+                    openDisplaySettings();
+                });
+            });
             if (displaySettingsClose) {
                 displaySettingsClose.addEventListener('click', closeDisplaySettings);
             }
@@ -2060,7 +2159,9 @@
             }
 
             const themeUserNick = "{{ user.nick|escapejs|default:'' }}";
-            const themeKey = themeUserNick ? ("inceptTheme_" + themeUserNick) : null;
+            const themeKey = themeUserNick ? ("inceptTheme_" + themeUserNick) : "inceptTheme";
+            const readTheme = () => { try { return localStorage.getItem(themeKey); } catch (error) { return null; } };
+            const writeTheme = (value) => { try { localStorage.setItem(themeKey, value); } catch (error) {} };
             const applyTheme = (isLight) => {
                 if (isLight) {
                     document.documentElement.setAttribute("data-theme", "light");
@@ -2069,14 +2170,14 @@
                 }
             };
             if (darkModeToggle && themeKey) {
-                const stored = localStorage.getItem(themeKey);
+                const stored = readTheme();
                 const isCurrentlyDark = stored !== "light";
                 darkModeToggle.classList.toggle("is-active", isCurrentlyDark);
                 darkModeToggle.addEventListener("click", () => {
                     const darkNow = darkModeToggle.classList.toggle("is-active");
                     const lightNow = !darkNow;
                     applyTheme(lightNow);
-                    localStorage.setItem(themeKey, lightNow ? "light" : "dark");
+                    writeTheme(lightNow ? "light" : "dark");
                 });
             }
         })();

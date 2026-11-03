@@ -44,7 +44,6 @@ urlpatterns = [
     path('explore/like-post/<id>/', feed_views.like, name='like'),
     path('explore/comment/<id>', feed_views.comment, name = 'comment'),
     path('explore/save-post/<id>/', feed_views.save, name='save'),
-    path('', feed_views.explore, name='explore'),
     path('explore/report/<int:post_id>/', feed_views.report_post, name='report'),
     path('notifications/', accounts_views.notifications_page, name='notifications'),
     path('search/', feed_views.search_pg, name='search_pg'),
@@ -58,7 +57,6 @@ urlpatterns = [
     path("explore/comment/<id>/list", feed_views.comments_api, name="comments_api"), #funcao criada pelo miguel
 
     path('core/<str:nick>/', accounts_views.core_pg, name='core_pg'),
-    path('core/follow/<id>/', accounts_views.follow, name='follow'),
 
     path('interests/', accounts_views.interests_pg, name='interests_pg'),
     path('interests/post', accounts_views.interests, name='interests'),

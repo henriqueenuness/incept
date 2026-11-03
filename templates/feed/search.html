@@ -36,6 +36,22 @@
         background: rgba(255, 255, 255, 0.05);
         color: var(--text);
     }
+    a.search-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .search-filter-chip.is-active {
+        border-color: rgba(155, 89, 255, 0.55);
+        background: rgba(155, 89, 255, 0.18);
+    }
+    [data-theme="light"] .search-filter-chip.is-active {
+        border-color: rgba(100, 40, 200, 0.45);
+        background: rgba(100, 40, 200, 0.12);
+    }
+    .search-follow {
+        margin-top: 12px;
+    }
     .search-avatar {
         width: 64px;
         height: 64px;
@@ -139,61 +155,7 @@
 
 {% block content %}
 <section class="app-shell">
-    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
-
-    <aside class="social-nav">
-        <a class="social-nav-link" href="{% url 'explore_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
-        </a>
-        <a class="social-nav-link is-active" href="{% url 'search_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
-            <span class="social-nav-label">Busca</span>
-        </a>
-        {% if user.is_authenticated and request.user.cargo != "cliente" %}
-        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
-            <span class="social-nav-label">Criar</span>
-        </a>
-        {% endif %}
-        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
-            <span class="social-nav-label">Ciclo</span>
-        </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A área de mensagens ainda depende da implementação do backend.">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
-            <span class="social-nav-label">Mensagens</span>
-        </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Notificações em breve" data-placeholder-copy="As notificações ainda precisam de eventos reais no backend.">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificações</span>
-        </a>
-        {% if user.is_authenticated %}
-        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
-            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
-            <span class="social-nav-label">Perfil</span>
-        </a>
-        {% endif %}
-    </aside>
-
-    <details class="social-more">
-        <summary>
-            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
-            <span class="social-more-label">Mais</span>
-        </summary>
-        <div class="social-more-menu">
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Configurações em breve" data-placeholder-copy="Salvar preferências do usuário ainda depende do backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M12 18v3"></path><path d="m4.93 4.93 2.12 2.12"></path><path d="m16.95 16.95 2.12 2.12"></path><path d="M3 12h3"></path><path d="M18 12h3"></path><path d="m4.93 19.07 2.12-2.12"></path><path d="m16.95 7.05 2.12-2.12"></path><circle cx="12" cy="12" r="3.5"></circle></svg><span>Configura&ccedil;&otilde;es</span></span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Salvos em breve" data-placeholder-copy="A área visual existe, mas salvar de verdade ainda depende de persistência no backend."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"></path></svg><span>Salvos</span></span></button>
-            <button class="social-more-item" type="button" data-display-settings-toggle style="border:0;background:transparent;color:var(--text);width:100%;padding:12px 18px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;flex-shrink:0;"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"></path></svg><span>Alternar exibi&ccedil;&atilde;o</span></button>
-            <button class="placeholder-link" type="button" data-placeholder-action data-placeholder-title="Relatar problema em breve" data-placeholder-copy="O envio real de relatos ainda precisa de um endpoint proprio."><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M12 9v4"></path><path d="M12 17h.01"></path><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg><span>Relatar problema</span></span></button>
-            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
-        </div>
-    </details>
-
-    <a class="messages-fab" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A área está reservada na interface, mas o fluxo real ainda não foi implementado.">
-        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
-        <span>Mensagens</span>
-    </a>
+    {% include "partials/app_nav.html" with active="search" %}
 
     <div class="app-main">
         <section class="social-layout">
@@ -204,16 +166,15 @@
                         <p class="lead">Menos formulário, menos texto solto e uma identificação mais clara entre artista e cliente.</p>
                     </div>
                     <form class="search-form" action="{% url 'search_user' %}" method="GET">
-                        {% csrf_token %}
+                        {% if filtro %}<input type="hidden" name="filtro" value="{{ filtro }}">{% endif %}
                         <div class="feed-comment-form" style="margin-top:0;">
                             <input class="field" name="search" placeholder="Busque por nick, nome ou estilo" value="{{ search }}">
                             <button class="button" type="submit">Buscar</button>
                         </div>
                         <div class="search-filter-row">
-                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="O filtro visual já está pronto, mas o filtro real ainda depende da busca no backend.">Artistas</button>
-                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="O filtro visual já está pronto, mas o filtro real ainda depende da busca no backend.">Clientes</button>
-                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="Os filtros por linguagem ainda precisam de suporte real no backend.">Ilustração</button>
-                            <button class="search-filter-chip" type="button" data-placeholder-action data-placeholder-title="Filtro em breve" data-placeholder-copy="Os filtros por linguagem ainda precisam de suporte real no backend.">Video</button>
+                            {% for chave, rotulo in filtros_busca %}
+                            <a class="search-filter-chip{% if filtro == chave %} is-active{% endif %}" href="{% url 'search_user' %}?search={{ search|urlencode }}{% if filtro != chave %}&amp;filtro={{ chave }}{% endif %}">{{ rotulo }}</a>
+                            {% endfor %}
                         </div>
                     </form>
                 </article>
@@ -228,7 +189,7 @@
                                 </span>
                             </a>
                         </div>
-                        <p class="feed-card-copy">{{ post.description }}</p>
+                        {% if post.description %}<p class="feed-card-copy">{{ post.description }}</p>{% endif %}
 
                         {% for media in post.media.all %}
                             {% if media.is_audio %}
@@ -238,15 +199,15 @@
                                     </audio>
                                 </div>
                             {% else %}
-                                <button class="feed-media feed-media-button" type="button" data-comment-toggle data-target="comments-panel-{{ post.id }}" data-dblclick-like data-like-url="{% url 'like' post.id %}" data-post-id="{{ post.id }}" aria-label="Ver comentários">
+                                <a class="feed-media" href="{% url 'explore_pg' %}#post-{{ post.id }}">
                                     <img loading="lazy" src="{{ media.image_url }}" alt="{{ post.description }}">
-                                </button>
+                                </a>
                             {% endif %}
                         {% endfor %}
 
                         <div class="feed-toolbar-meta">
                             {% for tag in post.roxotags %}
-                            <a class="tag" href="{% url 'search_user' %}?search=%23{{ tag }}">#{{ tag }}</a>
+                            <a class="tag" href="{% url 'search_user' %}?search=%23{{ tag|urlencode }}">#{{ tag }}</a>
                             {% endfor %}
                         </div>
                     </article>
@@ -260,34 +221,36 @@
                                 <span class="avatar-lg search-avatar"><img src="data:image/png;base64,{{ perfil.core_picture }}" alt="{{ perfil.nick }}"></span>
                                 <span class="feed-card-author-copy">
                                     <strong>@{{ perfil.nick }}</strong>
-                                    <small>{{ perfil.real_name|default_if_none:"Sem nome publico" }}</small>
-                                    {% if request.user.is_authenticated and perfil.user_id != request.user.user_id %}
-                                    <small class="feed-card-copy">{% if perfil.user_id in following %}Seguindo{% endif %}</small>
-                                    {% endif %}
+                                    <small>{{ perfil.real_name|default:"Sem nome público" }}</small>
                                 </span>
                             </a>
                             <span class="tag search-role {% if perfil.cargo == 'cliente' %}is-client{% endif %}">{{ perfil.cargo }}</span>
                         </div>
                         <div class="search-card-copy">
-                            <p class="feed-card-copy">{{ perfil.bio|default_if_none:"Este perfil ainda não escreveu uma bio." }}</p>
+                            <p class="feed-card-copy">{{ perfil.bio|default:"Este perfil ainda não escreveu uma bio." }}</p>
                             <div class="feed-toolbar" style="margin-top:0;">
                                 <div class="feed-toolbar-meta">
                                     {% if perfil.art_style %}
-                                    <span class="tag">{{ perfil.art_style }}</span>
+                                    <span class="tag">{{ perfil.get_art_style_display }}</span>
                                     {% endif %}
                                 </div>
                             </div>
+                            {% if request.user.is_authenticated and perfil.user_id != request.user.user_id %}
+                            <div class="search-follow">
+                                <button class="{% if perfil.user_id in following %}ghost-button{% else %}button{% endif %} follow-btn" type="button" data-url="{% url 'follow' perfil.user_id %}">{% if perfil.user_id in following %}Seguindo{% else %}Seguir{% endif %}</button>
+                            </div>
+                            {% endif %}
                         </div>
                     </article>
                     {% endfor %}
                 {% elif search %}
                 <article class="social-card profile-empty">
                     <h3 class="search-empty-title">Nada apareceu para "{{ search }}".</h3>
-                    <p>Tente um apelido diferente, um estilo ou parte do nome.</p>
+                    <p>Tente um apelido diferente, um estilo ou parte do nome. Para buscar posts, comece com # (ex: #ilustracao).</p>
                 </article>
                 {% else %}
                 <article class="social-card profile-empty">
-                    <h3>A busca comeca aqui.</h3>
+                    <h3>A busca começa aqui.</h3>
                     <p>Digite um nome, nicho ou pista visual para descobrir novos perfis.</p>
                 </article>
                 {% endif %}
@@ -296,7 +259,7 @@
             <aside class="social-rail">
                 <article class="social-card">
                     <h3 style="margin:14px 0 8px;">Visual mais objetivo.</h3>
-                    <p>Os perfis agora aparecem com tipo, bio curta e acesso rapido ao perfil sem excesso de texto.</p>
+                    <p>Os perfis agora aparecem com tipo, bio curta e acesso rápido ao perfil sem excesso de texto.</p>
                 </article>
             </aside>
         </section>
@@ -306,25 +269,39 @@
 
 {% block scripts %}
 <script>
+(() => {
     const csrftoken = "{{ csrf_token }}";
     const shouldConfirmUnfollow = (label) => ['Seguindo', 'Deixar de seguir'].includes(label.trim());
     document.querySelectorAll('.follow-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
             if (shouldConfirmUnfollow(btn.textContent) && !window.confirm('Tem certeza que deseja deixar de seguir este usuário?')) {
                 return;
             }
-
-            fetch(btn.dataset.url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrftoken
+            btn.disabled = true;
+            try {
+                const response = await fetch(btn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken, 'Accept': 'application/json' }
+                });
+                if (!(response.headers.get('content-type') || '').includes('application/json')) {
+                    window.location.href = "{% url 'login_pg' %}?next=" + encodeURIComponent(location.pathname + location.search);
+                    return;
                 }
-            })
-            .then((response) => response.json())
-            .then((data) => {
+                const data = await response.json();
+                if (!response.ok) {
+                    window.inceptToast?.(data.error || 'Não foi possível seguir agora.', 'error');
+                    return;
+                }
                 btn.textContent = data.is_following ? 'Seguindo' : 'Seguir';
-            });
+                btn.classList.toggle('button', !data.is_following);
+                btn.classList.toggle('ghost-button', data.is_following);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+            }
         });
     });
+})();
 </script>
 {% endblock %}

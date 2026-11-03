@@ -121,7 +121,7 @@ class Notification(models.Model):
 
     def get_message(self):
         if self.type == 'follow':
-            return f"{self.actor.username} começou a seguir você."
+            return f"{self.actor.nick} começou a seguir você."
         elif self.type == 'like' and self.post:
-            return f"{self.actor.username} deu like no seu post '{self.post.title}'."
+            return f"{self.actor.nick} curtiu seu post '{self.post.description}'." if self.post.description else f"{self.actor.nick} curtiu seu post."
         return "Nova notificação."

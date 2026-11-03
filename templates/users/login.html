@@ -309,6 +309,7 @@
     <div class="auth-panel">
         <form action="{% url 'login' %}" class="auth-form-shell stack" method="POST" id="loginForm">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
             <span class="eyebrow">Acesso</span>
             <h2>Entrar</h2>
             <p>Use seu email e senha para abrir a área autenticada da plataforma.</p>
@@ -386,14 +387,21 @@
                     redirect: 'manual',
                 });
 
+                /* volta para a página que pediu login (?next=), senão vai pro feed */
+                const destino = "{{ next|escapejs }}" || "{% url 'explore_pg' %}";
                 if (res.type === 'opaqueredirect' || res.redirected || res.status === 302) {
-                    window.location.href = "{% url 'explore_pg' %}";
+                    window.location.href = destino;
                     return;
                 }
 
                 const text = await res.text();
                 if (res.ok && !text.trim()) {
-                    window.location.href = "{% url 'explore_pg' %}";
+                    window.location.href = destino;
+                    return;
+                }
+                if (!res.ok) {
+                    resetSubmit();
+                    showError('O servidor não conseguiu fazer o login agora. Tente novamente em instantes.');
                     return;
                 }
 

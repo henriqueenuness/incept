@@ -14,7 +14,6 @@ import dj_database_url
 from dotenv import load_dotenv
 from decouple import config
 from pathlib import Path
-from supabase import create_client
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,6 +33,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h.strip()]
 
+# origens https liberadas para POST (ex: https://incept.com.br), separadas por virgula
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if o.strip()]
+
+# render/hostinger ficam atras de um proxy que faz o https; sem isso o django acha que a requisicao e http
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 
@@ -51,13 +56,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', #whitenoise precisa vir logo depois do SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'incept.urls'
@@ -65,7 +70,7 @@ ROOT_URLCONF = 'incept.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
@@ -85,8 +90,6 @@ WSGI_APPLICATION = 'incept.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASES = {
-    'neon': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True), #neon - suporte para ipv6 e ipv4
-
     'default': {                                    #supabase - suporte para ipv6
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv("dbname"),
@@ -103,10 +106,12 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+if DATABASE_URL: #sem a variavel o parse quebrava o settings inteiro
+    DATABASES['neon'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True) #neon - suporte para ipv6 e ipv4
+
+# o cliente do supabase e criado em accounts/views.py (get_supabase), so quando precisa
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # Password validation
@@ -144,12 +149,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-#STATIC_URL = '/static/'
-#"""STATICFILES_DIRS = [BASE_DIR / "static"]"""
-
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STORAGES = {
     "default": {
@@ -160,9 +162,4 @@ STORAGES = {
     },
 }
 LOGOUT_REDIRECT_URL = "login_pg"
-
-
-
-
-
-
+LOGIN_URL = "login_pg" #pra onde o @login_required manda quem nao esta logado

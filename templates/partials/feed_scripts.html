@@ -1,0 +1,449 @@
+{# Scripts do feed (curtir, salvar, seguir, comentários). Usado no explore e no ciclo. #}
+<script>
+(() => {
+    const csrftoken = "{{ csrf_token }}";
+    const loginUrl = "{% url 'login_pg' %}?next=" + encodeURIComponent(window.location.pathname + window.location.search);
+    const currentUserId = '{{ request.user.user_id|default:"" }}';
+    const toast = (message, kind) => (window.inceptToast ? window.inceptToast(message, kind) : null);
+
+    /* POST com CSRF. Quem nao esta logado e redirecionado pelo @login_required para a pagina de login;
+       antes o fetch tentava ler esse HTML como JSON e o botao simplesmente nao fazia nada. */
+    const postAction = async (url, options = {}) => {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: Object.assign({ 'X-CSRFToken': csrftoken, 'Accept': 'application/json' }, options.headers || {}),
+            body: options.body,
+        });
+        const contentType = response.headers.get('content-type') || '';
+        if (response.redirected && !contentType.includes('application/json')) {
+            if (response.url.includes("{% url 'login_pg' %}")) {
+                window.location.href = loginUrl;
+                return null;
+            }
+            return { ok: response.ok, data: null };
+        }
+        let data = null;
+        if (contentType.includes('application/json')) {
+            data = await response.json();
+        }
+        return { ok: response.ok, status: response.status, data };
+    };
+
+    /* Tira de perfis (só existe no explore) */
+    const storyStrip = document.querySelector('[data-story-strip]');
+    const storyPrevBtn = document.querySelector('[data-story-prev]');
+    const storyNextBtn = document.querySelector('[data-story-next]');
+    const storyContainer = storyStrip ? storyStrip.parentElement : null;
+    const updateStoryNavButtons = () => {
+        if (!storyContainer || !storyPrevBtn || !storyNextBtn) return;
+        const maxScroll = storyContainer.scrollWidth - storyContainer.clientWidth;
+        storyPrevBtn.hidden = storyContainer.scrollLeft <= 1;
+        storyNextBtn.hidden = maxScroll <= 1 || storyContainer.scrollLeft >= maxScroll - 1;
+    };
+    const scrollStories = (direction) => {
+        if (!storyContainer) return;
+        const amount = storyContainer.clientWidth * 0.8;
+        storyContainer.scrollBy({ left: direction === 'next' ? amount : -amount, behavior: 'smooth' });
+    };
+    if (storyPrevBtn) storyPrevBtn.addEventListener('click', () => scrollStories('prev'));
+    if (storyNextBtn) storyNextBtn.addEventListener('click', () => scrollStories('next'));
+    if (storyContainer) storyContainer.addEventListener('scroll', updateStoryNavButtons, { passive: true });
+    window.addEventListener('resize', updateStoryNavButtons);
+    setTimeout(updateStoryNavButtons, 100);
+
+    /* Tempo relativo */
+    const formatRelativeTime = (timestamp) => {
+        const diff = Math.floor(Date.now() / 1000 - timestamp);
+        if (diff < 60) return 'Agora';
+        if (diff < 3600) return `${Math.floor(diff / 60)}min`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+        if (diff < 604800) return `${Math.floor(diff / 86400)}d`;
+        if (diff < 2592000) return `${Math.floor(diff / 604800)}sem`;
+        return `${Math.floor(diff / 2592000)}m`;
+    };
+    document.querySelectorAll('[data-timestamp]').forEach((el) => {
+        const timestamp = parseFloat(el.dataset.timestamp);
+        if (timestamp) el.textContent = formatRelativeTime(timestamp);
+    });
+
+    /* Curtir */
+    const applyLikeState = (postId, data) => {
+        document.querySelectorAll(`.like-btn[data-like-post-id="${postId}"]`).forEach((likeButton) => {
+            likeButton.classList.toggle('liked', Boolean(data.liked));
+            likeButton.classList.remove('is-animating');
+            if (data.liked) {
+                void likeButton.offsetWidth;
+                likeButton.classList.add('is-animating');
+                window.setTimeout(() => likeButton.classList.remove('is-animating'), 560);
+            }
+            const likeCount = likeButton.querySelector('[data-like-count]');
+            if (likeCount) likeCount.textContent = data.likes;
+        });
+        const modal = document.getElementById('comments-panel-' + postId);
+        const summary = modal ? modal.querySelector('[data-like-summary]') : null;
+        if (summary) {
+            summary.textContent = data.likes
+                ? `${data.likes} curtida${data.likes === 1 ? '' : 's'}`
+                : 'Seja a primeira pessoa a curtir isso';
+        }
+    };
+    const toggleLike = async (postId, likeUrl) => {
+        try {
+            const result = await postAction(likeUrl);
+            if (!result || !result.ok || !result.data) return;
+            applyLikeState(postId, result.data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    document.querySelectorAll('.like-btn').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            toggleLike(btn.dataset.likePostId, btn.dataset.url);
+        });
+    });
+
+    /* Duplo clique na imagem = curtir (só curte; antes o segundo duplo clique descurtia).
+       O clique simples abre os comentários, mas espera um pouco para não abrir junto com o duplo clique. */
+    document.querySelectorAll('[data-dblclick-like]').forEach((btn) => {
+        btn.addEventListener('dblclick', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            window.clearTimeout(btn._openTimer);
+            const postId = btn.dataset.postId;
+            const heart = btn.querySelector('.dblclick-heart');
+            if (heart) {
+                heart.classList.remove('is-animating');
+                void heart.offsetWidth;
+                heart.classList.add('is-animating');
+                window.setTimeout(() => heart.classList.remove('is-animating'), 700);
+            }
+            const alreadyLiked = document.querySelector(`.like-btn.liked[data-like-post-id="${postId}"]`);
+            if (!alreadyLiked) toggleLike(postId, btn.dataset.likeUrl);
+        });
+    });
+
+    /* Apagar post */
+    document.querySelectorAll('[data-delete-post]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Apagar este post definitivamente?')) return;
+            try {
+                const result = await postAction(btn.dataset.url);
+                if (!result || !result.ok) {
+                    toast('Não foi possível apagar o post.', 'error');
+                    return;
+                }
+                const postId = btn.dataset.postId;
+                const modal = document.getElementById('comments-panel-' + postId);
+                if (modal) setCommentModalState(modal, false);
+                document.getElementById('post-' + postId)?.remove();
+                modal?.remove();
+                toast('Post apagado.', 'success');
+            } catch (err) { console.error(err); }
+        });
+    });
+
+    /* Comentários */
+    const commentModals = Array.from(document.querySelectorAll('.post-comments-modal'));
+    const commentPollingTimers = new Map();
+    const updateCommentCount = (modal, nextCount) => {
+        const postId = modal?.dataset?.postId;
+        if (!postId) return;
+        document
+            .querySelectorAll(`[data-comment-toggle][data-target="comments-panel-${postId}"] [data-comment-count]`)
+            .forEach((node) => { node.textContent = String(nextCount ?? 0); });
+    };
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    const pinSvg = '<svg viewBox="0 0 24 24"><path d="m16 3 5 5-5.5 5.5-1.5 6.5-4-4-6.5 1.5L9 12 3.5 6.5 9 1l7 2z"></path></svg>';
+    const buildCommentMarkup = (modal, comment) => {
+        const canPin = currentUserId && modal.dataset.postOwnerId === currentUserId;
+        return `
+            <article class="post-comments-comment" data-comment-entry data-comment-id="${escapeHtml(comment.id)}">
+                <div class="post-comments-comment-avatar">
+                    <img src="data:image/png;base64,${escapeHtml(comment.user.core_picture)}" alt="${escapeHtml(comment.user.nick)}">
+                </div>
+                <div class="post-comments-comment-head">
+                    <div class="post-comments-comment-copy">
+                        <p><strong>@${escapeHtml(comment.user.nick)}</strong> ${escapeHtml(comment.content)}</p>
+                        <div class="post-comments-comment-meta">
+                            <span>${escapeHtml(comment.created_relative)}</span>
+                            <span class="post-comments-pinned-badge">Fixado</span>
+                        </div>
+                    </div>
+                    ${canPin ? `<button class="post-comments-pin" type="button" data-comment-pin aria-label="Fixar comentário">${pinSvg}</button>` : ''}
+                </div>
+            </article>
+        `;
+    };
+    /* O "fixar" é só visual (não é salvo no servidor). Guardamos o id no modal para que a
+       atualização automática a cada 5s não desfaça o destaque, como acontecia antes. */
+    const applyPinned = (modal) => {
+        const container = modal.querySelector('[data-comment-list]');
+        const pinnedId = modal.dataset.pinnedId;
+        if (!container || !pinnedId) return;
+        const entry = container.querySelector(`[data-comment-id="${pinnedId}"]`);
+        if (entry) {
+            entry.classList.add('is-pinned');
+            container.prepend(entry);
+        }
+    };
+    const bindCommentInteractions = (modal) => {
+        const container = modal.querySelector('[data-comment-list]');
+        if (!container) return;
+        container.querySelectorAll('[data-comment-entry]').forEach((entry) => {
+            const pinButton = entry.querySelector('[data-comment-pin]');
+            if (!pinButton || pinButton.dataset.bound === 'true') return;
+            pinButton.dataset.bound = 'true';
+            pinButton.addEventListener('click', () => {
+                const isPinned = entry.classList.contains('is-pinned');
+                container.querySelectorAll('[data-comment-entry]').forEach((item) => item.classList.remove('is-pinned'));
+                modal.dataset.pinnedId = isPinned ? '' : entry.dataset.commentId;
+                applyPinned(modal);
+            });
+        });
+        applyPinned(modal);
+    };
+    const renderComments = (modal, comments) => {
+        const list = modal.querySelector('[data-comment-list]');
+        if (!list) return;
+        if (modal.dataset.commentsEnabled === 'false') {
+            list.innerHTML = '<div class="post-comments-empty" data-comment-empty>O artista desativou os comentários.</div>';
+            return;
+        }
+        updateCommentCount(modal, comments.length);
+        if (!comments.length) {
+            list.innerHTML = '<div class="post-comments-empty" data-comment-empty>Nenhum comentário ainda. Abra a conversa por aqui.</div>';
+            return;
+        }
+        list.innerHTML = comments.map((comment) => buildCommentMarkup(modal, comment)).join('');
+        bindCommentInteractions(modal);
+    };
+    const fetchComments = async (modal) => {
+        if (!modal?.dataset.commentsUrl || modal.dataset.commentsEnabled === 'false') return;
+        const list = modal.querySelector('[data-comment-list]');
+        const scrollTopBefore = list ? list.scrollTop : 0;
+        const wasNearBottom = list ? (list.scrollHeight - list.scrollTop - list.clientHeight) < 48 : false;
+        try {
+            const response = await fetch(modal.dataset.commentsUrl, { headers: { 'Accept': 'application/json' } });
+            if (!response.ok) return;
+            const data = await response.json();
+            renderComments(modal, data.comments || []);
+            if (list) list.scrollTop = wasNearBottom ? list.scrollHeight : scrollTopBefore;
+        } catch (error) {
+            console.error(error);
+        }
+    };
+    const setCommentModalState = (modal, shouldOpen) => {
+        if (!modal) return;
+        modal.hidden = !shouldOpen;
+        modal.classList.toggle('is-visible', shouldOpen);
+        modal.setAttribute('aria-hidden', String(!shouldOpen));
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
+        if (shouldOpen) {
+            fetchComments(modal);
+            if (!commentPollingTimers.has(modal) && modal.dataset.commentsEnabled !== 'false') {
+                const timer = window.setInterval(() => {
+                    if (modal.classList.contains('is-visible') && !document.hidden) fetchComments(modal);
+                }, 5000);
+                commentPollingTimers.set(modal, timer);
+            }
+            const input = modal.querySelector('[name="comment-content"]');
+            if (input) window.setTimeout(() => input.focus(), 40);
+        } else if (commentPollingTimers.has(modal)) {
+            window.clearInterval(commentPollingTimers.get(modal));
+            commentPollingTimers.delete(modal);
+        }
+    };
+    const openCommentModal = (modal) => {
+        commentModals.forEach((item) => { if (item !== modal) setCommentModalState(item, false); });
+        setCommentModalState(modal, true);
+    };
+
+    document.querySelectorAll('[data-comment-toggle]').forEach((btn) => {
+        btn.addEventListener('mousedown', () => {
+            btn.classList.remove('is-clicking');
+            void btn.offsetWidth;
+            btn.classList.add('is-clicking');
+            window.setTimeout(() => btn.classList.remove('is-clicking'), 300);
+        });
+        btn.addEventListener('click', () => {
+            const modal = document.getElementById(btn.dataset.target);
+            if (btn.hasAttribute('data-dblclick-like')) {
+                window.clearTimeout(btn._openTimer);
+                btn._openTimer = window.setTimeout(() => openCommentModal(modal), 260);
+                return;
+            }
+            openCommentModal(modal);
+        });
+    });
+    document.querySelectorAll('[data-comment-close]').forEach((btn) => {
+        btn.addEventListener('click', () => setCommentModalState(btn.closest('.post-comments-modal'), false));
+    });
+    commentModals.forEach((modal) => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) setCommentModalState(modal, false);
+        });
+        bindCommentInteractions(modal);
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        commentModals.forEach((modal) => {
+            if (modal.classList.contains('is-visible')) setCommentModalState(modal, false);
+        });
+    });
+    document.querySelectorAll('[data-focus-comment]').forEach((btn) => {
+        btn.addEventListener('click', () => btn.closest('form')?.querySelector('[name="comment-content"]')?.focus());
+    });
+
+    /* Menu de opções do post */
+    document.querySelectorAll('[data-options-toggle]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const menu = button.parentElement.querySelector('[data-options-menu]');
+            document.querySelectorAll('[data-options-menu]').forEach((item) => {
+                if (item !== menu) item.classList.remove('is-visible');
+            });
+            if (menu) menu.classList.toggle('is-visible');
+        });
+    });
+    document.querySelectorAll('[data-options-close]').forEach((button) => {
+        button.addEventListener('click', () => button.closest('[data-options-menu]')?.classList.remove('is-visible'));
+    });
+    document.addEventListener('click', (event) => {
+        if (event.target.closest('[data-options-menu]') || event.target.closest('[data-options-toggle]')) return;
+        document.querySelectorAll('[data-options-menu]').forEach((menu) => menu.classList.remove('is-visible'));
+    });
+
+    /* Seguir pelo menu: atualiza todos os botões do mesmo perfil */
+    document.querySelectorAll('[data-follow-menu]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            try {
+                const result = await postAction(button.dataset.url);
+                if (!result) return;
+                if (!result.ok || !result.data) {
+                    toast((result.data && result.data.error) || 'Não foi possível seguir agora.', 'error');
+                    return;
+                }
+                const label = result.data.is_following ? 'Deixar de seguir' : 'Seguir';
+                document.querySelectorAll(`[data-follow-menu][data-follow-user-id="${button.dataset.followUserId}"]`)
+                    .forEach((item) => { item.textContent = label; });
+                button.closest('[data-options-menu]')?.classList.remove('is-visible');
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    });
+
+    /* Copiar link / compartilhar */
+    document.querySelectorAll('[data-copy-link]').forEach((button) => {
+        button.addEventListener('click', async () => {
+            const shareUrl = new URL(button.dataset.copyLink, window.location.href).toString();
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                toast('Link copiado.', 'success');
+            } catch (error) {
+                toast(shareUrl);
+            }
+            button.closest('[data-options-menu]')?.classList.remove('is-visible');
+        });
+    });
+    document.querySelectorAll('[data-share-url]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const shareUrl = new URL(btn.dataset.shareUrl, window.location.href).toString();
+            try {
+                if (navigator.share) {
+                    await navigator.share({ url: shareUrl });
+                    return;
+                }
+                await navigator.clipboard.writeText(shareUrl);
+                toast('Link copiado.', 'success');
+            } catch (error) {
+                if (error && error.name !== 'AbortError') console.error(error);
+            }
+        });
+    });
+
+    /* Caixa de comentário */
+    document.querySelectorAll('[data-comment-input]').forEach((input) => {
+        const row = input.closest('.post-comments-form-row');
+        const form = input.closest('[data-comment-form]');
+        const submitButton = form ? form.querySelector('.button[type="submit"]') : null;
+        const resize = () => {
+            input.style.height = 'auto';
+            input.style.height = `${Math.min(input.scrollHeight, 68)}px`;
+            const overflowing = input.scrollHeight > 68;
+            input.classList.toggle('is-overflowing', overflowing);
+            if (row) row.classList.toggle('is-overflowing', overflowing);
+        };
+        const updateSubmitButton = () => {
+            if (submitButton) submitButton.classList.toggle('has-content', input.value.trim().length > 0);
+        };
+        input.dataset.minHeight = '26';
+        input.addEventListener('input', () => { resize(); updateSubmitButton(); });
+        /* Enter envia (Shift+Enter quebra linha). requestSubmit dispara o mesmo fluxo do botão. */
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+                event.preventDefault();
+                if (form && input.value.trim().length > 0) form.requestSubmit();
+            }
+        });
+        resize();
+        updateSubmitButton();
+    });
+    document.querySelectorAll('[data-comment-form]').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const modal = form.closest('.post-comments-modal');
+            const input = form.querySelector('[name="comment-content"]');
+            if (!modal || !input || !input.value.trim() || form.dataset.sending === 'true') return;
+            form.dataset.sending = 'true';
+            try {
+                const result = await postAction(form.action, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: new FormData(form),
+                });
+                if (!result) return;
+                if (!result.ok || !result.data || !result.data.ok) {
+                    toast((result.data && result.data.error) || 'Não foi possível comentar agora.', 'error');
+                    return;
+                }
+                input.value = '';
+                input.style.height = `${input.dataset.minHeight || 26}px`;
+                input.dispatchEvent(new Event('input'));
+                await fetchComments(modal);
+                input.focus();
+            } catch (error) {
+                console.error(error);
+            } finally {
+                form.dataset.sending = '';
+            }
+        });
+    });
+
+    /* Salvar post: atualiza o botão do card e o do modal juntos */
+    document.querySelectorAll('.save-btn').forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const result = await postAction(btn.dataset.url);
+                if (!result || !result.ok || !result.data) return;
+                document.querySelectorAll(`.save-btn[data-save-post-id="${btn.dataset.savePostId}"]`)
+                    .forEach((item) => item.classList.toggle('saved', Boolean(result.data.saved)));
+                toast(result.data.saved ? 'Salvo no seu perfil.' : 'Removido dos salvos.');
+            } catch (err) { console.error(err); }
+        });
+    });
+
+    /* Link compartilhado (#post-12): rola até o post */
+    if (window.location.hash.startsWith('#post-')) {
+        const target = document.querySelector(window.location.hash);
+        if (target) target.scrollIntoView({ block: 'center' });
+    }
+})();
+</script>

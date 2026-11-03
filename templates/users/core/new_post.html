@@ -291,61 +291,7 @@
 
 {% block content %}
 <section class="app-shell">
-    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
-
-    <aside class="social-nav">
-        <a class="social-nav-link" href="{% url 'explore_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
-        </a>
-        <a class="social-nav-link" href="{% url 'search_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
-            <span class="social-nav-label">Busca</span>
-        </a>
-        {% if user.is_authenticated and request.user.cargo != "cliente" %}
-        <a class="social-nav-link is-active" href="{% url 'new_post_pg' user.nick %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
-            <span class="social-nav-label">Criar</span>
-        </a>
-        {% endif %}
-        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
-            <span class="social-nav-label">Ciclo</span>
-        </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
-            <span class="social-nav-label">Mensagens</span>
-        </a>
-        <a class="social-nav-link" href="{% url 'notifications' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificações</span>
-        </a>
-        {% if user.is_authenticated %}
-        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
-            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
-            <span class="social-nav-label">Perfil</span>
-        </a>
-        {% endif %}
-    </aside>
-
-    <details class="social-more">
-        <summary>
-            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
-            <span class="social-more-label">Mais</span>
-        </summary>
-        <div class="social-more-menu">
-            <a href="#">Configurações</a>
-            <a href="#">Salvos</a>
-            <a href="#">Alternar exibição</a>
-            <a href="#">Relatar um problema</a>
-            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
-        </div>
-    </details>
-
-    <a class="messages-fab" href="#" hidden>
-        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
-        <span>Mensagens</span>
-    </a>
+    {% include "partials/app_nav.html" with active="new_post" %}
 
     <div class="app-main">
         <section class="composer-page">
@@ -366,7 +312,7 @@
                         <div class="composer-upload-row">
                         <div class="composer-dropzone" data-dropzone>
                             <input class="field composer-file-input" type="file" name="post_image" id="composer-file-input"
-                                accept="image/*,audio/mpeg,.mp3" multiple data-post-image
+                                accept="image/png,image/jpeg,image/webp,image/gif,audio/mpeg,.mp3" multiple data-post-image
                                 style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">
                             <svg viewBox="0 0 24 24" class="composer-dropzone-icon">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -374,7 +320,7 @@
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
                             <p class="composer-dropzone-label">Arraste aqui ou <span>clique para selecionar</span></p>
-                            <p class="composer-dropzone-sub">PNG, JPG, WEBP ou MP3 (até 20 MB) — múltiplos arquivos permitidos</p>
+                            <p class="composer-dropzone-sub">PNG, JPG, WEBP, GIF ou MP3 (até {{ max_upload_mb|default:20 }} MB cada) — múltiplos arquivos permitidos</p>
                         </div>
 
                             <div class="composer-upload-controls" data-upload-controls>
@@ -403,9 +349,9 @@
                         <label class="composer-field">
                             <div class="composer-field-header">
                                 <span>Descrição</span>
-                                <span class="composer-char-counter" data-char-counter>0/500</span>
+                                <span class="composer-char-counter" data-char-counter>0/255</span>
                             </div>
-                            <textarea class="textarea-field" name="post_description" placeholder="Conte sobre seu trabalho... (opcional)" maxlength="500" data-description-input></textarea>
+                            <textarea class="textarea-field" name="post_description" placeholder="Conte sobre seu trabalho... (opcional)" maxlength="255" data-counter-input></textarea>
                         </label>
 
                         <label class="composer-field">
@@ -413,15 +359,15 @@
                                 <span>Collab</span>
                                 <span class="composer-char-counter" data-char-counter>0/25</span>
                             </div>
-                            <input class="textarea-field" name="collab" placeholder="Coloque aqui o nick de quem fez a arte com você (sem @)" maxlength="25" data-description-input></input>
+                            <input class="textarea-field" name="collab" placeholder="Coloque aqui o nick de quem fez a arte com você (sem @)" maxlength="25" autocomplete="off" data-counter-input>
                         </label>
 
                         <label class="composer-field">
                             <div class="composer-field-header">
                                 <span>Roxotags</span>
-                                <span class="composer-char-counter" data-char-counter>0/25</span>
+                                <span class="composer-char-counter" data-char-counter>0/200</span>
                             </div>
-                            <input class="textarea-field" name="roxotag" placeholder="digite as roxotags que tem haver com sua arte" data-description-input></input>
+                            <input class="textarea-field" name="roxotag" placeholder="Roxotags que têm a ver com sua arte (ex: #ilustracao #retrato)" maxlength="200" autocomplete="off" data-counter-input>
                         </label>
 
                         <div class="composer-actions">
@@ -439,48 +385,75 @@
 
 {% block scripts %}
 <script>
+(() => {
     const postImageInput = document.querySelector('[data-post-image]');
     const previewBox = document.querySelector('[data-post-preview]');
-    const composerHead = document.querySelector('.composer-head');
     const postUploadControls = document.querySelector('[data-upload-controls]');
     const changeImageButton = document.querySelector('[data-change-image]');
     const removeImageButton = document.querySelector('[data-remove-image]');
     const submitPostButton = document.querySelector('[data-submit-post]');
     const dropzone = document.querySelector('[data-dropzone]');
-    const fileInput = document.getElementById('composer-file-input');
-    const MAX_SIZE = 15 * 1024 * 1024; // 15 MB em bytes
-    fileInput.addEventListener('change', function () {
-        for (const file of this.files) {
-            if (file.size > MAX_SIZE) {
-            alert(`O arquivo "${file.name}" excede o limite de 10 MB.`);
-            this.value = ""; // limpa o input para evitar envio
-        break;
-        }
-        }
-    });
+    const composerForm = document.querySelector('.composer-form');
+    /* mesmo limite do servidor (antes: 15 MB no código, "10 MB" no aviso e "20 MB" no texto da tela) */
+    const MAX_MB = {{ max_upload_mb|default:20 }};
+    const MAX_SIZE = MAX_MB * 1024 * 1024;
+    const IMAGE_EXT = /\.(png|jpe?g|gif|webp)$/i;
+    const AUDIO_EXT = /\.mp3$/i;
+    const toast = (message, kind) => (window.inceptToast ? window.inceptToast(message, kind) : alert(message));
+
+    const isAudio = (file) => AUDIO_EXT.test(file.name);
+    const isAllowed = (file) => IMAGE_EXT.test(file.name) || isAudio(file);
+
+    /* tira arquivos grandes demais ou de tipo não aceito (antes, um arquivo grande limpava a seleção inteira e só no "change") */
+    const keepValidFiles = (files) => {
+        const valid = [];
+        const rejected = [];
+        files.forEach((file) => {
+            if (!isAllowed(file)) {
+                rejected.push(`${file.name} (formato não aceito)`);
+            } else if (file.size > MAX_SIZE) {
+                rejected.push(`${file.name} (maior que ${MAX_MB} MB)`);
+            } else {
+                valid.push(file);
+            }
+        });
+        if (rejected.length) toast('Arquivos ignorados: ' + rejected.join(', '), 'error');
+        const transfer = new DataTransfer();
+        valid.forEach((file) => transfer.items.add(file));
+        postImageInput.files = transfer.files;
+        return valid;
+    };
 
     const showPreviews = (files) => {
         if (!previewBox) return;
         previewBox.innerHTML = '';
-        for (const file of files) {
+        files.forEach((file) => {
+            if (isAudio(file)) {
+                /* antes o mp3 aparecia como imagem quebrada */
+                const box = document.createElement('div');
+                box.style.cssText = 'width:120px;height:120px;border-radius:12px;margin:4px;display:inline-grid;place-items:center;padding:8px;text-align:center;font-size:0.75rem;background:rgba(155,89,255,0.12);word-break:break-all;';
+                box.textContent = '♪ ' + file.name;
+                previewBox.appendChild(box);
+                return;
+            }
             const img = document.createElement('img');
             img.src = URL.createObjectURL(file);
             img.alt = 'Preview';
             img.style.cssText = 'width:120px;height:120px;object-fit:cover;border-radius:12px;margin:4px;';
             previewBox.appendChild(img);
-        }
+        });
         const hasFiles = files.length > 0;
         if (submitPostButton) submitPostButton.disabled = !hasFiles;
-        if (postUploadControls) { postUploadControls.style.display = hasFiles ? 'flex' : 'none'; }
+        if (postUploadControls) postUploadControls.style.display = hasFiles ? 'flex' : 'none';
     };
 
     if (postImageInput) {
         postImageInput.addEventListener('change', () => {
-            showPreviews(Array.from(postImageInput.files || []));
+            showPreviews(keepValidFiles(Array.from(postImageInput.files || [])));
         });
     }
 
-    if (dropzone) {
+    if (dropzone && postImageInput) {
         dropzone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropzone.classList.add('is-dragover');
@@ -489,12 +462,8 @@
         dropzone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropzone.classList.remove('is-dragover');
-            const dt = e.dataTransfer;
-            if (dt && dt.files.length && postImageInput) {
-                const transfer = new DataTransfer();
-                Array.from(dt.files).forEach(f => transfer.items.add(f));
-                postImageInput.files = transfer.files;
-                showPreviews(Array.from(dt.files));
+            if (e.dataTransfer && e.dataTransfer.files.length) {
+                showPreviews(keepValidFiles(Array.from(e.dataTransfer.files)));
             }
         });
     }
@@ -505,30 +474,35 @@
     if (removeImageButton && postImageInput && previewBox) {
         removeImageButton.addEventListener('click', () => {
             postImageInput.value = '';
-            previewBox.innerHTML = '';
-            if (submitPostButton) submitPostButton.disabled = true;
-            if (postUploadControls) postUploadControls.style.display = 'none';
+            showPreviews([]);
         });
     }
 
     if (submitPostButton) submitPostButton.disabled = true;
     if (postUploadControls) postUploadControls.style.display = 'none';
 
-    const descriptionInput = document.querySelector('[data-description-input]');
-    const charCounter = document.querySelector('[data-char-counter]');
-
-    if (descriptionInput && charCounter) {
-        const updateCounter = () => {
-            const length = descriptionInput.value.length;
-            const maxLength = 500;
-            charCounter.textContent = `${length}/${maxLength}`;
-
-            charCounter.classList.toggle('near-limit', length >= 450 && length < maxLength);
-            charCounter.classList.toggle('at-limit', length >= maxLength);
-        };
-
-        descriptionInput.addEventListener('input', updateCounter);
-        updateCounter();
+    /* evita publicar duas vezes com clique duplo */
+    if (composerForm && submitPostButton) {
+        composerForm.addEventListener('submit', () => {
+            submitPostButton.disabled = true;
+            submitPostButton.textContent = 'Publicando...';
+        });
     }
+
+    /* um contador por campo (antes só a descrição tinha contador funcionando) */
+    document.querySelectorAll('[data-counter-input]').forEach((input) => {
+        const counter = input.closest('.composer-field')?.querySelector('[data-char-counter]');
+        const maxLength = Number(input.getAttribute('maxlength')) || 255;
+        if (!counter) return;
+        const updateCounter = () => {
+            const length = input.value.length;
+            counter.textContent = `${length}/${maxLength}`;
+            counter.classList.toggle('near-limit', length >= maxLength * 0.9 && length < maxLength);
+            counter.classList.toggle('at-limit', length >= maxLength);
+        };
+        input.addEventListener('input', updateCounter);
+        updateCounter();
+    });
+})();
 </script>
 {% endblock %}

@@ -381,9 +381,21 @@
     .photo-modal-action:focus-visible {
         background: rgba(255, 255, 255, 0.03);
     }
+    .photo-modal-form {
+        margin: 0;
+    }
+    .delete-account-form {
+        display: grid;
+        margin: 0;
+    }
     .photo-modal-link {
         display: block;
         width: 100%;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        font: inherit;
+        cursor: pointer;
         padding: 22px 24px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         color: #ff5d73;
@@ -561,66 +573,21 @@
         .editor-hero .avatar-lg { width: 84px; height: 84px; }
         .editor-avatar-trigger::after { font-size: 0.68rem; inset: auto 6px 6px; }
     }
+    .editor-photo-note {
+        margin: 0 0 12px;
+        padding: 10px 14px;
+        border-radius: 14px;
+        background: rgba(155, 89, 255, 0.12);
+        color: var(--text);
+        font-size: 0.9rem;
+    }
+    .editor-photo-note[hidden] { display: none; }
 </style>
 {% endblock %}
 
 {% block content %}
 <section class="app-shell">
-    <a class="social-brand-fixed" href="{% url 'home' %}">Incept</a>
-
-    <aside class="social-nav">
-        <a class="social-nav-link" href="{% url 'explore_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10.5V20h14v-9.5"></path></svg></span>
-            <span class="social-nav-label">Página Inicial</span>
-        </a>
-        <a class="social-nav-link" href="{% url 'search_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></span>
-            <span class="social-nav-label">Busca</span>
-        </a>
-        {% if user.is_authenticated and request.user.cargo != "cliente" %}
-        <a class="social-nav-link" href="{% url 'new_post_pg' user.nick %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></span>
-            <span class="social-nav-label">Criar</span>
-        </a>
-        {% endif %}
-        <a class="social-nav-link" href="{% url 'cycle_pg' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.5-5.7"></path><path d="M20 4v5h-5"></path><path d="M20 12a8 8 0 0 1-13.5 5.7"></path><path d="M4 20v-5h5"></path></svg></span>
-            <span class="social-nav-label">Ciclo</span>
-        </a>
-        <a class="social-nav-link" href="#" hidden data-placeholder-action data-placeholder-title="Mensagens em breve" data-placeholder-copy="A interface de mensagens ainda depende da implementação completa do backend.">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg></span>
-            <span class="social-nav-label">Mensagens</span>
-        </a>
-        <a class="social-nav-link" href="{% url 'notifications' %}">
-            <span class="social-nav-icon"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg></span>
-            <span class="social-nav-label">Notificações</span>
-        </a>
-        {% if user.is_authenticated %}
-        <a class="social-nav-profile" href="{% url 'core_pg' user.nick %}">
-            <span class="social-nav-avatar"><img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}"></span>
-            <span class="social-nav-label">Perfil</span>
-        </a>
-        {% endif %}
-    </aside>
-
-    <details class="social-more">
-        <summary>
-            <svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
-            <span class="social-more-label">Mais</span>
-        </summary>
-        <div class="social-more-menu">
-            <a href="#">Configurações</a>
-            <a href="#">Salvos</a>
-            <a href="#">Alternar exibição</a>
-            <a href="#">Relatar um problema</a>
-            <button type="button" data-logout-trigger><span class="social-more-item"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg><span>Sair</span></span></button>
-        </div>
-    </details>
-
-    <a class="messages-fab" href="#" hidden>
-        <svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>
-        <span>Mensagens</span>
-    </a>
+    {% include "partials/app_nav.html" with active="profile" %}
 
     <div class="app-main">
         <section class="editor-page">
@@ -629,7 +596,7 @@
                         <div class="editor-hero-top">
                             <button class="editor-avatar-trigger" type="button" data-photo-modal-open aria-label="Alterar foto do perfil">
                                 <div class="avatar-lg">
-                                    <img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}">
+                                    <img src="data:image/png;base64,{{ user.core_picture }}" alt="{{ user.nick }}" data-avatar-preview>
                                 </div>
                             </button>
                             <div class="editor-meta">
@@ -648,15 +615,16 @@
 
                     <form class="editor-form" method="POST" action="{% url 'edit_core' %}" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input id="core-picture-input" name="core_picture" accept="image/*" type="file">
+                        <input id="core-picture-input" name="core_picture" accept="image/png,image/jpeg,image/webp,image/gif" type="file">
+                        <p class="editor-photo-note" data-photo-note hidden>Nova foto selecionada. Clique em <strong>Salvar alterações</strong> para aplicar.</p>
                         <div class="editor-grid">
                             <label class="editor-field">
                                 <span>Nick</span>
-                                <input class="field" name="nick" placeholder="Seu nome público" value="{{ user.nick }}">
+                                <input class="field" name="nick" placeholder="Seu nome público" value="{{ user.nick }}" maxlength="25" autocomplete="username">
                             </label>
                             <label class="editor-field">
                                 <span>Nome</span>
-                                <input class="field" name="real_name" placeholder="Nome real (opcional)" value="{{ user.real_name }}">
+                                <input class="field" name="real_name" placeholder="Nome real (opcional)" value="{{ user.real_name|default:'' }}" maxlength="255">
                             </label>
                         </div>
 
@@ -664,7 +632,7 @@
                             <div class="editor-section-head">
                                 <span class="editor-kicker">Conta</span>
                                 <h3>Dados visíveis e contato</h3>
-                                <p>Seu email aparece aqui como referencia da conta. Os links abaixo ficam associados a este navegador.</p>
+                                <p>Seu email aparece aqui como referência da conta. O site e os links abaixo aparecem no seu perfil público.</p>
                             </div>
                             <div class="editor-grid">
                                 <label class="editor-field">
@@ -673,7 +641,8 @@
                                 </label>
                                 <label class="editor-field">
                                     <span>Site principal</span>
-                                    <input name="website_link" class="field" type="url" placeholder="https://seusite.com" data-profile-link="website">
+                                    <input name="website_link" class="field" type="text" inputmode="url" placeholder="https://seusite.com" value="{{ website }}" data-profile-link="website">
+                                    <small class="muted">Deixe em branco para remover.</small>
                                 </label>
                             </div>
                         </section>
@@ -682,38 +651,14 @@
                             <label class="editor-field editor-field-span">
                                 <span>Linguagem</span>
                                 <select class="select-field" name="art_style">
-                                    <option value="{{ user.art_style }}" selected disabled>{{ user.art_style|default_if_none:"Selecionar estilo" }}</option>
-                                    <optgroup label="Música">
-                                        <option value="música clássica">música clássica</option>
-                                        <option value="jazz">jazz</option>
-                                        <option value="blues">blues</option>
-                                        <option value="gospel">gospel</option>
-                                        <option value="soul">soul</option>
-                                        <option value="pop">pop</option>
-                                        <option value="rock">rock</option>
-                                        <option value="country">country</option>
+                                    <option value="" disabled{% if not user.art_style %} selected{% endif %}>Selecionar estilo</option>
+                                    {% for grupo, opcoes in art_style_groups %}
+                                    <optgroup label="{{ grupo }}">
+                                        {% for valor, rotulo in opcoes %}
+                                        <option value="{{ valor }}"{% if user.art_style == valor %} selected{% endif %}>{{ rotulo }}</option>
+                                        {% endfor %}
                                     </optgroup>
-                                    <optgroup label="Pintura e desenho">
-                                        <option value="desenhista 2D">desenhista 2D</option>
-                                        <option value="realismo">realismo</option>
-                                        <option value="cartoon">cartoon</option>
-                                        <option value="manga">manga</option>
-                                        <option value="chibi">chibi</option>
-                                        <option value="caricatura">caricatura</option>
-                                        <option value="doodleArt">doodleArt</option>
-                                        <option value="surrealismo">surrealismo</option>
-                                        <option value="modelador 3D">modelador 3D</option>
-                                    </optgroup>
-                                    <optgroup label="Audiovisual">
-                                        <option value="videomaker">videomaker</option>
-                                        <option value="editor de vídeos">editor de vídeos</option>
-                                        <option value="filmmaker">filmmaker</option>
-                                        <option value="roteirista">roteirista</option>
-                                        <option value="designer gráfico">designer gráfico</option>
-                                        <option value="editor de fotos">editor de fotos</option>
-                                        <option value="colorista">colorista</option>
-                                        <option value="motion designer">motion designer</option>
-                                    </optgroup>
+                                    {% endfor %}
                                 </select>
                             </label>
                         </div>
@@ -728,17 +673,18 @@
                             <div class="link-row" data-link-row-template hidden>
                                 <label class="editor-field">
                                     <span>Link</span>
-                                    <input class="field" type="text" placeholder="https://" name='link' data-link-url>
+                                    <input class="field" type="text" inputmode="url" placeholder="https://" data-link-url>
                                 </label>
                                 <label class="editor-field">
                                     <span>Título (ex: Portfolio)</span>
-                                    <input class="field" type="text" name="link_name" placeholder="Portfolio, Loja, Insta" data-link-title>
+                                    <input class="field" type="text" maxlength="50" placeholder="Portfolio, Loja, Insta" data-link-title>
                                 </label>
                                 <button class="ghost-button" type="button" data-remove-link>Remover</button>
                             </div>
                             <div class="link-actions">
                                 <button class="button" type="button" data-add-link>Adicionar outro link</button>
                             </div>
+                            {{ extra_links|json_script:"profile-links-data" }}
                         </section>
 
                         <label class="editor-field">
@@ -751,11 +697,11 @@
 
                         <section class="editor-section">
                             <div class="editor-section-head">
-                                <span class="editor-kicker">Seguranca</span>
+                                <span class="editor-kicker">Segurança</span>
                                 <h3>Senha da conta</h3>
                             </div>
                             <div class="editor-note">
-                                A troca de senha ainda não tem fluxo pronto no backend deste projeto. Assim que existir uma rota real, esta seção pode ser conectada sem refazer a interface.
+                                A troca de senha ainda não está disponível. Ela será liberada em uma próxima atualização.
                             </div>
                         </section>
 
@@ -776,7 +722,11 @@
                             <div class="delete-account-confirm" data-delete-confirm>
                                 <p>Para excluir a conta, escreva <strong>querodeletar</strong>.</p>
                                 <input class="field" type="text" data-delete-input placeholder="querodeletar">
-                                <a class="button" href="{% url 'delete_account' %}" data-delete-link aria-disabled="true">Confirmar exclusão</a>
+                                {# era um link GET: qualquer site podia apagar a conta de quem estivesse logado #}
+                                <form class="delete-account-form" method="POST" action="{% url 'delete_account' %}">
+                                    {% csrf_token %}
+                                    <button class="button" type="submit" data-delete-link aria-disabled="true" disabled>Confirmar exclusão</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -792,7 +742,10 @@
             <h3 id="photo-modal-title">Alterar foto do perfil</h3>
         </div>
         <button class="photo-modal-action" type="button" data-photo-upload>Carregar foto</button>
-        <a class="photo-modal-link" href="{% url 'delete_core_picture' %}">Remover foto atual</a>
+        <form class="photo-modal-form" method="POST" action="{% url 'delete_core_picture' %}">
+            {% csrf_token %}
+            <button class="photo-modal-link" type="submit">Remover foto atual</button>
+        </form>
         <button class="photo-modal-cancel" type="button" data-photo-modal-close>Cancelar</button>
     </div>
 </div>
@@ -858,9 +811,14 @@
     const addLinkBtn = document.querySelector('[data-add-link]');
 
     if (editorForm && linkList && linkRowTemplate && addLinkBtn) {
-        // Clear legacy frontend-only link storage; links are visual-only until backend exists.
-        window.localStorage.removeItem('incept.profileLinks.{{ user.user_id }}');
+        try { window.localStorage.removeItem('incept.profileLinks.{{ user.user_id }}'); } catch (error) {}
         linkRowTemplate.hidden = true;
+        let savedLinks = [];
+        try {
+            savedLinks = JSON.parse(document.getElementById('profile-links-data')?.textContent || '[]');
+        } catch (error) {
+            savedLinks = [];
+        }
 
         const updateRowStates = () => {
             Array.from(linkList.querySelectorAll('[data-link-row]')).forEach((row, index) => {
@@ -879,6 +837,8 @@
             const titleInput = clone.querySelector('[data-link-title]');
             const urlInput = clone.querySelector('[data-link-url]');
             const removeBtn = clone.querySelector('[data-remove-link]');
+            urlInput.name = 'link';
+            titleInput.name = 'link_name';
             titleInput.value = link.title || '';
             urlInput.value = link.url || '';
             removeBtn.addEventListener('click', () => {
@@ -891,12 +851,39 @@
 
         const renderLinks = () => {
             linkList.innerHTML = '';
-            createRow();
+            if (savedLinks.length) {
+                savedLinks.forEach((link) => createRow(link));
+            } else {
+                createRow();
+            }
         };
 
         renderLinks();
 
-        addLinkBtn.addEventListener('click', () => createRow());
+        addLinkBtn.addEventListener('click', () => {
+            if (linkList.querySelectorAll('[data-link-row]').length >= 10) {
+                window.inceptToast?.('Você pode ter até 10 links.', 'error');
+                return;
+            }
+            createRow();
+        });
+    }
+
+    /* Preview da nova foto (antes não havia nenhum sinal de que a foto foi escolhida) */
+    const avatarPreview = document.querySelector('[data-avatar-preview]');
+    const photoNote = document.querySelector('[data-photo-note]');
+    if (corePictureInput) {
+        corePictureInput.addEventListener('change', () => {
+            const file = corePictureInput.files && corePictureInput.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) {
+                window.inceptToast?.('A foto pode ter no máximo 10 MB.', 'error');
+                corePictureInput.value = '';
+                return;
+            }
+            if (avatarPreview) avatarPreview.src = URL.createObjectURL(file);
+            if (photoNote) photoNote.hidden = false;
+        });
     }
 
     if (deleteToggle && deleteConfirm && deleteInput && deleteLink) {
@@ -910,6 +897,7 @@
         deleteInput.addEventListener('input', () => {
             const isValid = deleteInput.value.trim().toLowerCase() === 'querodeletar';
             deleteLink.setAttribute('aria-disabled', String(!isValid));
+            deleteLink.disabled = !isValid;
         });
     }
 
@@ -922,7 +910,7 @@
             const maxLength = 255;
             bioCounter.textContent = `${length}/${maxLength}`;
 
-            bioCounter.classList.toggle('near-limit', length >= 230 && length < maxLength);
+            bioCounter.classList.toggle('near-limit', length >= maxLength - 25 && length < maxLength);
             bioCounter.classList.toggle('at-limit', length >= maxLength);
         };
 

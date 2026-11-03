@@ -1,0 +1,26 @@
+{# Miniatura de post no perfil (artes, salvos e collabs). Espera: post e, opcionalmente, can_delete. #}
+{# Antes só existia o caso "imagem": post de áudio ou só de texto aparecia como um quadro quebrado. #}
+<article class="profile-tab-tile" id="post-tile-{{ post.id }}">
+    {% for media in post.media.all|slice:":1" %}
+        {% if media.is_audio %}
+        <div class="profile-tab-tile-text">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+            {% if post.description %}<p>{{ post.description|truncatechars:90 }}</p>{% endif %}
+            <audio controls preload="none" src="{{ media.image_url }}">Seu navegador não suporta áudio.</audio>
+        </div>
+        {% else %}
+        <button class="feed-media profile-tab-tile-button" type="button" style="margin-top:0; border:0; border-radius:0; height:100%;" data-open-lightbox data-image-src="{{ media.image_url }}" data-image-alt="{{ post.description }}">
+            <img src="{{ media.image_url }}" alt="{{ post.description }}" loading="lazy">
+        </button>
+        {% endif %}
+    {% empty %}
+        <div class="profile-tab-tile-text">
+            <p>{{ post.description|truncatechars:160 }}</p>
+        </div>
+    {% endfor %}
+    {% if can_delete %}
+    <button class="tile-delete-btn" type="button" title="Apagar post" aria-label="Apagar post" data-delete-post data-url="{% url 'delete_post' post.id %}" data-post-id="{{ post.id }}">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>
+    </button>
+    {% endif %}
+</article>

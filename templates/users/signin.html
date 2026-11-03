@@ -514,16 +514,19 @@
                     redirect: 'manual',
                 });
 
+                /* cadastro OK: o servidor redireciona para a tela de interesses.
+                   Antes ia para "interests" (a rota que só recebe o POST), que pulava a tela e caía no feed. */
                 if (res.type === 'opaqueredirect' || res.redirected || res.status === 302) {
-                    window.location.href = "{% url 'interests' %}";
+                    window.location.href = "{% url 'interests_pg' %}";
                     return;
                 }
 
                 const text = await res.text();
 
-                /* Se a resposta contém HTML de uma página inteira (cadastro OK → render interests.html) */
-                if (text.includes('<!DOCTYPE') || text.includes('<html')) {
-                    window.location.href = "{% url 'interests_pg' %}";
+                /* erro do servidor (500) também vem como página HTML e antes era tratado como sucesso */
+                if (!res.ok) {
+                    resetSubmit();
+                    showError('O servidor não conseguiu criar a conta agora. Tente novamente em instantes.');
                     return;
                 }
 
