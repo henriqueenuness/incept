@@ -1,0 +1,2 @@
+# scripts de shell rodam no linux: sempre LF, senao o bash quebra com \r
+*.sh text eol=lf
