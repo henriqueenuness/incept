@@ -104,7 +104,8 @@ def signup(request): #registro/cadastro usuario
         nick = (request.POST.get('nick') or '').strip()
         email = (request.POST.get('email') or '').strip()
         password = request.POST.get('password') or ''
-        cargo = Null
+        cargo = None
+    
 
         if not nick or not email or not password: #antes, campo vazio virava None e quebrava no " " in nick
             return HttpResponse("preencha nick, email e senha")
