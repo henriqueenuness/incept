@@ -126,7 +126,7 @@ def signup(request): #registro/cadastro usuario
             if erro:
                 return HttpResponse(erro)
 
-        new_user = User.objects.create_user(nick=nick, email=email, password=password, cargo=cargo)
+        new_user = User.objects.create_user(nick=nick, email=email, password=password)
         login(request, new_user)
         return redirect('interests_pg')
     return redirect('signup_pg')
