@@ -104,9 +104,7 @@ def signup(request): #registro/cadastro usuario
         nick = (request.POST.get('nick') or '').strip()
         email = (request.POST.get('email') or '').strip()
         password = request.POST.get('password') or ''
-        cargo = request.POST.get('cargo')
-        if cargo not in CARGOS:
-            cargo = 'cliente' #o formulario manda cargo vazio e a conta ficava sem tipo
+        cargo = Null
 
         if not nick or not email or not password: #antes, campo vazio virava None e quebrava no " " in nick
             return HttpResponse("preencha nick, email e senha")
